@@ -24,3 +24,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+__MACOSX/lost-and-found-backend/._.env
+__MACOSX/lost-and-found-backend/._node_modules
