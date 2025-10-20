@@ -43,8 +43,8 @@ jobs:
         source: "frontend/dist/*"
         target: "../var/www/html"
         timeout: 120s
-        strip_components: 2
-        rm: true
+        #strip_components: 2
+        #rm: true
 
     # Deploy backend files to server
     - name: Deploy backend files
