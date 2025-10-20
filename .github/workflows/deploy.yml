@@ -41,7 +41,7 @@ jobs:
         password: ${{ secrets.SERVER_PASSWORD }}
         port: ${{ secrets.SERVER_PORT }}
         source: "frontend/dist/*"
-        target: "../var/www/html"
+        target: "/var/www/html"
         timeout: 120s
         #strip_components: 2
         #rm: true
