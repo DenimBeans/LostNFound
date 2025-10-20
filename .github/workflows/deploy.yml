@@ -36,10 +36,10 @@ jobs:
     - name: Deploy frontend to server
       uses: appleboy/scp-action@v0.1.5
       with:
-        host: ${{ server_secrets.SERVER_HOST }}
-        username: ${{ server_secrets.SERVER_USER }}
-        password: ${{ server_secrets.SERVER_PASSWORD }}
-        port: ${{ server_secrets.SERVER_PORT }}
+        host: ${{ SERVER_SECRETS.SERVER_HOST }}
+        username: ${{ SERVER_SECRETS.SERVER_USER }}
+        password: ${{ SERVER_SECRETS.SERVER_PASSWORD }}
+        port: ${{ SERVER_SECRETS.SERVER_PORT }}
         source: "frontend/dist/*"
         target: "/var/www/html"
         strip_components: 2
@@ -49,10 +49,10 @@ jobs:
     - name: Deploy backend files
       uses: appleboy/scp-action@v0.1.5
       with:
-        host: ${{ server_secrets.SERVER_HOST }}
-        username: ${{ server_secrets.SERVER_USER }}
-        password: ${{ server_secrets.SERVER_PASSWORD }}
-        port: ${{ server_secrets.SERVER_PORT }}
+        host: ${{ SERVER_SECRETS.SERVER_HOST }}
+        username: ${{ SERVER_SECRETS.SERVER_USER }}
+        password: ${{ SERVER_SECRETS.SERVER_PASSWORD }}
+        port: ${{ SERVER_SECRETS.SERVER_PORT }}
         source: "server.js,package.json,package-lock.json"
         target: "/var/server"
         overwrite: true
@@ -61,10 +61,10 @@ jobs:
     - name: Install dependencies and restart server
       uses: appleboy/ssh-action@v1.0.0
       with:
-        host: ${{ server_secrets.SERVER_HOST }}
-        username: ${{ server_secrets.SERVER_USER }}
-        password: ${{ server_secrets.SERVER_PASSWORD }}
-        port: ${{ server_secrets.SERVER_PORT }}
+        host: ${{ SERVER_SECRETS.SERVER_HOST }}
+        username: ${{ SERVER_SECRETS.SERVER_USER }}
+        password: ${{ SERVER_SECRETS.SERVER_PASSWORD }}
+        port: ${{ SERVER_SECRETS.SERVER_PORT }}
         script: |
           # Navigate to backend directory
           cd /var/server
