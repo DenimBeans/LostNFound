@@ -1,46 +1,30 @@
 import React, { useState } from 'react';
+import { buildPath } from './Path';
 
 //CHANGE AS NEEDED. Taken from MERN App, retooled for testing purposes.
 
 function CardUI()
 {
-    //let _ud : any = localStorage.getItem('user_data');
-    //let ud = JSON.parse( _ud );
-    //let userId : string = ud.id;
     const [message,setMessage] = useState('');
     const [searchResults,setResults] = useState('');
     const [itemList,setItemList] = useState('');
-    const [search,setSearchValue] = React.useState('');
+    //const [search,setSearchValue] = React.useState('');
     const [itemTitle,setItemNameValue] = React.useState('');
     const [itemLocation,setLocationValue] = React.useState('');
     const [ownerName,setNameValue] = React.useState('');
     const [ownerEmail,setEmailValue] = React.useState('');
-
-    const app_name = '174.138.65.216';
-    function buildPath(route:string) : string
-    {
-        if (import.meta.env.MODE != 'development') 
-        {
-            return 'http://' + app_name + ':5000/' + route;
-        }
-        else
-        {        
-            return 'http://localhost:5000/' + route;
-        }
-    }
-
-    
+   
     async function addItem(e:any) : Promise<void>
     {
         e.preventDefault();
 
-        let obj = {title:itemTitle,locationText:itemLocation,reporterName:ownerName,reporterEmail:ownerEmail};
+        let obj = {title:itemTitle, locationText:itemLocation,reporterName:ownerName,reporterEmail:ownerEmail};
         let js = JSON.stringify(obj);
 
         try
         {
-            const response = await fetch(buildPath('api/addItem'),
-                {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+            const response = await fetch(buildPath('api/items'),
+                {method:'GET',body:js,headers:{'Content-Type': 'application/json'}});
 
             let txt = await response.text();
             let res = JSON.parse(txt);
@@ -64,13 +48,13 @@ function CardUI()
     {
         e.preventDefault();
         
-        let obj = {search:search};
-        let js = JSON.stringify(obj);
+        //let obj = {id:search};
+        //let js = JSON.stringify(obj);
 
         try
         {
-            const response = await fetch(buildPath('api/searchItems'),
-                {method:'POST',body:js,headers:{'Content-Type': 'application/json'}});
+            const response = await fetch(buildPath('api/items'),
+                {method:'GET',headers:{'Content-Type': 'application/json'}});
 
             let txt = await response.text();
             let res = JSON.parse(txt);
@@ -89,15 +73,18 @@ function CardUI()
         }
         catch(error:any)
         {
+            console.log("Frontend Error");
             alert(error.toString());
             setResults(error.toString());
         }
     };
 
+/*
     function handleSearchTextChange( e: any ) : void
     {
         setSearchValue( e.target.value );
     }
+*/
 
     function handleItemTextChange( e: any ) : void
     {
@@ -122,10 +109,8 @@ function CardUI()
     return(
         <div id="cardUIDiv">
             <br />
-            Search: <input type="text" id="searchText" placeholder="Card To Search For" 
-                onChange={handleSearchTextChange} />
             <button type="button" id="searchItemButton" className="buttons" 
-                onClick={searchItem}> Search Item</button><br />
+                onClick={searchItem}>Display All Items</button><br />
             <span id="cardSearchResult">{searchResults}</span>
             <p id="cardList">{itemList}</p><br /><br />
             Add: <input type="text" id="title" placeholder="Item" 

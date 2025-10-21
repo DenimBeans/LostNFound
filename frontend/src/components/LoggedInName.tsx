@@ -13,7 +13,7 @@ function LoggedInName()
       <div id="loggedInDiv">
         <span id="userName">This is a temporary landing page. </span><br />
         <button type="button" id="logoutButton" className="buttons" 
-           onClick={doLogout}> Log Out </button>
+           onClick={doLogout}> Refresh Page </button>
       </div>
     );
 };
