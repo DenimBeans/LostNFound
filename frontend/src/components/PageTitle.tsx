@@ -1,6 +1,11 @@
+import '../Styles/FrontPage.css';
+
 function PageTitle() {
   return (
-    <h1 id="title">COP 4331 MERN Stack Demo</h1>
+    <div id = "TitleBorder">
+      <h1 id="title">KnightFind</h1>
+    </div>
+    
   );
 };
 

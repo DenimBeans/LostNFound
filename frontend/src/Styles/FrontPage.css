@@ -1,0 +1,14 @@
+#TitleBorder{
+    background-color: darkgoldenrod;
+    width: 80%;
+    margin-left: 20%;
+    height: 100px;
+    border-radius: 16px;
+    border-color: black;
+    border-width: 16px;
+    
+}
+
+#title{
+ font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif
+}
