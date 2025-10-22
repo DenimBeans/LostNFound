@@ -13,7 +13,7 @@ function App() {
         <Route path="/" element={<CardPage />} />
       </Routes>
     </BrowserRouter>
-      );
+  );
 }
 
 export default App;

@@ -26,7 +26,7 @@ export const createItem = async (req, res) => {
     res.status(400).json({ error: error });
   }
 
-   res.status(201).json({ error:error });
+  res.status(201).json({ error: error });
 };
 
 // GET /api/items?status=lost&search=backpack
@@ -51,12 +51,11 @@ export const listItems = async (req, res) => {
 
     //Added to return item titles to MERN App. Change as neccessary for final app - Jean
     var _ret = [];
-    for( var i=0; i<items.length; i++ )
-    {
-      _ret.push( items[i].title );
+    for (var i = 0; i < items.length; i++) {
+      _ret.push(items[i].title);
     }
-    
-    res.json({results: _ret, error:error});
+
+    res.json({ results: _ret, error: error });
   } catch (err) {
     error = err.toString();
     res.status(500).json({ error: error });

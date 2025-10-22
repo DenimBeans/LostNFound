@@ -1,21 +1,19 @@
-function LoggedInName()
-{
+function LoggedInName() {
 
-    function doLogout(event:any) : void
-    {
-      event.preventDefault();
-    
-      localStorage.removeItem("user_data")
-      window.location.href = '/';
-  };    
+  function doLogout(event: any): void {
+    event.preventDefault();
 
-    return(
-      <div id="loggedInDiv">
-        <span id="userName">This is a temporary landing page. </span><br />
-        <button type="button" id="logoutButton" className="buttons" 
-           onClick={doLogout}> Refresh Page </button>
-      </div>
-    );
+    localStorage.removeItem("user_data")
+    window.location.href = '/';
+  };
+
+  return (
+    <div id="loggedInDiv">
+      <span id="userName">This is a temporary landing page. </span><br />
+      <button type="button" id="logoutButton" className="buttons"
+        onClick={doLogout}> Refresh Page </button>
+    </div>
+  );
 };
 
 
