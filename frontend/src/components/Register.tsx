@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { buildPath } from './Path';
+import '../Styles/Register.css';
 
 function Register(){
 const [message, setMessage] = useState('');

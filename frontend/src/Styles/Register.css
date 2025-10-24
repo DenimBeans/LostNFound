@@ -1,0 +1,129 @@
+#registerDiv{
+width: 80%;
+margin-left: 10%;
+height: 70vh;
+background-color: rgb(101, 101, 101);
+display:flex;
+flex-direction: column;
+
+border-width: 3px;
+border-radius: 20px;
+border-style:solid;
+border-color:black;
+}
+
+#RegisterTitle{
+    margin-top: 5%;
+    font-size: x-large;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+}
+
+#FirstName{
+    width: 50%;
+    margin-left: 25%;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+}
+
+#FirstName:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+}
+
+#LastName{
+    width: 50%;
+    margin-left: 25%;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+
+}
+#LastName:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+}
+
+#Email{
+    width: 50%;
+    margin-left: 25%;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+
+}
+
+#Email:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+}
+#Password{
+    width: 50%;
+    margin-left: 25%;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+
+}
+#Password:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+}
+#RegisterButton{
+    margin-top: 20px;
+    height: 35px;
+    width: 10%;
+    margin-left: 45%;
+    display: flex;
+    justify-content: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+}
+
+#RegisterButton:hover{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    cursor: pointer;
+}
