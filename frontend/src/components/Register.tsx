@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { buildPath } from './Path';
 
 function Register(){
-const [message, setMessage] = useState('');
+//const [message, setMessage] = useState('');
 const [FirstName,setFirstName] = React.useState('');
 const [LastName,setLastName] = React.useState('');
-const [RegisterUser,setRegisterUser] = React.useState('');
+//const [RegisterUser,setRegisterUser] = React.useState('');
 const [RegisterEmail,setRegisterEmail] = React.useState('');
 const [RegisterPassword,setRegisterPassword] = React.useState('');
-const [RegisterPasswordRepeat,SetRegisterPasswordRepeat] = React.useState('');
+//const [RegisterPasswordRepeat,SetRegisterPasswordRepeat] = React.useState('');
 
 function handleSetFirstName(e: any): void{
     setFirstName(e.target.value);
