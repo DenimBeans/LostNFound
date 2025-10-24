@@ -43,6 +43,7 @@ border-color:black;
 }
 
 #LastName{
+    margin-top: 20px;
     width: 50%;
     margin-left: 25%;
     display:flex;
@@ -65,6 +66,7 @@ border-color:black;
 }
 
 #Email{
+    margin-top: 20px;
     width: 50%;
     margin-left: 25%;
     display:flex;
@@ -87,6 +89,7 @@ border-color:black;
     outline-width: 3px;
 }
 #Password{
+    margin-top: 20px;
     width: 50%;
     margin-left: 25%;
     display:flex;
