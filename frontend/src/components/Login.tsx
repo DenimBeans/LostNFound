@@ -56,6 +56,7 @@ function Login() {
       <input type="submit" id="loginButton" className="buttons" value="Submit"
         onClick={doLogin} />
       <span id="loginResult">{message}</span>
+      <a href = "http://174.138.65.216/register">Temp Register</a>
     </div>
   );
 };

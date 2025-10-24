@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import LoginPage from './pages/LoginPage';
 import CardPage from './pages/CardPage';
+import RegisterPage from './pages/RegisterPage';
 
 //Removed Login Page to make changes work with Rian's Database/API functions - Jean
 
@@ -10,6 +11,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<RegisterPage />} />
         <Route path="/" element={<CardPage />} />
       </Routes>
     </BrowserRouter>
