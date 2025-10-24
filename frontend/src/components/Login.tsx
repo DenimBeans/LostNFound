@@ -48,12 +48,12 @@ function Login() {
   return (
     <div id="loginDiv">
       <span id="inner-title">PLEASE LOG IN</span><br />
-      Login: <input type="text" id="loginName" placeholder="Username"
+       <input type="text" id="loginName" placeholder="Username"
         onChange={handleSetLoginName} />
-      Password: <input type="password" id="loginPassword" placeholder="Password"
+       <input type="password" id="loginPassword" placeholder="Password"
         onChange={handleSetPassword} />
 
-      <input type="submit" id="loginButton" className="buttons" value="Do It"
+      <input type="submit" id="loginButton" className="buttons" value="Submit"
         onClick={doLogin} />
       <span id="loginResult">{message}</span>
     </div>
