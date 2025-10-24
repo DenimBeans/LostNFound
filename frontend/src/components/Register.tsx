@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { buildPath } from './Path';
 
 function Register(){
-//const [message, setMessage] = useState('');
+const [message, setMessage] = useState('');
 const [FirstName,setFirstName] = React.useState('');
 const [LastName,setLastName] = React.useState('');
 //const [RegisterUser,setRegisterUser] = React.useState('');
@@ -18,9 +18,9 @@ function handleSetLastName(e: any): void{
     setLastName(e.target.value);
 }
 
-function handleSetRegisterUser(e: any): void{
-    setRegisterUser(e.target.value);
-}
+//function handleSetRegisterUser(e: any): void{
+//    setRegisterUser(e.target.value);
+//}
 
 function handleSetRegisterEmail(e: any): void{
     setRegisterEmail(e.target.value);
@@ -30,9 +30,9 @@ function handleSetRegisterPassword(e:any): void{
     setRegisterPassword(e.target.value);
 }
 
-function handleSetRegisterPasswordRepeat(e: any): void{
-    SetRegisterPasswordRepeat(e.target.value);
-}
+//function handleSetRegisterPasswordRepeat(e: any): void{
+//    SetRegisterPasswordRepeat(e.target.value);
+//}
 
 async function doRegister(event: any): Promise<void> {
     event.preventDefault();
@@ -67,19 +67,20 @@ async function doRegister(event: any): Promise<void> {
 
 
 
-
-
+//<input type = "password" id = "PasswordRepeat" placeholder = "Re-enter Password" onChange = {handleSetRegisterPasswordRepeat} />
+//<input type = "text" id = "UserName" placeholder = "Username" onChange = {handleSetRegisterUser} />
 
     return(
       <div id = "registerDiv">
         <span id = "RegisterTitle">Register</span><br/>
         <input type = "text" id = "FirstName" placeholder = "First Name" onChange={handleSetFirstName} />
         <input type = "text" id = "LastName" placeholder = "Last Name" onChange ={handleSetLastName} />
-        <input type = "text" id = "UserName" placeholder = "Username" onChange = {handleSetRegisterUser} />
+ 
         <input type = "text" id = "Email" placeholder = "Email" onChange = {handleSetRegisterEmail} />
         <input type = "password" id = "Password" placeholder = "Password" onChange = {handleSetRegisterPassword} />
-        <input type = "password" id = "PasswordRepeat" placeholder = "Re-enter Password" onChange = {handleSetRegisterPasswordRepeat} />
+        
         <input type = "Submit" id = "RegisterButton" className = "buttons" value = "Register" onClick = {doRegister} />
+        <span id="RegisterResult">{message}</span>
       </div>  
     )
 }
