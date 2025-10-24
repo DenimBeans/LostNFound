@@ -11,7 +11,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/" element={<RegisterPage />} />
+        <Route path="/Register" element={<RegisterPage />} />
         <Route path="/" element={<CardPage />} />
       </Routes>
     </BrowserRouter>
