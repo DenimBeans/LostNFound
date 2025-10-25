@@ -38,12 +38,12 @@ function handleSetRegisterPassword(e:any): void{
 async function doRegister(event: any): Promise<void> {
     event.preventDefault();
 
-    var obj = {firstname: FirstName, lastname: LastName, email: RegisterEmail, password: RegisterPassword};
+    var obj = {firstName: FirstName, lastName: LastName, email: RegisterEmail, password: RegisterPassword};
     var js = JSON.stringify(obj);
     
     
      try {
-        console.log(obj);
+        
       const response = await fetch(buildPath('api/auth/register'),
         { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 

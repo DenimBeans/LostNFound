@@ -18,11 +18,11 @@ function Login() {
   async function doLogin(event: any): Promise<void> {
     event.preventDefault();
 
-    var obj = { login: loginName, password: loginPassword };
+    var obj = { email: loginName, password: loginPassword };
     var js = JSON.stringify(obj);
     
     try {
-      console.log(obj);
+      
       const response = await fetch(buildPath('api/auth/login'),
         { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
