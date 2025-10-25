@@ -43,7 +43,7 @@ async function doRegister(event: any): Promise<void> {
  
     
      try {
-      const response = await fetch(buildPath('api/register'),
+      const response = await fetch(buildPath('api/auth/register'),
         { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
       var res = JSON.parse(await response.text());
@@ -85,6 +85,7 @@ async function doRegister(event: any): Promise<void> {
       </div>  
     )
 }
+
 
 
 export default Register;
