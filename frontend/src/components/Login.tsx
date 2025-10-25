@@ -20,22 +20,23 @@ function Login() {
 
     var obj = { login: loginName, password: loginPassword };
     var js = JSON.stringify(obj);
-
+    
     try {
+      console.log(obj);
       const response = await fetch(buildPath('api/auth/login'),
         { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
       var res = JSON.parse(await response.text());
 
       if (res.error != '') {
-        setMessage('User/Password combination incorrect');
+        setMessage(res.error);
       }
       else {
         var user = { firstName: res.firstName, lastName: res.lastName, id: res.id }
         localStorage.setItem('user_data', JSON.stringify(user));
 
         setMessage('');
-        window.location.href = '/cards';
+        window.location.href = '/';
       }
     }
 

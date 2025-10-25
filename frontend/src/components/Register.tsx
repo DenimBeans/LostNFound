@@ -40,16 +40,17 @@ async function doRegister(event: any): Promise<void> {
 
     var obj = {firstname: FirstName, lastname: LastName, email: RegisterEmail, password: RegisterPassword};
     var js = JSON.stringify(obj);
- 
+    
     
      try {
+        console.log(obj);
       const response = await fetch(buildPath('api/auth/register'),
         { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
       var res = JSON.parse(await response.text());
 
       if (res.error != '') {
-        setMessage('Error');
+        setMessage(res.error);
       }
       else {
         var user = { firstName: res.firstName, lastName: res.lastName, id: res.id }
