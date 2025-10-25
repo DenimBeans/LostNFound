@@ -1,43 +1,7 @@
-#root{
-    background-color: rgb(53, 53, 53);
-    height: 100vh;
-}
-
-
-
-
-#TitleBorder{
-    background-color: darkgoldenrod;
-    width: 80%;
-    margin-left: 10%;
-    min-height: 100px;
-    
-    display: flex;
-    text-align:center;
-    justify-content: center;
-    margin-bottom: 5%;
-
-    border-radius: 20px;
-    border-width: 3px;
-    border-style:solid;
-    border-color:black;
-    
-}
-
-#title{
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    color: black;
-    text-align: center;
-    justify-content: center;
-    font-size: 50px;
-    
-}
-
-#loginDiv{
-
+#registerDiv{
 width: 80%;
 margin-left: 10%;
-height: 50vh;
+height: 70vh;
 background-color: rgb(101, 101, 101);
 display:flex;
 flex-direction: column;
@@ -46,18 +10,17 @@ border-width: 3px;
 border-radius: 20px;
 border-style:solid;
 border-color:black;
-
 }
-#inner-title{
+
+#RegisterTitle{
     margin-top: 5%;
     font-size: x-large;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
     display:flex;
     justify-content:center;
-    
-    
 }
-#loginName{
+
+#FirstName{
     width: 50%;
     margin-left: 25%;
     display:flex;
@@ -71,16 +34,15 @@ border-color:black;
     border-radius: 20px;
     border-style:solid;
     border-color:black;
-    
 }
 
-#loginName:focus{
+#FirstName:focus{
     outline-color: darkgoldenrod;
     outline-style: solid;
     outline-width: 3px;
-    
 }
-#loginPassword{
+
+#LastName{
     margin-top: 20px;
     width: 50%;
     margin-left: 25%;
@@ -95,15 +57,60 @@ border-color:black;
     border-radius: 20px;
     border-style:solid;
     border-color:black;
-    
-    
+
 }
-#loginPassword:focus{
+#LastName:focus{
     outline-color: darkgoldenrod;
     outline-style: solid;
     outline-width: 3px;
 }
-#loginButton{
+
+#Email{
+    margin-top: 20px;
+    width: 50%;
+    margin-left: 25%;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+
+}
+
+#Email:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+}
+#Password{
+    margin-top: 20px;
+    width: 50%;
+    margin-left: 25%;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+
+}
+#Password:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+}
+#RegisterButton{
     margin-top: 20px;
     height: 35px;
     width: 10%;
@@ -116,14 +123,10 @@ border-color:black;
     border-radius: 20px;
     border-style:solid;
     border-color:black;
-    
 }
 
-
-#loginButton:hover{
-    
+#RegisterButton:hover{
     outline-color: darkgoldenrod;
     outline-style: solid;
     cursor: pointer;
-
 }

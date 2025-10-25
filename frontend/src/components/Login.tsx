@@ -22,7 +22,7 @@ function Login() {
     var js = JSON.stringify(obj);
 
     try {
-      const response = await fetch(buildPath('api/login'),
+      const response = await fetch(buildPath('api/auth/login'),
         { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
       var res = JSON.parse(await response.text());
@@ -48,14 +48,15 @@ function Login() {
   return (
     <div id="loginDiv">
       <span id="inner-title">PLEASE LOG IN</span><br />
-      Login: <input type="text" id="loginName" placeholder="Username"
+       <input type="text" id="loginName" placeholder="Username"
         onChange={handleSetLoginName} />
-      Password: <input type="password" id="loginPassword" placeholder="Password"
+       <input type="password" id="loginPassword" placeholder="Password"
         onChange={handleSetPassword} />
 
-      <input type="submit" id="loginButton" className="buttons" value="Do It"
+      <input type="submit" id="loginButton" className="buttons" value="Submit"
         onClick={doLogin} />
       <span id="loginResult">{message}</span>
+      <a href = "http://174.138.65.216/Register">Temp Register</a>
     </div>
   );
 };
