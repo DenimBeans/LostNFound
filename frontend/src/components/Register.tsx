@@ -48,7 +48,7 @@ async function doRegister(event: any): Promise<void> {
 
       var res = JSON.parse(await response.text());
 
-      if (res.id <= 0) {
+      if (res.error != '') {
         setMessage('Error');
       }
       else {
