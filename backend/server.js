@@ -520,33 +520,67 @@ app.post('/api/auth/reset-password/:token', async (req, res) => {
 
 // CREATE ITEM ENDPOINT - Report a lost or found item
 // POST /api/items
-// Body: { title, description, category, location, userId }
+// Body: { title, description, category, imageUrl, lat, lng, locationText, lostAt, userId }
 // Response: { success, message, itemId, error }
 app.post('/api/items', async (req, res) => {
   var error = '';
   
   try {
-    // Extract item data from request body
-    const { title, description, category, location, userId } = req.body;
+    const { 
+      title, 
+      description, 
+      category, 
+      imageUrl, 
+      lat, 
+      lng, 
+      locationText, 
+      lostAt, 
+      userId,
+      reporterName,
+      reporterEmail
+    } = req.body;
     
-    // Validate: Title, description, and userId are required
+    // Validate required fields
     if (!title || !description || !userId) {
       error = 'Title, description, and userId required';
       var ret = { error: error };
       return res.status(400).json(ret);
     }
 
-    // Create new item in database
+    // Build location object for database
+    var itemLocation = { type: 'Point', coordinates: [] };  // Default empty
+    // Validate GPS coordinates if provided
+    if (lat !== undefined && lng !== undefined) {  // ← CORRECT! Using AND
+      // Validate coordinate ranges
+      if (lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+        error = 'Invalid coordinates. Latitude: -90 to 90, Longitude: -180 to 180';
+        var ret = { error: error };
+        return res.status(400).json(ret);
+      }
+      
+      // GeoJSON format: [longitude, latitude]
+      itemLocation = {
+        type: 'Point',
+        coordinates: [lng, lat]
+  };
+}
+
+    // Create item
     const item = await Item.create({
-      title,
-      description,
-      category: category || 'Other',  // Default category if not provided
-      status: 'lost',                 // New items default to 'lost' status
-      userId,
-      location: location || { type: 'Point', coordinates: [0, 0] }  // Default location if not provided
+      title, // Item title
+      description,  // Item description
+      category: category || 'Other', // Default category if not provided
+      location: itemLocation, // GeoJSON location
+      locationText: locationText || '',// Optional textual location
+      imageUrl: imageUrl || '', // Optional image URL
+      lostAt: lostAt || new Date(), // Default to now if not provided
+      status: 'lost',// Default status
+      userId: userId || null,// Reference to user who reported
+      reporterName: reporterName || '',// Optional reporter name
+      reporterEmail: reporterEmail || '', // Optional reporter email
+      isClaimed: false
     });
 
-    // Return success response
     var ret = {
       success: true,
       message: 'Item report created',
@@ -557,6 +591,80 @@ app.post('/api/items', async (req, res) => {
 
   } catch (err) {
     console.error('Create item error:', err);
+    error = err.message;
+    var ret = { error: error };
+    res.status(500).json(ret);
+  }
+});
+
+// GET NEARBY ITEMS ENDPOINT - Find items near a location
+// GET /api/items/nearby?lat=28.6024&lng=-81.2003&radius=5
+// Query: lat, lng, radius (km, default 5)
+// Response: { results, count, error }
+app.get('/api/items/nearby', async (req, res) => {
+  var error = '';
+  
+  try {
+    const { lat, lng, radius } = req.query;
+    
+    if (!lat || !lng) {
+      error = 'Latitude and longitude required';
+      var ret = { error: error };
+      return res.status(400).json(ret);
+    }
+
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lng);
+    const radiusKm = parseFloat(radius) || 5;  // Default 5km
+    
+    // Calculate rough degree range (1 degree ≈ 111km)
+    const latRange = radiusKm / 111;
+    const lngRange = radiusKm / (111 * Math.cos(latitude * Math.PI / 180));
+    
+    // Find items within bounding box
+    const items = await Item.find({
+      lat: { $gte: latitude - latRange, $lte: latitude + latRange },
+      lng: { $gte: longitude - lngRange, $lte: longitude + lngRange },
+      status: { $ne: 'returned' }  // Exclude returned items
+    })
+    .populate('userId', 'firstName lastName email')
+    .sort({ createdAt: -1 })
+    .limit(50);
+    
+    // Calculate actual distances and filter
+    const itemsWithDistance = items.map(item => {
+      if (item.lat && item.lng) {
+        // Haversine formula for distance
+        const R = 6371; // Earth radius in km
+        const dLat = (item.lat - latitude) * Math.PI / 180;
+        const dLng = (item.lng - longitude) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(latitude * Math.PI / 180) * Math.cos(item.lat * Math.PI / 180) *
+                  Math.sin(dLng/2) * Math.sin(dLng/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        const distance = R * c;
+        
+        return {
+          ...item.toObject(),
+          distance: Math.round(distance * 100) / 100  // Round to 2 decimals
+        };
+      }
+      return { ...item.toObject(), distance: null };
+    })
+    .filter(item => item.distance === null || item.distance <= radiusKm)
+    .sort((a, b) => (a.distance || 999) - (b.distance || 999));  // Sort by distance
+    
+    var ret = {
+      results: itemsWithDistance,
+      count: itemsWithDistance.length,
+      searchLocation: { latitude, longitude },
+      radiusKm: radiusKm,
+      error: ''
+    };
+    res.json(ret);
+
+  } catch (err) {
+    console.error('Nearby search error:', err);
     error = err.message;
     var ret = { error: error };
     res.status(500).json(ret);
@@ -645,8 +753,8 @@ app.patch('/api/items/:id/status', async (req, res) => {
     const { status } = req.body;
     
     // Validate: Status must be one of the allowed values
-    if (!status || !['lost', 'pending', 'found'].includes(status)) {
-      error = 'Invalid status. Must be: lost, pending, or found';
+    if (!status || !['lost', 'found', 'claimed', 'returned'].includes(status)) {
+      error = 'Invalid status. Must be: lost, found, claimed, or returned';
       var ret = { error: error };
       return res.status(400).json(ret);
     }
@@ -659,7 +767,7 @@ app.patch('/api/items/:id/status', async (req, res) => {
     );
     
     // If item not found
-    if (!item) {
+    if (!item) { // Return 404 if item doesn't exist
       error = 'Item not found';
       var ret = { error: error };
       return res.status(404).json(ret);
@@ -674,11 +782,76 @@ app.patch('/api/items/:id/status', async (req, res) => {
     };
     res.json(ret);
 
-  } catch (err) {
+  } catch (err) {// Handle errors
     console.error('Status update error:', err);
     error = err.message;
     var ret = { error: error };
     res.status(500).json(ret);
+  }
+});
+
+// EDIT ITEM ENDPOINT
+// PATCH /api/items/:id
+// Body: { title, description, category, locationText, status }
+app.patch('/api/items/:id', async (req, res) => {
+  var error = '';
+  try {
+    const { id } = req.params;
+    const updateData = req.body;
+    
+    // Remove fields that shouldn't be updated
+    delete updateData._id; // Prevent changing item ID
+    delete updateData.userId; // Prevent changing item owner
+    delete updateData.createdAt; // Prevent manual timestamp changes
+    delete updateData.updatedAt; // Prevent manual timestamp changes
+    delete updateData.__v; // Mongoose version key
+    delete updateData.isClaimed; // Prevent changing claimed status
+    // Add more fields to exclude as necessary
+    const item = await Item.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    ).populate('userId', 'firstName lastName email');
+    // If item not found
+    if (!item) {
+      error = 'Item not found';
+      return res.status(404).json({ error });
+    }
+    // Return success response with updated item
+    res.json({
+      success: true,
+      message: 'Item updated successfully',
+      item: item,
+      error: ''
+    });
+  } catch (err) {// Handle errors
+    console.error('Edit item error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
+// DELETE ITEM ENDPOINT
+// DELETE /api/items/:id
+// Response: { success, message, error }
+app.delete('/api/items/:id', async (req, res) => {
+  var error = '';
+  // Find item by ID and delete
+  try {
+    const item = await Item.findByIdAndDelete(req.params.id);// If item not found
+    if (!item) {// Return 404 if item doesn't exist
+      error = 'Item not found';
+      return res.status(404).json({ error });
+    }
+    res.json({// Return success response
+      success: true,
+      message: 'Item deleted successfully',
+      error: ''
+    });
+  } catch (err) {// Handle errors
+    console.error('Delete item error:', err);
+    error = err.message;
+    res.status(500).json({ error });
   }
 });
 
