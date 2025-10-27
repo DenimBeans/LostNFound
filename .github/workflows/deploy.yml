@@ -75,7 +75,7 @@ jobs:
           npm ci --production
 
           # Run backend tests
-          npm tests
+          npm test
           
           # Ensure PM2 is installed globally
           npm list -g pm2 || npm install -g pm2
