@@ -18,24 +18,25 @@ function Login() {
   async function doLogin(event: any): Promise<void> {
     event.preventDefault();
 
-    var obj = { login: loginName, password: loginPassword };
+    var obj = { email: loginName, password: loginPassword };
     var js = JSON.stringify(obj);
-
+    
     try {
+      
       const response = await fetch(buildPath('api/auth/login'),
         { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
       var res = JSON.parse(await response.text());
 
-      if (res.id <= 0) {
-        setMessage('User/Password combination incorrect');
+      if (res.error != '') {
+        setMessage(res.error);
       }
       else {
         var user = { firstName: res.firstName, lastName: res.lastName, id: res.id }
         localStorage.setItem('user_data', JSON.stringify(user));
 
         setMessage('');
-        window.location.href = '/cards';
+        window.location.href = '/';
       }
     }
 
