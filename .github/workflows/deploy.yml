@@ -67,7 +67,7 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         password: ${{ secrets.SERVER_PASSWORD }}
         port: ${{ secrets.SERVER_PORT }}
-        source: "backend/_tests_/*"
+        source: "backend/__tests__/*"
         strip_components: 2
         target: "/var/server/_tests_"
         overwrite: true
