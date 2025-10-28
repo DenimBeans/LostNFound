@@ -54,9 +54,22 @@ jobs:
         username: ${{ secrets.SERVER_USER }}
         password: ${{ secrets.SERVER_PASSWORD }}
         port: ${{ secrets.SERVER_PORT }}
-        source: "backend/server.js,backend/package.json,backend/package-lock.json,backend/_tests_"
+        source: "backend/server.js,backend/package.json,backend/package-lock.json"
         strip_components: 1
         target: "/var/server"
+        overwrite: true
+
+    # Deploy backend unit tests to serve
+    - name: Deploy backend unit test files
+      uses: appleboy/scp-action@v0.1.5
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        password: ${{ secrets.SERVER_PASSWORD }}
+        port: ${{ secrets.SERVER_PORT }}
+        source: "backend/_tests_/*"
+        strip_components: 2
+        target: "/var/server/_tests_"
         overwrite: true
 
     # Install backend dependencies and restart PM2
