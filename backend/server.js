@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
@@ -41,16 +40,31 @@ mongoose.connect(MONGO_URI)
   });
 
 // ==================== EMAIL CONFIGURATION ====================
-// Configure nodemailer to send emails via Gmail
-const transporter = nodemailer.createTransport({
-  host: 'smtp.sendgrid.net', // new host SendGrid
-  port: 587, // TLS port
-  secure: false, // true for 465, false for other ports
-  auth: {
-   user: 'apikey', // SendGrid username
-    pass: process.env.SENDGRID_API_KEY  // Gmail app password (NOT regular password)
+// Configure SendGrid for email delivery (using Web API, not SMTP)
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+// Helper function to send emails
+const sendEmail = async (to, subject, html) => {
+  const msg = {
+    to: to,
+    from: process.env.SENDGRID_FROM_EMAIL,
+    subject: subject,
+    html: html
+  };
+  
+  try {
+    await sgMail.send(msg);
+    console.log(`✅ Email sent to ${to}`);
+    return true;
+  } catch (error) {
+    console.error('❌ SendGrid error:', error.message);
+    if (error.response) {
+      console.error('Response body:', error.response.body);
+    }
+    return false;
   }
-});
+};
 
 // ==================== DATABASE SCHEMAS ====================
 
@@ -70,7 +84,8 @@ const userSchema = new mongoose.Schema({
   verificationToken: { type: String },                               // Token for email verification link
   verificationTokenExpires: { type: Date },                          // When verification token expires
   resetPasswordToken: { type: String },                              // Token for password reset link
-  resetPasswordExpires: { type: Date }                               // When reset token expires
+  resetPasswordExpires: { type: Date },                               // When reset token expires
+  trackedItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item'}] // Items user is tracking 
 }, { timestamps: true });  // Automatically add createdAt and updatedAt fields
 
 // Create User model from schema
@@ -175,18 +190,17 @@ app.post('/api/auth/register', async (req, res) => {
     
     // Try to send verification email
     try {
-      await transporter.sendMail({
-        from: SENDGRID_FROM_EMAIL || process.env.SENDGRID_FROM_EMAIL,
-        to: email,
-        subject: 'Verify Your Email - Lost & Found',
-        html: `
+      await sendEmail(
+        email,
+        'Verify Your Email - Lost & Found',
+        `
           <h1>Welcome ${firstName}!</h1>
           <p>Please verify your email by clicking the link below:</p>
           <a href="${verificationUrl}">Verify Email</a>
           <p>This link expires in 24 hours.</p>
           <p>If you did not create an account, please ignore this email.</p>
         `
-      });
+      );
       console.log(`✅ Verification email sent to ${email}`);
     } catch (emailError) {
       // If email fails, log error but still create user
@@ -299,17 +313,16 @@ app.post('/api/auth/resend-verification', async (req, res) => {
     const verificationUrl = `${BASE_URL}/api/auth/verify/${verificationToken}`;
     
     // Send new verification email
-    await transporter.sendMail({
-      from: SENDGRID_FROM_EMAIL || process.env.SENDGRID_FROM_EMAIL,
-      to: email,
-      subject: 'Verify Your Email - Lost & Found',
-      html: `
+    await sendEmail(
+      email,
+      'Verify Your Email - Lost & Found',
+      `
         <h1>Email Verification</h1>
         <p>Please verify your email by clicking the link below:</p>
         <a href="${verificationUrl}">Verify Email</a>
         <p>This link expires in 24 hours.</p>
       `
-    });
+    );
 
     // Return success response
     var ret = {
@@ -434,19 +447,17 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     // Create password reset URL
     const resetUrl = `${BASE_URL}/api/auth/reset-password/${resetToken}`;
     
-    // Send password reset email
-    await transporter.sendMail({
-      from: SENDGRID_FROM_EMAIL || process.env.SENDGRID_FROM_EMAIL,
-      to: email,
-      subject: 'Password Reset - Lost & Found',
-      html: `
-        <h1>Password Reset Request</h1>
-        <p>You requested a password reset. Click the link below to reset your password:</p>
-        <a href="${resetUrl}">Reset Password</a>
-        <p>This link expires in 1 hour.</p>
-        <p>If you did not request this, please ignore this email.</p>
-      `
-    });
+    await sendEmail(
+      email,
+        'Password Reset - Lost & Found',
+        `
+          <h1>Password Reset Request</h1>
+          <p>You requested a password reset. Click the link below to reset your password:</p>
+          <a href="${resetUrl}">Reset Password</a>
+          <p>This link expires in 1 hour.</p>
+          <p>If you did not request this, please ignore this email.</p>
+        `
+    );
 
     // Return generic success message (security: don't reveal if email exists)
     var ret = {
@@ -609,6 +620,7 @@ app.get('/api/items/nearby', async (req, res) => {
   try {
     const { lat, lng, radius } = req.query;
     
+    // Validate required parameters
     if (!lat || !lng) {
       error = 'Latitude and longitude required';
       var ret = { error: error };
@@ -619,42 +631,66 @@ app.get('/api/items/nearby', async (req, res) => {
     const longitude = parseFloat(lng);
     const radiusKm = parseFloat(radius) || 5;  // Default 5km
     
-    // Calculate rough degree range (1 degree ≈ 111km)
+    // Validate coordinate ranges
+    if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+      error = 'Invalid coordinates. Latitude: -90 to 90, Longitude: -180 to 180';
+      return res.status(400).json({ error });
+    }
+    
+    // Calculate degree ranges (1 degree ≈ 111km)
     const latRange = radiusKm / 111;
     const lngRange = radiusKm / (111 * Math.cos(latitude * Math.PI / 180));
     
-    // Find items within bounding box
+    // Find items within bounding box using GeoJSON coordinates
+    // coordinates[0] = longitude, coordinates[1] = latitude
     const items = await Item.find({
-      lat: { $gte: latitude - latRange, $lte: latitude + latRange },
-      lng: { $gte: longitude - lngRange, $lte: longitude + lngRange },
+      'location.coordinates.1': { 
+        $gte: latitude - latRange, 
+        $lte: latitude + latRange 
+      },
+      'location.coordinates.0': { 
+        $gte: longitude - lngRange, 
+        $lte: longitude + lngRange 
+      },
       status: { $ne: 'returned' }  // Exclude returned items
     })
     .populate('userId', 'firstName lastName email')
     .sort({ createdAt: -1 })
     .limit(50);
     
-    // Calculate actual distances and filter
-    const itemsWithDistance = items.map(item => {
-      if (item.lat && item.lng) {
-        // Haversine formula for distance
-        const R = 6371; // Earth radius in km
-        const dLat = (item.lat - latitude) * Math.PI / 180;
-        const dLng = (item.lng - longitude) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(latitude * Math.PI / 180) * Math.cos(item.lat * Math.PI / 180) *
-                  Math.sin(dLng/2) * Math.sin(dLng/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        const distance = R * c;
+    // Calculate exact distances using Haversine formula
+    const itemsWithDistance = items
+      .map(item => {
+        // Check if item has valid coordinates
+        if (item.location && 
+            item.location.coordinates && 
+            item.location.coordinates.length === 2) {
+          
+          const itemLng = item.location.coordinates[0];
+          const itemLat = item.location.coordinates[1];
+          
+          // Haversine formula for great-circle distance
+          const R = 6371; // Earth radius in km
+          const dLat = (itemLat - latitude) * Math.PI / 180;
+          const dLng = (itemLng - longitude) * Math.PI / 180;
+          const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                    Math.cos(latitude * Math.PI / 180) * 
+                    Math.cos(itemLat * Math.PI / 180) *
+                    Math.sin(dLng/2) * Math.sin(dLng/2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          const distance = R * c;
+          
+          return {
+            ...item.toObject(),
+            distance: Math.round(distance * 100) / 100  // Round to 2 decimals
+          };
+        }
         
-        return {
-          ...item.toObject(),
-          distance: Math.round(distance * 100) / 100  // Round to 2 decimals
-        };
-      }
-      return { ...item.toObject(), distance: null };
-    })
-    .filter(item => item.distance === null || item.distance <= radiusKm)
-    .sort((a, b) => (a.distance || 999) - (b.distance || 999));  // Sort by distance
+        // Item has no valid coordinates
+        return { ...item.toObject(), distance: null };
+      })
+      .filter(item => item.distance === null || item.distance <= radiusKm)  // Filter by radius
+      .sort((a, b) => (a.distance || 999) - (b.distance || 999));  // Sort by distance
     
     var ret = {
       results: itemsWithDistance,
@@ -852,6 +888,126 @@ app.delete('/api/items/:id', async (req, res) => {
     });
   } catch (err) {// Handle errors
     console.error('Delete item error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
+// TRACK ITEM ENDPOINT - Add Item to User's Tracked List
+// POST /api/users/:userId/tracked-items/:itemId
+// Response: { success, message, trackedItems, error }
+app.post('/api/users/:userId/tracked-items/:itemId', async (req, res) => {
+  var error = '';
+  
+  try {
+    const { userId, itemId } = req.params;
+    
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      error = 'User not found';
+      return res.status(404).json({ error });
+    }
+    
+    // Check if item exists
+    const item = await Item.findById(itemId);
+    if (!item) {
+      error = 'Item not found';
+      return res.status(404).json({ error });
+    }
+    
+    // Check if already tracking
+    if (user.trackedItems.includes(itemId)) {
+      error = 'Item already tracked';
+      return res.status(400).json({ error });
+    }
+    
+    // Add to tracked items
+    user.trackedItems.push(itemId);
+    await user.save();
+    
+    var ret = {
+      success: true,
+      message: 'Item added to tracked list',
+      trackedItems: user.trackedItems,
+      error: ''
+    };
+    res.json(ret);
+    
+  } catch (err) {
+    console.error('Track item error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
+// REMOVE TRACKED ITEM ENDPOINT - Remove item from user's tracked list (KAN-67)
+// DELETE /api/users/:userId/tracked-items/:itemId
+// Response: { success, message, trackedItems, error }
+app.delete('/api/users/:userId/tracked-items/:itemId', async (req, res) => {
+  var error = '';
+  
+  try {
+    const { userId, itemId } = req.params;
+    
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      error = 'User not found';
+      return res.status(404).json({ error });
+    }
+    
+    // Remove from tracked items
+    user.trackedItems = user.trackedItems.filter(
+      id => id.toString() !== itemId
+    );
+    await user.save();
+    
+    var ret = {
+      success: true,
+      message: 'Item removed from tracked list',
+      trackedItems: user.trackedItems,
+      error: ''
+    };
+    res.json(ret);
+    
+  } catch (err) {
+    console.error('Remove tracked item error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
+// GET TRACKED ITEMS ENDPOINT - Retrieve all items user is tracking (KAN-64)
+// GET /api/users/:userId/tracked-items
+// Response: { results, count, error }
+app.get('/api/users/:userId/tracked-items', async (req, res) => {
+  var error = '';
+  
+  try {
+    const { userId } = req.params;
+    
+    // Find user and populate tracked items with full item details
+    const user = await User.findById(userId)
+      .populate({
+        path: 'trackedItems',
+        populate: { path: 'userId', select: 'firstName lastName email' }
+      });
+    
+    if (!user) {
+      error = 'User not found';
+      return res.status(404).json({ error });
+    }
+    
+    var ret = {
+      results: user.trackedItems,
+      count: user.trackedItems.length,
+      error: ''
+    };
+    res.json(ret);
+    
+  } catch (err) {
+    console.error('Get tracked items error:', err);
     error = err.message;
     res.status(500).json({ error });
   }
