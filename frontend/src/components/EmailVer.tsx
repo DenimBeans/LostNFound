@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { buildPath } from './Path';
 import {useParams} from 'react-router-dom';
 
@@ -9,7 +9,7 @@ function EmailVer() {
 const { token } = useParams();
 const [message, setMessage] = useState('');
   
-async function Verify(token){
+async function Verify(token: any){
 
    try {
       
@@ -44,7 +44,7 @@ async function Verify(token){
     <div id = "EmailMain">
       <h1>{message}</h1>
       <input type="submit" id="loginButton" className="buttons" value="Verify Email"
-        onClick={Verify} />
+        onClick={()=>Verify(token)} />
     </div>
     
   );
