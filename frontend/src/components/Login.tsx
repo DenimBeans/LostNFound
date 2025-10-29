@@ -32,11 +32,11 @@ function Login() {
         setMessage(res.error);
       }
       else {
-        var user = { firstName: res.firstName, lastName: res.lastName, id: res.id }
+        var user = { firstName: res.firstName, lastName: res.lastName, userId: res.userId, accessToken: res.accessToken}
         localStorage.setItem('user_data', JSON.stringify(user));
 
         setMessage('');
-        window.location.href = '/';
+        window.location.href = '/cards';
       }
     }
 

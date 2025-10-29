@@ -50,14 +50,10 @@ async function doRegister(event: any): Promise<void> {
       var res = JSON.parse(await response.text());
 
       if (res.error != '') {
-        setMessage(res.error);
+        setMessage("Check your email for verification.");
       }
       else {
-        var user = { firstName: res.firstName, lastName: res.lastName, id: res.id }
-        localStorage.setItem('user_data', JSON.stringify(user));
-
-        setMessage('');
-        window.location.href = '/cards';
+        setMessage(res.error);
       }
     }
 
