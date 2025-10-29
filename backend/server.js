@@ -22,8 +22,8 @@ const PORT = process.env.PORT || 4000;                      // Server port (defa
 const JWT_SECRET = process.env.ACCESS_TOKEN_SECRET || 'fallback_secret';  // Secret for JWT tokens
 const NODE_ENV = process.env.NODE_ENV || 'development';     // Environment (development/production)
 const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;      // Base URL for email links
-const EMAIL_USER = process.env.EMAIL_USER;                  // Gmail address for sending emails
-const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;          // Gmail app password
+const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;      // SendGrid API key
+const SENDGRID_FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL; // Email address to send from
 
 // Debug: Log if MongoDB connection string loaded successfully
 console.log('🔍 Connection string loaded:', MONGO_URI ? 'Yes ✅' : 'No ❌');
@@ -43,10 +43,12 @@ mongoose.connect(MONGO_URI)
 // ==================== EMAIL CONFIGURATION ====================
 // Configure nodemailer to send emails via Gmail
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.sendgrid.net', // new host SendGrid
+  port: 587, // TLS port
+  secure: false, // true for 465, false for other ports
   auth: {
-    user: EMAIL_USER,      // Gmail address
-    pass: EMAIL_PASSWORD   // Gmail app password (NOT regular password)
+   user: 'apikey', // SendGrid username
+    pass: process.env.SENDGRID_API_KEY  // Gmail app password (NOT regular password)
   }
 });
 
@@ -174,7 +176,7 @@ app.post('/api/auth/register', async (req, res) => {
     // Try to send verification email
     try {
       await transporter.sendMail({
-        from: EMAIL_USER,
+        from: SENDGRID_FROM_EMAIL || process.env.SENDGRID_FROM_EMAIL,
         to: email,
         subject: 'Verify Your Email - Lost & Found',
         html: `
@@ -298,7 +300,7 @@ app.post('/api/auth/resend-verification', async (req, res) => {
     
     // Send new verification email
     await transporter.sendMail({
-      from: EMAIL_USER,
+      from: SENDGRID_FROM_EMAIL || process.env.SENDGRID_FROM_EMAIL,
       to: email,
       subject: 'Verify Your Email - Lost & Found',
       html: `
@@ -434,7 +436,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     
     // Send password reset email
     await transporter.sendMail({
-      from: EMAIL_USER,
+      from: SENDGRID_FROM_EMAIL || process.env.SENDGRID_FROM_EMAIL,
       to: email,
       subject: 'Password Reset - Lost & Found',
       html: `
@@ -873,5 +875,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📍 Environment: ${NODE_ENV}`);
-  console.log(`📧 Email configured:`, EMAIL_USER ? 'Yes ✅' : 'No ❌');
+  console.log(`📧 Email configured:`, SENDGRID_API_KEY ? 'Yes ✅' : 'No ❌');
 });
