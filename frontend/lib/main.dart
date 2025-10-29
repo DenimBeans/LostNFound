@@ -4,13 +4,6 @@ import 'package:flutter/material.dart';
 // import 'package:http/http.dart' as http;
 // import 'dart:convert';
 
-//  Form Validation
-//  First name and last name should be: 
-//  no more than two characters long each
-//  only letters
-//  Email needs that valid regex you're familiar with already, it's probably been written already
-//  Not sure what the password requirements should be beyond not empty
-
 void main() {
   runApp(const MyApp());
 }
@@ -175,14 +168,7 @@ class LoginFormState extends State<LoginForm> {
       key: _loginFormKey,
       child: Column(
         children: [
-          FormField(
-            label: 'Email',
-            validator: (String? value) {
-              return (value == null || value.isEmpty || 
-              !(RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")).hasMatch(value))
-              ? 'Please enter valid email' : null;
-            }
-          ),
+          EmailField(),
           FormField(
             label: 'Password',
             validator: (String? value) {
@@ -192,9 +178,9 @@ class LoginFormState extends State<LoginForm> {
           BoldElevatedButton(
             text: 'Next',
             onPressed: () {
-              // Validate returns true if the form is valid, or false otherwise.
               if (_loginFormKey.currentState!.validate()) {
-                // Run login function
+                // Will need to run login function
+                // For now, just go straight to navigating to item search
                 Navigator.push(
                   context, 
                   MaterialPageRoute(builder: (context) => ItemSearch()),
@@ -269,14 +255,7 @@ class RegisterFormState extends State<RegisterForm> {
               return (value == null || value.isEmpty) ? 'Please enter valid last name' : null;
             }
           ),
-          FormField(
-            label: 'Email',
-            validator: (String? value) {
-              return (value == null || value.isEmpty || 
-              !(RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")).hasMatch(value))
-              ? 'Please enter valid email' : null;
-            }
-          ),
+          EmailField(),
           FormField(
             label: 'Password',
             controller: passwordController,
@@ -309,6 +288,24 @@ class RegisterFormState extends State<RegisterForm> {
   }
 }
 
+class EmailField extends StatelessWidget {
+  const EmailField({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FormField(
+      label: 'Email',
+      validator: (String? value) {
+        return (value == null || value.isEmpty || 
+        !(RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")).hasMatch(value))
+        ? 'Please enter valid email' : null;
+      }
+    );
+  }
+}
+
 //  Email Verification Popup
 
 //  Search for Items Widgets
@@ -317,7 +314,83 @@ class ItemSearch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return Scaffold(
+      //  This doesn't actually need an arrow
+      //  I'll rewrite some stuff later so that the back arrow becomes optional
+      //  + rename it from ArrowTitleBar to CenterTitleBar
+      appBar: ArrowTitleBar(title: 'Search for Items'),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.document_scanner_rounded),
+            label: 'Report Lost',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
+        ]
+      ),
+      endDrawer: Drawer(
+        child: ListView(
+          // Important: Remove any padding from the ListView.
+          padding: EdgeInsets.zero,
+          children: [
+            /*
+            const DrawerHeader(
+              decoration: BoxDecoration(color: Colors.blue),
+              child: Text('Drawer Header'),
+            ),
+            */
+            ListTile(
+              title: const Text('Notifications'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            ListTile(
+              title: const Text('Tracked Items'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            ListTile(
+              title: const Text('Your Reports'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            ListTile(
+              title: const Text('Account Settings'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            ListTile(
+              title: const Text('About'),
+              onTap: () {
+                // Update the state of the app.
+                // ...
+              },
+            ),
+            Spacer(),
+            BoldElevatedButton(
+              text: 'Log Out', 
+              onPressed: () { 
+                //  Run log out function
+                Navigator.pop(context); 
+              }, 
+              minWidth: 40, 
+              minHeight: 30,
+            ),
+          ],
+        ),
+      ), 
+    );
   }
 }
 
@@ -421,7 +494,6 @@ class ArrowTitleBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: () {
           Navigator.pop(
             context
-            
           );
         },
         icon: Icon(Icons.arrow_back),
@@ -448,7 +520,7 @@ class FormField extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(12.0),
-      child: TextFormField(  
+      child: TextFormField(
         decoration: InputDecoration(
           labelText: label,
         ),
