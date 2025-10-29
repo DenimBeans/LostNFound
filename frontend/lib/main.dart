@@ -4,6 +4,13 @@ import 'package:flutter/material.dart';
 // import 'package:http/http.dart' as http;
 // import 'dart:convert';
 
+//  Form Validation
+//  First name and last name should be: 
+//  no more than two characters long each
+//  only letters
+//  Email needs that valid regex you're familiar with already, it's probably been written already
+//  Not sure what the password requirements should be beyond not empty
+
 void main() {
   runApp(const MyApp());
 }
@@ -140,9 +147,7 @@ class LoginModal extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             const Text('Login', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            FormField(label: 'Email',),
-            FormField(label: 'Password',),
-            LoginModalButton(),
+            LoginForm(),
           ],
         ),
       ),
@@ -150,45 +155,57 @@ class LoginModal extends StatelessWidget {
   }
 }
 
-class LoginModalButton extends StatelessWidget {
-  const LoginModalButton({
+class LoginForm extends StatefulWidget {
+  const LoginForm({
     super.key,
   });
 
   @override
-  Widget build(BuildContext context) {
-    return BoldElevatedButton(
-      text: 'Next',
-      onPressed: () {
-
-      },
-      minWidth: 70,
-      minHeight: 20,
-    );
+  LoginFormState createState() {
+    return LoginFormState();
   }
 }
 
-class LoginOverlay extends StatelessWidget {
-  const LoginOverlay({super.key});
+class LoginFormState extends State<LoginForm> {
+  final _loginFormKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [ 
-        AppBar(
-          backgroundColor: Colors.grey,
-          centerTitle: true,
-          title: const Text('Login'),
-        ),
-        Form(
-          child: Column(
-            children: [
-              FormField(label: 'Email'),
-              FormField(label: 'Password'),
-            ]
+    return Form(
+      key: _loginFormKey,
+      child: Column(
+        children: [
+          FormField(
+            label: 'Email',
+            validator: (String? value) {
+              return (value == null || value.isEmpty || 
+              !(RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")).hasMatch(value))
+              ? 'Please enter valid email' : null;
+            }
           ),
-        ),
-      ],
+          FormField(
+            label: 'Password',
+            validator: (String? value) {
+              return (value == null || value.isEmpty) ? 'Please enter valid password' : null;
+            }
+          ),
+          BoldElevatedButton(
+            text: 'Next',
+            onPressed: () {
+              // Validate returns true if the form is valid, or false otherwise.
+              if (_loginFormKey.currentState!.validate()) {
+                // Run login function
+                Navigator.push(
+                  context, 
+                  MaterialPageRoute(builder: (context) => ItemSearch()),
+                );
+              }
+            },
+            minWidth: 70,
+            minHeight: 20,
+          ),
+        ]
+      )
     );
   }
 }
@@ -206,24 +223,87 @@ class Register extends StatelessWidget {
       body: Column(
         //mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          Form(
-            child: Column(
-              children: [
-                FormField(label: 'First Name'),
-                FormField(label: 'Last Name'),
-                FormField(label: 'Email'),
-                FormField(label: 'Password'),
-                FormField(label: 'Re-type Password'),
-              ]
-            ),
+          RegisterForm(),
+        ],
+      ),
+    );
+  }
+}
+
+class RegisterForm extends StatefulWidget {
+  const RegisterForm({
+    super.key,
+  });
+
+  @override
+  RegisterFormState createState() {
+    return RegisterFormState();
+  }
+}
+
+class RegisterFormState extends State<RegisterForm> {
+  final _registerFormKey = GlobalKey<FormState>();
+  final passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _registerFormKey,
+      child: Column(
+        children: [
+          FormField(
+            label: 'First Name',            
+            validator: (String? value) {
+              return (value == null || value.isEmpty) ? 'Please enter valid first name' : null;
+            }
+          ),
+          FormField(
+            label: 'Last Name',
+            validator: (String? value) {
+              return (value == null || value.isEmpty) ? 'Please enter valid last name' : null;
+            }
+          ),
+          FormField(
+            label: 'Email',
+            validator: (String? value) {
+              return (value == null || value.isEmpty || 
+              !(RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")).hasMatch(value))
+              ? 'Please enter valid email' : null;
+            }
+          ),
+          FormField(
+            label: 'Password',
+            controller: passwordController,
+            validator: (String? value) {
+              return (value == null || value.isEmpty) ? 'Please enter valid password' : null;
+            }
+          ),
+          FormField(
+            label: 'Re-type Password',
+            validator: (String? value) {
+              return (value != passwordController.text) ? 'Passwords should match' : null;
+            }
           ),
           BoldElevatedButton(
             text: 'Next', 
-            onPressed: () {}, 
+            onPressed: () {
+              // Validate returns true if the form is valid, or false otherwise.
+              if (_registerFormKey.currentState!.validate()) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Processing Data')),
+                );
+              }
+            }, 
             minWidth: 100, 
             minHeight: 46,
           )
-        ],
+        ]
       ),
     );
   }
@@ -354,14 +434,14 @@ class ArrowTitleBar extends StatelessWidget implements PreferredSizeWidget {
 
 class FormField extends StatelessWidget {
   final String label;
-  //final bool valid;
-  //final String err;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
 
   const FormField({
     super.key,
     required this.label,
-    //required this.valid,
-    //required this.err,
+    this.controller,
+    this.validator,
   });
 
   @override
@@ -370,17 +450,10 @@ class FormField extends StatelessWidget {
       padding: const EdgeInsets.all(12.0),
       child: TextFormField(  
         decoration: InputDecoration(
-          //hintText: 'What do people call you?',
           labelText: label,
         ),
-        onSaved: (String? value) {
-          // This optional block of code can be used to run
-          // code when the user saves the form.
-        },
-        validator: (String? value) {
-          return //(valid) ? err : null;  //  
-          (value != null && value.contains('@')) ? 'Do not use the @ char.' : null;
-        },
+        controller: controller,
+        validator: validator,
       )
     );
   }
