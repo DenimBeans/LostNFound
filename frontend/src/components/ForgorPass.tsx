@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { buildPath } from './Path';
 import '../Styles/FrontPage.css';
 
-function Forgor() {
+function ForgorPass() {
   const [message, setMessage] = useState('');
   const [EmailName, setEmailName] = React.useState('');
   
@@ -11,7 +11,7 @@ function Forgor() {
     setEmailName(e.target.value);
   }
 
-  async function doLogin(event: any): Promise<void> {
+  async function Forgor(event: any): Promise<void> {
     event.preventDefault();
 
     var obj = { email: EmailName};
@@ -52,4 +52,4 @@ function Forgor() {
   );
 };
 
-export default Forgor;
+export default ForgorPass;
