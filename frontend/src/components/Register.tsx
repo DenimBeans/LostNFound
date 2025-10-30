@@ -49,7 +49,7 @@ async function doRegister(event: any): Promise<void> {
 
       var res = JSON.parse(await response.text());
 
-      if (res.error != '') {
+      if (res.error == '') {
         setMessage("Check your email for verification.");
       }
       else {

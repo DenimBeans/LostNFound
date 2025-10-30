@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { buildPath } from './Path';
 import {useParams} from 'react-router-dom';
-
+import '../Styles/FrontPage.css';
 
 
 
@@ -43,7 +43,7 @@ async function Verify(token: any){
  return (
     <div id = "EmailMain">
       <h1>{message}</h1>
-      <input type="submit" id="loginButton" className="buttons" value="Verify Email"
+      <input type="submit" id="EmailButton" className="buttons" value="Verify Email"
         onClick={()=>Verify(token)} />
     </div>
     
