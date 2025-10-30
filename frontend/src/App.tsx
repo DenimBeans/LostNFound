@@ -18,7 +18,7 @@ function App() {
         <Route path="/Register" element={<RegisterPage />} />
         <Route path="/cards" element={<CardPage />} />
         <Route path="/PasswordResetEmail" element={<ForgorPassPage />} />
-        <Route path="/PasswordReset" element={<PasswordResetPage/>} />
+        <Route path="/reset-password/:token" element={<PasswordResetPage/>} />
         <Route path = "/verify/:token" element={<EmailVerificationPage/>} />
       </Routes>
     </BrowserRouter>
