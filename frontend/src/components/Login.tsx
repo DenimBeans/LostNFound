@@ -58,6 +58,7 @@ function Login() {
         onClick={doLogin} />
       <span id="loginResult">{message}</span>
       <a href = "http://174.138.65.216/Register">Temp Register</a>
+      <a href = "http://174.138.65.216/PasswordResetEmail">Temp Pass Reset</a>
     </div>
   );
 };

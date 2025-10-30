@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { buildPath } from './Path';
 import {useParams} from 'react-router-dom';
+import {useEffect} from 'react';
 import '../Styles/FrontPage.css';
 
 
@@ -8,13 +9,16 @@ import '../Styles/FrontPage.css';
 function EmailVer() {
 const { token } = useParams();
 const [message, setMessage] = useState('');
+
+
+useEffect(() => {Verify(token);},[token]);
   
 async function Verify(token: any){
 
    try {
       
       const response = await fetch(buildPath(`api/auth/verify/${token}`),
-        { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+        { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
       var res = JSON.parse(await response.text());
 
@@ -43,8 +47,6 @@ async function Verify(token: any){
  return (
     <div id = "EmailMain">
       <h1>{message}</h1>
-      <input type="submit" id="EmailButton" className="buttons" value="Verify Email"
-        onClick={()=>Verify(token)} />
     </div>
     
   );
