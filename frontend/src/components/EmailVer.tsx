@@ -24,7 +24,7 @@ async function Verify(token: any){
 
       if (res.success == true) {
         setMessage(res.message);
-        setTimeout(() =>{window.location.href = '/login';},3000);//the 3000 is miliseconds so 3 seconds.
+        setTimeout(() =>{window.location.href = '/';},3000);//the 3000 is miliseconds so 3 seconds.
       }
       if(res.error == "Invalid or expired verification token"){
         setMessage(res.error);
