@@ -1,8 +1,8 @@
 // import 'dart:ffi';
 
 import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
-// import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -45,7 +45,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-//  Page 1 Layout Widgets
+//  Title Page Widgets
 class TextHeading extends StatelessWidget {
   const TextHeading({
     super.key,
@@ -132,7 +132,7 @@ class LoginModal extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 250,
+      height: 300,
       color: Colors.amber,
       child: Center(
         child: Column(
@@ -161,6 +161,65 @@ class LoginForm extends StatefulWidget {
 
 class LoginFormState extends State<LoginForm> {
   final _loginFormKey = GlobalKey<FormState>();
+  final TextEditingController _loginController = TextEditingController(); 
+  final TextEditingController _passwordController = TextEditingController(); 
+  String _errorMessage = ''; 
+  bool _isLoading = false; 
+
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:4000/api/auth/login'), //  For Android emulator only
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': _loginController.text,
+          'password': _passwordController.text,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        
+        if (data['error'] == null || data['error'].isEmpty) {
+          // Login successful, navigate to second page
+          if (mounted) {
+            AlertDialog(title: Text('Login successful'));
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ItemSearch( 
+                  firstName: data['firstName'], 
+                  lastName: data['lastName'],
+                ),
+              ),
+            );
+          }
+        } else { 
+          setState(() { 
+            AlertDialog(title: Text('err'));
+            _errorMessage = data['error']; 
+          }); 
+        } 
+      } else { 
+        setState(() {
+          _errorMessage = 'Login failed. Please try again.'; 
+        }); 
+      } 
+    } catch (e) { 
+      setState(() { 
+        _errorMessage = 'Network error. Please check your connection.'; 
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -168,9 +227,12 @@ class LoginFormState extends State<LoginForm> {
       key: _loginFormKey,
       child: Column(
         children: [
-          EmailField(),
+          //  Pass email controller to EmailField
+          EmailField(controller: _loginController,),
           FormField(
             label: 'Password',
+            controller: _passwordController,
+            isObscure: true,
             validator: (String? value) {
               return (value == null || value.isEmpty) ? 'Please enter valid password' : null;
             }
@@ -179,24 +241,34 @@ class LoginFormState extends State<LoginForm> {
             text: 'Next',
             onPressed: () {
               if (_loginFormKey.currentState!.validate()) {
-                // Will need to run login function
-                // For now, just go straight to navigating to item search
-                Navigator.push(
-                  context, 
-                  MaterialPageRoute(builder: (context) => ItemSearch()),
-                );
+                _isLoading ? null : _login();
               }
             },
             minWidth: 70,
             minHeight: 20,
           ),
+          if (_errorMessage.isNotEmpty) Text(
+            _errorMessage,
+            style: const TextStyle( 
+              color: Colors.red, 
+              fontSize: 14, 
+            ), 
+            textAlign: TextAlign.center, 
+          ),
         ]
       )
     );
   }
+
+  @override 
+  void dispose() { 
+    _loginController.dispose(); 
+    _passwordController.dispose(); 
+    super.dispose(); 
+  }
 }
 
-//  Register Widgets
+//  Register Page Widgets
 class Register extends StatelessWidget {
   const Register({super.key});
   static const Color mainCol = Color(0xFFFFF4D9);
@@ -229,11 +301,16 @@ class RegisterForm extends StatefulWidget {
 
 class RegisterFormState extends State<RegisterForm> {
   final _registerFormKey = GlobalKey<FormState>();
-  final passwordController = TextEditingController();
+  final TextEditingController _fnameController = TextEditingController(); 
+  final TextEditingController _lnameController = TextEditingController(); 
+  final TextEditingController _emailController = TextEditingController(); 
+  final TextEditingController _passwordController = TextEditingController(); 
+  String _errorMessage = '';
+  bool _isLoading = false;
 
   @override
   void dispose() {
-    passwordController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -244,29 +321,35 @@ class RegisterFormState extends State<RegisterForm> {
       child: Column(
         children: [
           FormField(
-            label: 'First Name',            
+            label: 'First Name',    
+            isObscure: false,       
+            controller: _fnameController, 
             validator: (String? value) {
               return (value == null || value.isEmpty) ? 'Please enter valid first name' : null;
             }
           ),
           FormField(
             label: 'Last Name',
+            isObscure: false,
+            controller: _lnameController,
             validator: (String? value) {
               return (value == null || value.isEmpty) ? 'Please enter valid last name' : null;
             }
           ),
-          EmailField(),
+          EmailField(controller: _emailController,),
           FormField(
             label: 'Password',
-            controller: passwordController,
+            isObscure: false,
+            controller: _passwordController,
             validator: (String? value) {
               return (value == null || value.isEmpty) ? 'Please enter valid password' : null;
             }
           ),
           FormField(
             label: 'Re-type Password',
+            isObscure: false,
             validator: (String? value) {
-              return (value != passwordController.text) ? 'Passwords should match' : null;
+              return (value != _passwordController.text) ? 'Passwords should match' : null;
             }
           ),
           BoldElevatedButton(
@@ -289,14 +372,19 @@ class RegisterFormState extends State<RegisterForm> {
 }
 
 class EmailField extends StatelessWidget {
+  final TextEditingController? controller;
+
   const EmailField({
     super.key,
+    this.controller,
   });
 
   @override
   Widget build(BuildContext context) {
     return FormField(
       label: 'Email',
+      isObscure: false,
+      controller: controller,
       validator: (String? value) {
         return (value == null || value.isEmpty || 
         !(RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")).hasMatch(value))
@@ -310,15 +398,45 @@ class EmailField extends StatelessWidget {
 
 //  Search for Items Widgets
 class ItemSearch extends StatelessWidget {
-  const ItemSearch({super.key});
+  final String firstName;
+  final String lastName;
+  //final int userID;
+  
+  const ItemSearch({
+    super.key, 
+    required this.firstName, 
+    required this.lastName, 
+    //required this.userID
+    }
+  );
 
   @override
   Widget build(BuildContext context) {
+    //  Should make the scaffold into its own "Home Page" widget
+    //  everything remains the same between the report and search
+    //  page except for:
+    //  The app bar title
+    //  Which icon is shadowed in the bottom navigation
+    //  And the actual content in the body
     return Scaffold(
       //  This doesn't actually need an arrow
-      //  I'll rewrite some stuff later so that the back arrow becomes optional
+      //  I'll rewrite the widget later so that the back arrow becomes optional
       //  + rename it from ArrowTitleBar to CenterTitleBar
-      appBar: ArrowTitleBar(title: 'Search for Items'),
+      appBar: ArrowTitleBar(title: 'Search for Lost Items'),
+      body: Column(
+        children: [
+          FormField(label: 'Search Item', isObscure: false,),
+          SizedBox(
+            width: 350,
+            height: 250,
+            //  Container widget is placeholder
+            //  As this will be where we output the items, ListView may be better
+            child: Container(
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
@@ -333,22 +451,9 @@ class ItemSearch extends StatelessWidget {
       ),
       endDrawer: Drawer(
         child: ListView(
-          // Important: Remove any padding from the ListView.
           padding: EdgeInsets.zero,
           children: [
-            /*
-            const DrawerHeader(
-              decoration: BoxDecoration(color: Colors.blue),
-              child: Text('Drawer Header'),
-            ),
-            */
-            ListTile(
-              title: const Text('Notifications'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
+            ContentPopup(title: 'Notifications', simpleModal: NotificationsModal(),),
             ListTile(
               title: const Text('Tracked Items'),
               onTap: () {
@@ -370,19 +475,13 @@ class ItemSearch extends StatelessWidget {
                 // ...
               },
             ),
-            ListTile(
-              title: const Text('About'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
+            ContentPopup(title: 'About', simpleModal: AboutModal(),),
             Spacer(),
             BoldElevatedButton(
               text: 'Log Out', 
               onPressed: () { 
                 //  Run log out function
-                Navigator.pop(context); 
+                Navigator.of(context).popUntil((route) => route.isFirst);
               }, 
               minWidth: 40, 
               minHeight: 30,
@@ -394,36 +493,85 @@ class ItemSearch extends StatelessWidget {
   }
 }
 
-//  Report a Lost Item Widgets
-class ItemReport extends StatelessWidget {
-  const ItemReport({super.key});
+class ContentPopup extends StatelessWidget {
+  final String title;
+  final Widget simpleModal;
+
+  const ContentPopup({
+    super.key,
+    required this.title,
+    required this.simpleModal,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
-  }
-}
-
-//  Notification Settings Menu
-//  Should be a popup, not a new page (swap out navigator for overlay toggle?)
-class Notifications extends StatelessWidget {
-  const Notifications({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: ArrowTitleBar(title: 'Notifcations'),
-      //  Item Tracked - Switch 1
-      //  Item Found - Switch 2
-      //  Return Meeting Schedule - Switch 3
+    return ListTile(
+      title: Text(title),
+      onTap: () => showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => simpleModal,            
+      ),
     );
   }
 }
 
-//  About Section Popup
-//  Should be a popup, not a new page (swap out navigator for overlay toggle?)
-class About extends StatelessWidget {
-  const About({super.key});
+class NotificationsModal extends StatelessWidget {
+  const NotificationsModal({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SimpleDialog(
+      title: const Text('Notifications'),
+      children: <Widget>[
+        SwitchListTile(
+          title: const Text('Reported items tracked'),
+          value: true,
+          onChanged: (bool newVal) {},
+        ),
+        //  Honestly would probably get rid of this one as I cannot see a linear way for us
+        //  to direct the user to retrieve their found item without at least notifying them
+        //  it's been found
+        SwitchListTile(
+          title: const Text('Reported items found'),
+          value: true,
+          onChanged: (bool newVal) {},
+        ),
+        SwitchListTile(
+          title: const Text('Item return meeting'),
+          value: true,
+          onChanged: (bool newVal) {},
+        ),
+      ],
+    );
+  }
+}
+
+class AboutModal extends StatelessWidget {
+  const AboutModal({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SimpleDialog(
+      title: const Text('About'),
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsetsGeometry.all(20),
+          //  Might want to find a way to change this so that the text itself is hyperlinked instead of
+          //  just a plaintext link
+          child: Text('Created in X weeks for COP 4331\n\nGithub: https://github.com/DenimBeans/LostNFound'),
+        )
+      ]
+    );
+  }
+}
+
+//  Report a Lost Item Widgets
+class ItemReport extends StatelessWidget {
+  const ItemReport({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -506,12 +654,14 @@ class ArrowTitleBar extends StatelessWidget implements PreferredSizeWidget {
 
 class FormField extends StatelessWidget {
   final String label;
+  final bool isObscure;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
 
   const FormField({
     super.key,
     required this.label,
+    required this.isObscure,
     this.controller,
     this.validator,
   });
@@ -524,6 +674,7 @@ class FormField extends StatelessWidget {
         decoration: InputDecoration(
           labelText: label,
         ),
+        obscureText: isObscure,
         controller: controller,
         validator: validator,
       )
