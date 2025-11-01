@@ -1,0 +1,124 @@
+#MainUIDiv{
+width: 80%;
+margin-left: 10%;
+height: 70vh;
+background-color: rgb(101, 101, 101);
+display:flex;
+flex-direction: column;
+
+border-width: 3px;
+border-radius: 20px;
+border-style:solid;
+border-color:black;
+}
+
+#title{
+    width: 50%;
+    margin-left: 25%;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+    
+}
+#title:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+    
+}
+
+#locationText{
+    width: 50%;
+    margin-left: 25%;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+    
+}
+#locationText:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+    
+}
+
+#name{
+    width: 50%;
+    margin-left: 25%;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+    
+}
+#name:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+    
+}
+
+#email{
+    width: 50%;
+    margin-left: 25%;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+    
+}
+#email:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+    
+}
+#addItemButton{
+    margin-top: 20px;
+    height: 35px;
+    width: 10%;
+    margin-left: 45%;
+    display: flex;
+    justify-content: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+}
+#addItemButton:hover{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    cursor: pointer;
+}
