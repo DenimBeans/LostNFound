@@ -186,7 +186,7 @@ app.post('/api/auth/register', async (req, res) => {
     });
 
     // Create verification URL that user will click in email
-    const verificationUrl = `${BASE_URL}/api/auth/verify/${verificationToken}`;
+    const verificationUrl = `${BASE_URL}/verify/${verificationToken}`;
     
     // Try to send verification email
     try {
@@ -445,7 +445,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     await user.save();
 
     // Create password reset URL
-    const resetUrl = `${BASE_URL}/api/auth/reset-password/${resetToken}`;
+    const resetUrl = `${BASE_URL}/reset-password/${resetToken}`;
     
     await sendEmail(
       email,

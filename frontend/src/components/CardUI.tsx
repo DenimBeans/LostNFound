@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { buildPath } from './Path';
+import '../Styles/MainPage.css';
 
 //CHANGE AS NEEDED. Taken from MERN App, retooled for testing purposes.
 
@@ -92,13 +93,13 @@ function CardUI() {
     }
 
     return (
-        <div id="cardUIDiv">
+        <div id="MainUIDiv">
             <br />
             <button type="button" id="searchItemButton" className="buttons"
                 onClick={searchItem}>Display All Items</button><br />
             <span id="cardSearchResult">{searchResults}</span>
             <p id="cardList">{itemList}</p><br /><br />
-            Add: <input type="text" id="title" placeholder="Item"
+             <input type="text" id="title" placeholder="Item"
                 onChange={handleItemTextChange} />
             <input type="text" id="locationText" placeholder="Location"
                 onChange={handleLocationTextChange} />
