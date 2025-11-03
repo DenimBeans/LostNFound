@@ -9,7 +9,7 @@ import '../Styles/MainPage.css';
 
 function CardUI() {
     const AddPopupRef = useRef<HTMLDivElement>(null);
-    
+
     const [message, setMessage] = useState('');
     const [searchResults, setResults] = useState('');
     const [itemList, setItemList] = useState('');
@@ -135,8 +135,16 @@ function CardUI() {
         setItemDateValue(e.target.value);
     }
     //Grab userid
-    useEffect(() => {const Data = JSON.parse(localStorage.getItem('user_data'))
-    setItemUSERIDValue(Data?.userId);},[]);
+    useEffect(() => {
+        const Data = localStorage.getItem('user_data');
+        if(Data != null){
+            const UserData = JSON.parse(Data);
+            setItemUSERIDValue(UserData?.userId);
+        }
+        else{
+            setItemUSERIDValue('');
+        }
+    },[]);
     
   
 
