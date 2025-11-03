@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { buildPath } from './Path';
 import {useEffect} from 'react';
+import {useRef} from 'react';
 import '../Styles/MainPage.css';
+
 
 //CHANGE AS NEEDED. Taken from MERN App, retooled for testing purposes.
 
 function CardUI() {
+    const AddPopupRef = useRef<HTMLDivElement>(null);
+    
     const [message, setMessage] = useState('');
     const [searchResults, setResults] = useState('');
     const [itemList, setItemList] = useState('');
@@ -24,7 +28,9 @@ function CardUI() {
     const [ownerEmail, setEmailValue] = React.useState('');
 
     async function ItemPage(){
-        document.getElementById("AddItemPopup")?.style.display = "flex";
+        if (AddPopupRef.current){
+            AddPopupRef.current.style.display = 'flex';
+        }
     }
 
 
@@ -45,7 +51,9 @@ function CardUI() {
                 setMessage(res.error)
             }
             else {
-                document.getElementById("AddItemPopup")?.style.display = "none";
+                if (AddPopupRef.current){
+                    AddPopupRef.current.style.display = 'none';
+                }
                 setItemNameValue('');
                 setItemDescValue('');
                 setItemCatValue('');
@@ -146,7 +154,7 @@ function CardUI() {
                 <span id="cardSearchResult">{searchResults}</span>
                 <p>{itemList}</p>
             </div>
-            <div id = "AddItemPopup">
+            <div id = "AddItemPopup" ref = {AddPopupRef}>
 
                 <input type="text" id="title" placeholder="Item"
                     onChange={handleItemTextChange} />
