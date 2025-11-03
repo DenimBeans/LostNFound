@@ -1,5 +1,3 @@
-// import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -188,11 +186,10 @@ class LoginFormState extends State<LoginForm> {
         if (data['error'] == null || data['error'].isEmpty) {
           // Login successful, navigate to second page
           if (mounted) {
-            AlertDialog(title: Text('Login successful'));
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => ItemSearch( 
+                builder: (context) => ItemSearch(
                   firstName: data['firstName'], 
                   lastName: data['lastName'],
                 ),
@@ -201,7 +198,6 @@ class LoginFormState extends State<LoginForm> {
           }
         } else { 
           setState(() { 
-            AlertDialog(title: Text('err'));
             _errorMessage = data['error']; 
           }); 
         } 
@@ -308,10 +304,60 @@ class RegisterFormState extends State<RegisterForm> {
   String _errorMessage = '';
   bool _isLoading = false;
 
-  @override
-  void dispose() {
-    _passwordController.dispose();
-    super.dispose();
+  Future<void> _register() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://10.0.2.2:4000/api/auth/register'),  //  Android emulation
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'firstName': _fnameController.text,
+          'lastName': _lnameController.text,
+          'email': _emailController.text,
+          'password': _passwordController.text,
+        }),
+      );
+
+      if(response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+
+        if(data['error'] == null || data['error'].isEmpty) {
+          if(mounted) {
+            //  Must add email verification
+            //  For now just jump to next screen
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ItemSearch(
+                  firstName: data['firstName'], 
+                  lastName: data['lastName'],
+                ),
+              ),
+            );
+          }
+        } else {
+          setState(() {
+            _errorMessage = data['error'];
+          });
+        }
+      } else {
+        setState(() {
+          _errorMessage = 'Registration failed. Please check your email for verification.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Network error. Please check your connection.';
+    });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -357,40 +403,35 @@ class RegisterFormState extends State<RegisterForm> {
             onPressed: () {
               // Validate returns true if the form is valid, or false otherwise.
               if (_registerFormKey.currentState!.validate()) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Processing Data')),
-                );
+                //  ScaffoldMessenger.of(context).showSnackBar(
+                //    const SnackBar(content: Text('Processing Data')),
+                //  );
+                _isLoading ? null : _register();
               }
             }, 
             minWidth: 100, 
             minHeight: 46,
-          )
+          ),
+          if (_errorMessage.isNotEmpty) Text(
+            _errorMessage,
+            style: const TextStyle( 
+              color: Colors.red, 
+              fontSize: 14, 
+            ), 
+            textAlign: TextAlign.center, 
+          ),
         ]
       ),
     );
   }
-}
-
-class EmailField extends StatelessWidget {
-  final TextEditingController? controller;
-
-  const EmailField({
-    super.key,
-    this.controller,
-  });
 
   @override
-  Widget build(BuildContext context) {
-    return FormField(
-      label: 'Email',
-      isObscure: false,
-      controller: controller,
-      validator: (String? value) {
-        return (value == null || value.isEmpty || 
-        !(RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")).hasMatch(value))
-        ? 'Please enter valid email' : null;
-      }
-    );
+  void dispose() { 
+    _fnameController.dispose(); 
+    _lnameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose(); 
+    super.dispose(); 
   }
 }
 
@@ -678,6 +719,29 @@ class FormField extends StatelessWidget {
         controller: controller,
         validator: validator,
       )
+    );
+  }
+}
+
+class EmailField extends StatelessWidget {
+  final TextEditingController? controller;
+
+  const EmailField({
+    super.key,
+    this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FormField(
+      label: 'Email',
+      isObscure: false,
+      controller: controller,
+      validator: (String? value) {
+        return (value == null || value.isEmpty || 
+        !(RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")).hasMatch(value))
+        ? 'Please enter valid email' : null;
+      }
     );
   }
 }
