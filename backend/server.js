@@ -52,7 +52,7 @@ const sendEmail = async (to, subject, html) => {
     subject: subject,
     html: html
   };
-  
+
   try {
     await sgMail.send(msg);
     console.log(`✅ Email sent to ${to}`);
@@ -73,8 +73,8 @@ const userSchema = new mongoose.Schema({
   firstName: { type: String, required: true, trim: true },           // User's first name
   lastName: { type: String, required: true, trim: true },            // User's last name
   email: {                                                           // User's email (unique)
-    type: String, 
-    required: true, 
+    type: String,
+    required: true,
     unique: true,        // No duplicate emails allowed
     trim: true,          // Remove whitespace
     lowercase: true      // Store as lowercase
@@ -85,7 +85,7 @@ const userSchema = new mongoose.Schema({
   verificationTokenExpires: { type: Date },                          // When verification token expires
   resetPasswordToken: { type: String },                              // Token for password reset link
   resetPasswordExpires: { type: Date },                               // When reset token expires
-  trackedItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item'}] // Items user is tracking 
+  trackedItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }] // Items user is tracking 
 }, { timestamps: true });  // Automatically add createdAt and updatedAt fields
 
 // Create User model from schema
@@ -97,19 +97,19 @@ const itemSchema = new mongoose.Schema({
   description: { type: String, required: true },                     // Item description
   category: { type: String, required: true },                        // Category (e.g., "Electronics")
   status: {                                                          // Item status
-    type: String, 
+    type: String,
     enum: ['lost', 'found', 'pending'],  // Only these 3 values allowed
     default: 'lost',                     // Default to 'lost'
-    required: true 
+    required: true
   },
   location: {                                                        // Geographic location
     type: { type: String, default: 'Point' },                       // GeoJSON type
     coordinates: [Number]  // [longitude, latitude] for map display
   },
   userId: {                                                          // Reference to user who posted item
-    type: mongoose.Schema.Types.ObjectId, 
+    type: mongoose.Schema.Types.ObjectId,
     ref: 'User',           // Links to User model
-    required: true 
+    required: true
   },
   imageUrl: { type: String },                                        // URL to item photo (optional)
   isClaimed: { type: Boolean, default: false }                       // Whether item has been claimed
@@ -123,7 +123,7 @@ const Item = mongoose.model('Item', itemSchema);
 // ROOT ENDPOINT - Returns API information
 // GET /
 app.get('/', (req, res) => {
-  res.json({ 
+  res.json({
     message: '📦 Lost and Found API is running ✅',
     version: '1.0.0',
     environment: NODE_ENV
@@ -133,8 +133,8 @@ app.get('/', (req, res) => {
 // HEALTH CHECK ENDPOINT - Used to verify server is running
 // GET /health
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     message: 'Server is healthy',
     timestamp: new Date().toISOString()
   });
@@ -148,11 +148,11 @@ app.get('/health', (req, res) => {
 // Response: { success, message, userId, error }
 app.post('/api/auth/register', async (req, res) => {
   var error = '';
-  
+
   try {
     // Extract user data from request body
     const { firstName, lastName, email, password } = req.body;
-    
+
     // Validate: Check if all required fields are provided
     if (!firstName || !lastName || !email || !password) {
       error = 'All fields required';
@@ -170,10 +170,10 @@ app.post('/api/auth/register', async (req, res) => {
 
     // Hash password for security (never store plain text passwords!)
     const hashedPassword = await bcrypt.hash(password, 10);
-    
+
     // Generate random verification token (32 bytes = 64 hex characters)
     const verificationToken = crypto.randomBytes(32).toString('hex');
-    
+
     // Create new user in database
     const user = await User.create({
       firstName,
@@ -187,7 +187,7 @@ app.post('/api/auth/register', async (req, res) => {
 
     // Create verification URL that user will click in email
     const verificationUrl = `${BASE_URL}/verify/${verificationToken}`;
-    
+
     // Try to send verification email
     try {
       await sendEmail(
@@ -229,7 +229,7 @@ app.post('/api/auth/register', async (req, res) => {
 // Response: { success, message, error }
 app.get('/api/auth/verify/:token', async (req, res) => {
   var error = '';
-  
+
   try {
     // Extract token from URL parameter
     const { token } = req.params;
@@ -275,7 +275,7 @@ app.get('/api/auth/verify/:token', async (req, res) => {
 // Response: { success, message, error }
 app.post('/api/auth/resend-verification', async (req, res) => {
   var error = '';
-  
+
   try {
     // Extract email from request body
     const { email } = req.body;
@@ -311,7 +311,7 @@ app.post('/api/auth/resend-verification', async (req, res) => {
 
     // Create new verification URL
     const verificationUrl = `${BASE_URL}/api/auth/verify/${verificationToken}`;
-    
+
     // Send new verification email
     await sendEmail(
       email,
@@ -346,7 +346,7 @@ app.post('/api/auth/resend-verification', async (req, res) => {
 // Response: { success, accessToken, userId, firstName, lastName, error }
 app.post('/api/auth/login', async (req, res) => {
   var error = '';
-  
+
   try {
     // Extract credentials from request body
     const { email, password } = req.body;
@@ -413,7 +413,7 @@ app.post('/api/auth/login', async (req, res) => {
 // Response: { success, message, error }
 app.post('/api/auth/forgot-password', async (req, res) => {
   var error = '';
-  
+
   try {
     // Extract email from request body
     const { email } = req.body;
@@ -446,11 +446,11 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 
     // Create password reset URL
     const resetUrl = `${BASE_URL}/reset-password/${resetToken}`;
-    
+
     await sendEmail(
       email,
-        'Password Reset - Lost & Found',
-        `
+      'Password Reset - Lost & Found',
+      `
           <h1>Password Reset Request</h1>
           <p>You requested a password reset. Click the link below to reset your password:</p>
           <a href="${resetUrl}">Reset Password</a>
@@ -481,7 +481,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 // Response: { success, message, error }
 app.post('/api/auth/reset-password/:token', async (req, res) => {
   var error = '';
-  
+
   try {
     // Extract token from URL and new password from body
     const { token } = req.params;
@@ -529,6 +529,201 @@ app.post('/api/auth/reset-password/:token', async (req, res) => {
   }
 });
 
+// ==================== ACCOUNT MANAGEMENT ENDPOINTS ====================
+
+// EDIT ACCOUNT ENDPOINT - Update user account information
+// PATCH /api/users/:userId
+// Body: { firstName, lastName, email, currentPassword, newPassword }
+// Response: { success, message, user, error }
+app.patch('/api/users/:userId', async (req, res) => {
+  var error = '';
+
+  try {
+    const { userId } = req.params;
+    const { firstName, lastName, email, currentPassword, newPassword } = req.body;
+
+    // Find user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      error = 'User not found';
+      return res.status(404).json({ error });
+    }
+
+    // Prepare update object
+    const updates = {};
+
+    // Update basic info if provided
+    if (firstName) updates.firstName = firstName.trim();
+    if (lastName) updates.lastName = lastName.trim();
+
+    // Handle email change
+    if (email && email.toLowerCase() !== user.email) {
+      // Check if new email already exists
+      const existingUser = await User.findOne({ email: email.toLowerCase() });
+      if (existingUser) {
+        error = 'Email already in use';
+        return res.status(400).json({ error });
+      }
+
+      updates.email = email.toLowerCase();
+      updates.isVerified = false;  // Require re-verification for new email
+
+      // Generate new verification token
+      const verificationToken = crypto.randomBytes(32).toString('hex');
+      updates.verificationToken = verificationToken;
+      updates.verificationTokenExpires = Date.now() + 24 * 60 * 60 * 1000;
+
+      // Send verification email to new address
+      const verificationUrl = `${BASE_URL}/api/auth/verify/${verificationToken}`;
+      try {
+        await sendEmail(
+          email,
+          'Verify Your New Email - Lost & Found',
+          `
+            <h1>Email Change Verification</h1>
+            <p>Hi ${user.firstName},</p>
+            <p>You recently changed your email address. Please verify your new email by clicking the link below:</p>
+            <a href="${verificationUrl}">Verify Email</a>
+            <p>This link expires in 24 hours.</p>
+            <p>If you did not make this change, please contact support immediately.</p>
+          `
+        );
+      } catch (emailError) {
+        console.error('Verification email error:', emailError.message);
+      }
+    }
+
+    // Handle password change
+    if (newPassword) {
+      // Require current password for security
+      if (!currentPassword) {
+        error = 'Current password required to change password';
+        return res.status(400).json({ error });
+      }
+
+      // Verify current password
+      const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+      if (!isValidPassword) {
+        error = 'Current password is incorrect';
+        return res.status(401).json({ error });
+      }
+
+      // Hash and update password
+      updates.password = await bcrypt.hash(newPassword, 10);
+    }
+
+    // Apply updates to user
+    Object.assign(user, updates);
+    await user.save();
+
+    // Return user without sensitive fields
+    const userResponse = {
+      _id: user._id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      isVerified: user.isVerified,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    };
+
+    var ret = {
+      success: true,
+      message: email && email.toLowerCase() !== user.email
+        ? 'Account updated. Please verify your new email address.'
+        : 'Account updated successfully',
+      user: userResponse,
+      error: ''
+    };
+    res.json(ret);
+
+  } catch (err) {
+    console.error('Edit account error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
+// DELETE ACCOUNT ENDPOINT - Permanently delete user account
+// DELETE /api/users/:userId
+// Potential Body: { password, confirmDelete } - Here for potential extra security (other things commented out in here align with it)
+// Response: { success, message, error }
+app.delete('/api/users/:userId', async (req, res) => {
+  var error = '';
+
+  try {
+    const { userId } = req.params;
+    /*const { password, confirmDelete } = req.body;
+
+    // Require password confirmation for security
+    if (!password) {
+      error = 'Password required to delete account';
+      return res.status(400).json({ error });
+    }
+
+    // Require explicit confirmation
+    if (!confirmDelete || confirmDelete !== true) {
+      error = 'Must confirm account deletion';
+      return res.status(400).json({ error });
+    }*/
+
+    // Find user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      error = 'User not found';
+      return res.status(404).json({ error });
+    }
+
+    // Verify password
+    /*const isValidPassword = await bcrypt.compare(password, user.password);
+    if (!isValidPassword) {
+      error = 'Incorrect password';
+      return res.status(401).json({ error });
+    }*/
+
+    // Delete all items posted by user
+    await Item.deleteMany({ userId: userId });
+
+    // Remove user from other users' tracked items
+    await User.updateMany(
+      { trackedItems: userId },
+      { $pull: { trackedItems: userId } }
+    );
+
+    // Delete user account
+    await User.findByIdAndDelete(userId);
+
+    // Send confirmation email
+    try {
+      await sendEmail(
+        user.email,
+        'Account Deleted - Lost & Found',
+        `
+          <h1>Account Deleted</h1>
+          <p>Hi ${user.firstName},</p>
+          <p>Your Lost & Found account has been successfully deleted.</p>
+          <p>All your personal data has been removed from our system.</p>
+          <p>If you did not request this deletion, please contact support immediately.</p>
+        `
+      );
+    } catch (emailError) {
+      console.error('Deletion confirmation email error:', emailError.message);
+    }
+
+    var ret = {
+      success: true,
+      message: 'Account deleted successfully',
+      error: ''
+    };
+    res.json(ret);
+
+  } catch (err) {
+    console.error('Delete account error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
 // ==================== ITEM ENDPOINTS ====================
 
 // CREATE ITEM ENDPOINT - Report a lost or found item
@@ -537,22 +732,22 @@ app.post('/api/auth/reset-password/:token', async (req, res) => {
 // Response: { success, message, itemId, error }
 app.post('/api/items', async (req, res) => {
   var error = '';
-  
+
   try {
-    const { 
-      title, 
-      description, 
-      category, 
-      imageUrl, 
-      lat, 
-      lng, 
-      locationText, 
-      lostAt, 
+    const {
+      title,
+      description,
+      category,
+      imageUrl,
+      lat,
+      lng,
+      locationText,
+      lostAt,
       userId,
       reporterName,
       reporterEmail
     } = req.body;
-    
+
     // Validate required fields
     if (!title || !description || !userId) {
       error = 'Title, description, and userId required';
@@ -570,13 +765,13 @@ app.post('/api/items', async (req, res) => {
         var ret = { error: error };
         return res.status(400).json(ret);
       }
-      
+
       // GeoJSON format: [longitude, latitude]
       itemLocation = {
         type: 'Point',
         coordinates: [lng, lat]
-  };
-}
+      };
+    }
 
     // Create item
     const item = await Item.create({
@@ -616,10 +811,10 @@ app.post('/api/items', async (req, res) => {
 // Response: { results, count, error }
 app.get('/api/items/nearby', async (req, res) => {
   var error = '';
-  
+
   try {
     const { lat, lng, radius } = req.query;
-    
+
     // Validate required parameters
     if (!lat || !lng) {
       error = 'Latitude and longitude required';
@@ -630,68 +825,68 @@ app.get('/api/items/nearby', async (req, res) => {
     const latitude = parseFloat(lat);
     const longitude = parseFloat(lng);
     const radiusKm = parseFloat(radius) || 5;  // Default 5km
-    
+
     // Validate coordinate ranges
     if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
       error = 'Invalid coordinates. Latitude: -90 to 90, Longitude: -180 to 180';
       return res.status(400).json({ error });
     }
-    
+
     // Calculate degree ranges (1 degree ≈ 111km)
     const latRange = radiusKm / 111;
     const lngRange = radiusKm / (111 * Math.cos(latitude * Math.PI / 180));
-    
+
     // Find items within bounding box using GeoJSON coordinates
     // coordinates[0] = longitude, coordinates[1] = latitude
     const items = await Item.find({
-      'location.coordinates.1': { 
-        $gte: latitude - latRange, 
-        $lte: latitude + latRange 
+      'location.coordinates.1': {
+        $gte: latitude - latRange,
+        $lte: latitude + latRange
       },
-      'location.coordinates.0': { 
-        $gte: longitude - lngRange, 
-        $lte: longitude + lngRange 
+      'location.coordinates.0': {
+        $gte: longitude - lngRange,
+        $lte: longitude + lngRange
       },
       status: { $ne: 'returned' }  // Exclude returned items
     })
-    .populate('userId', 'firstName lastName email')
-    .sort({ createdAt: -1 })
-    .limit(50);
-    
+      .populate('userId', 'firstName lastName email')
+      .sort({ createdAt: -1 })
+      .limit(50);
+
     // Calculate exact distances using Haversine formula
     const itemsWithDistance = items
       .map(item => {
         // Check if item has valid coordinates
-        if (item.location && 
-            item.location.coordinates && 
-            item.location.coordinates.length === 2) {
-          
+        if (item.location &&
+          item.location.coordinates &&
+          item.location.coordinates.length === 2) {
+
           const itemLng = item.location.coordinates[0];
           const itemLat = item.location.coordinates[1];
-          
+
           // Haversine formula for great-circle distance
           const R = 6371; // Earth radius in km
           const dLat = (itemLat - latitude) * Math.PI / 180;
           const dLng = (itemLng - longitude) * Math.PI / 180;
-          const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                    Math.cos(latitude * Math.PI / 180) * 
-                    Math.cos(itemLat * Math.PI / 180) *
-                    Math.sin(dLng/2) * Math.sin(dLng/2);
-          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+          const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(latitude * Math.PI / 180) *
+            Math.cos(itemLat * Math.PI / 180) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+          const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
           const distance = R * c;
-          
+
           return {
             ...item.toObject(),
             distance: Math.round(distance * 100) / 100  // Round to 2 decimals
           };
         }
-        
+
         // Item has no valid coordinates
         return { ...item.toObject(), distance: null };
       })
       .filter(item => item.distance === null || item.distance <= radiusKm)  // Filter by radius
       .sort((a, b) => (a.distance || 999) - (b.distance || 999));  // Sort by distance
-    
+
     var ret = {
       results: itemsWithDistance,
       count: itemsWithDistance.length,
@@ -715,21 +910,21 @@ app.get('/api/items/nearby', async (req, res) => {
 // Response: { results, count, error }
 app.get('/api/items', async (req, res) => {
   var error = '';
-  
+
   try {
     // Extract optional filter parameters from query string
     const { status, category } = req.query;
-    
+
     // Build filter object for MongoDB query
     var filter = {};
     if (status) filter.status = status;        // Filter by status if provided
     if (category) filter.category = category;  // Filter by category if provided
-    
+
     // Query database with filters, populate user info, sort by newest first
     const items = await Item.find(filter)
       .populate('userId', 'firstName lastName email')  // Include user details
       .sort({ createdAt: -1 });                       // Newest items first
-    
+
     // Return items array with count
     var ret = {
       results: items,
@@ -751,19 +946,19 @@ app.get('/api/items', async (req, res) => {
 // Response: { item, error }
 app.get('/api/items/:id', async (req, res) => {
   var error = '';
-  
+
   try {
     // Find item by ID and populate user info
     const item = await Item.findById(req.params.id)
       .populate('userId', 'firstName lastName email');
-    
+
     // If item not found
     if (!item) {
       error = 'Item not found';
       var ret = { error: error };
       return res.status(404).json(ret);
     }
-    
+
     // Return item details
     var ret = {
       item: item,
@@ -785,32 +980,32 @@ app.get('/api/items/:id', async (req, res) => {
 // Response: { success, message, item, error }
 app.patch('/api/items/:id/status', async (req, res) => {
   var error = '';
-  
+
   try {
     // Extract new status from request body
     const { status } = req.body;
-    
+
     // Validate: Status must be one of the allowed values
     if (!status || !['lost', 'found', 'claimed', 'returned'].includes(status)) {
       error = 'Invalid status. Must be: lost, found, claimed, or returned';
       var ret = { error: error };
       return res.status(400).json(ret);
     }
-    
+
     // Find item by ID and update status, return updated document
     const item = await Item.findByIdAndUpdate(
-      req.params.id, 
+      req.params.id,
       { status },          // Update object
       { new: true }        // Return updated document (not old one)
     );
-    
+
     // If item not found
     if (!item) { // Return 404 if item doesn't exist
       error = 'Item not found';
       var ret = { error: error };
       return res.status(404).json(ret);
     }
-    
+
     // Return success response with updated item
     var ret = {
       success: true,
@@ -836,7 +1031,7 @@ app.patch('/api/items/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
-    
+
     // Remove fields that shouldn't be updated
     delete updateData._id; // Prevent changing item ID
     delete updateData.userId; // Prevent changing item owner
@@ -898,34 +1093,34 @@ app.delete('/api/items/:id', async (req, res) => {
 // Response: { success, message, trackedItems, error }
 app.post('/api/users/:userId/tracked-items/:itemId', async (req, res) => {
   var error = '';
-  
+
   try {
     const { userId, itemId } = req.params;
-    
+
     // Find user
     const user = await User.findById(userId);
     if (!user) {
       error = 'User not found';
       return res.status(404).json({ error });
     }
-    
+
     // Check if item exists
     const item = await Item.findById(itemId);
     if (!item) {
       error = 'Item not found';
       return res.status(404).json({ error });
     }
-    
+
     // Check if already tracking
     if (user.trackedItems.includes(itemId)) {
       error = 'Item already tracked';
       return res.status(400).json({ error });
     }
-    
+
     // Add to tracked items
     user.trackedItems.push(itemId);
     await user.save();
-    
+
     var ret = {
       success: true,
       message: 'Item added to tracked list',
@@ -933,7 +1128,7 @@ app.post('/api/users/:userId/tracked-items/:itemId', async (req, res) => {
       error: ''
     };
     res.json(ret);
-    
+
   } catch (err) {
     console.error('Track item error:', err);
     error = err.message;
@@ -946,23 +1141,23 @@ app.post('/api/users/:userId/tracked-items/:itemId', async (req, res) => {
 // Response: { success, message, trackedItems, error }
 app.delete('/api/users/:userId/tracked-items/:itemId', async (req, res) => {
   var error = '';
-  
+
   try {
     const { userId, itemId } = req.params;
-    
+
     // Find user
     const user = await User.findById(userId);
     if (!user) {
       error = 'User not found';
       return res.status(404).json({ error });
     }
-    
+
     // Remove from tracked items
     user.trackedItems = user.trackedItems.filter(
       id => id.toString() !== itemId
     );
     await user.save();
-    
+
     var ret = {
       success: true,
       message: 'Item removed from tracked list',
@@ -970,7 +1165,7 @@ app.delete('/api/users/:userId/tracked-items/:itemId', async (req, res) => {
       error: ''
     };
     res.json(ret);
-    
+
   } catch (err) {
     console.error('Remove tracked item error:', err);
     error = err.message;
@@ -983,29 +1178,29 @@ app.delete('/api/users/:userId/tracked-items/:itemId', async (req, res) => {
 // Response: { results, count, error }
 app.get('/api/users/:userId/tracked-items', async (req, res) => {
   var error = '';
-  
+
   try {
     const { userId } = req.params;
-    
+
     // Find user and populate tracked items with full item details
     const user = await User.findById(userId)
       .populate({
         path: 'trackedItems',
         populate: { path: 'userId', select: 'firstName lastName email' }
       });
-    
+
     if (!user) {
       error = 'User not found';
       return res.status(404).json({ error });
     }
-    
+
     var ret = {
       results: user.trackedItems,
       count: user.trackedItems.length,
       error: ''
     };
     res.json(ret);
-    
+
   } catch (err) {
     console.error('Get tracked items error:', err);
     error = err.message;
