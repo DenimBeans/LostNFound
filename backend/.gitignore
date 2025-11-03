@@ -18,3 +18,4 @@ env
 # Build files
 dist/
 build/
+coverage/
