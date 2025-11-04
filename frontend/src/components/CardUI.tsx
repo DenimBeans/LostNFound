@@ -10,11 +10,19 @@ import '../Styles/MainPage.css';
 function CardUI() {
     const AddPopupRef = useRef<HTMLDivElement>(null);
 
+    interface ContainerData{
+        _id : string;
+        title : string;
+        description : string;
+        category : string;
+        status : string;
+    }
+
     const [message, setMessage] = useState('');
-    const [searchResults, setResults] = useState('');
-    const [itemList, setItemList] = useState('');
+    //const [searchResults, setResults] = useState('');
+    //const [itemList, setItemList] = useState('');
     
-    const [ItemContainer,setItemContainer] = useState([]);
+    const [ItemContainer,setItemContainer] = useState<ContainerData[]>([]);
 
     const [itemTitle, setItemNameValue] = React.useState('');
     const [itemDesc, setItemDescValue] = React.useState('');
@@ -95,7 +103,7 @@ function CardUI() {
 
             let txt = await response.text();
             let res = JSON.parse(txt);
-            setItemList(res.results)
+            setItemContainer(res.results)
             
             
             }
