@@ -14,6 +14,7 @@ function CardUI() {
     const [searchResults, setResults] = useState('');
     const [itemList, setItemList] = useState('');
     
+    const [ItemContainer,setItemContainer] = useState([]);
 
     const [itemTitle, setItemNameValue] = React.useState('');
     const [itemDesc, setItemDescValue] = React.useState('');
@@ -33,6 +34,17 @@ function CardUI() {
         }
     }
 
+    async function ItemData(){
+
+    }
+
+    async function EditItem(){
+
+    }
+
+    async function DeleteItem(){
+
+    }
 
     async function addItem(e: any): Promise<void> {
         e.preventDefault();
@@ -83,17 +95,12 @@ function CardUI() {
 
             let txt = await response.text();
             let res = JSON.parse(txt);
-            let _results = res.results;
-            let resultText = '';
-            for (let i = 0; i < _results.length; i++) {
-                resultText += _results[i];
-                if (i < _results.length - 1) {
-                    resultText += ', ';
-                }
+            setItemList(res.results)
+            
+            
             }
-            setResults('Item(s) have been retrieved');
-            setItemList(resultText);
-        }
+            
+        
         catch (error: any) {
             console.log("Frontend Error");
             alert(error.toString());
@@ -159,8 +166,16 @@ function CardUI() {
     return (
         <div id="MainUIDiv">
             <div id = "LostItemPage">
-                <span id="cardSearchResult">{searchResults}</span>
-                <p>{itemList}</p>
+                {ItemContainer.map(ItemContainer => (
+                    <div key = {ItemContainer._id} className = "ItemContainers">
+                        <input type = "text" id = "ContainerTitle" value = {ItemContainer.title} readOnly/>
+                        <button type = "button" id = "ContainerData" onClick = {ItemData}>Info</button>
+                        <button type = "button" id = "ContainerEdit" onClick = {EditItem}>Edit</button>
+                        <button type = "button" id = "ContainerDelete" onClick = {DeleteItem}>Delete</button>
+                        <input type = "text" id = "ContainerStatus" value = {ItemContainer.status} readOnly/>
+                    </div>
+                ))}
+                
             </div>
             <div id = "AddItemPopup" ref = {AddPopupRef}>
 
@@ -171,6 +186,7 @@ function CardUI() {
                     onChange={handleDescTextChange}></textarea>
 
                 <select value = {itemCat} onChange = {handleItemCatChange}>
+                    <option value = " ">Select Option</option>
                     <option value = "Electronic">Electronic</option>
                     <option value = "Apparal">Apparal</option>
                     <option value = "Container">Container</option>
