@@ -85,7 +85,8 @@ const userSchema = new mongoose.Schema({
   verificationTokenExpires: { type: Date },                          // When verification token expires
   resetPasswordToken: { type: String },                              // Token for password reset link
   resetPasswordExpires: { type: Date },                               // When reset token expires
-  trackedItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }] // Items user is tracking 
+  trackedItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }], // Items user is tracking
+  notifications: { type: [String], default: [] }
 }, { timestamps: true });  // Automatically add createdAt and updatedAt fields
 
 // Create User model from schema
@@ -1203,6 +1204,163 @@ app.get('/api/users/:userId/tracked-items', async (req, res) => {
 
   } catch (err) {
     console.error('Get tracked items error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
+// ==================== NOTIFICATION ENDPOINTS ====================
+
+// ADD NOTIFICATION ENDPOINT - Add a new notification for a user
+// POST /api/users/:userId/notifications
+// Body: { message }
+// Response: { success, message, notifications, error }
+app.post('/api/users/:userId/notifications', async (req, res) => {
+  var error = '';
+
+  try {
+    const { userId } = req.params;
+    const { message } = req.body;
+
+    // Validate message
+    if (!message || typeof message !== 'string') {
+      error = 'Notification message required';
+      return res.status(400).json({ error });
+    }
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      error = 'User not found';
+      return res.status(404).json({ error });
+    }
+
+    // Add notification
+    user.notifications.push(message);
+    await user.save();
+
+    var ret = {
+      success: true,
+      message: 'Notification added',
+      notifications: user.notifications,
+      error: ''
+    };
+    res.status(201).json(ret);
+
+  } catch (err) {
+    console.error('Add notification error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
+// GET NOTIFICATIONS ENDPOINT - Retrieve all notifications for a user
+// GET /api/users/:userId/notifications
+// Response: { notifications, count, error }
+app.get('/api/users/:userId/notifications', async (req, res) => {
+  var error = '';
+
+  try {
+    const { userId } = req.params;
+
+    // Find user by ID
+    const user = await User.findById(userId).select('notifications');
+
+    if (!user) {
+      error = 'User not found';
+      return res.status(404).json({ error });
+    }
+
+    var ret = {
+      notifications: user.notifications,
+      count: user.notifications.length,
+      error: ''
+    };
+    res.json(ret);
+
+  } catch (err) {
+    console.error('Get notifications error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
+// DELETE NOTIFICATION ENDPOINT - Remove a specific notification
+// DELETE /api/users/:userId/notifications/:notificationIndex
+// Response: { success, message, notifications, error }
+app.delete('/api/users/:userId/notifications/:notificationIndex', async (req, res) => {
+  var error = '';
+
+  try {
+    const { userId, notificationIndex } = req.params;
+    const index = parseInt(notificationIndex);
+
+    // Validate index is a number
+    if (isNaN(index) || index < 0) {
+      error = 'Invalid notification index';
+      return res.status(400).json({ error });
+    }
+
+    // Find user
+    const user = await User.findById(userId);
+    if (!user) {
+      error = 'User not found';
+      return res.status(404).json({ error });
+    }
+
+    // Check if index exists
+    if (index >= user.notifications.length) {
+      error = 'Notification not found';
+      return res.status(404).json({ error });
+    }
+
+    // Remove notification at index
+    user.notifications.splice(index, 1);
+    await user.save();
+
+    var ret = {
+      success: true,
+      message: 'Notification deleted successfully',
+      notifications: user.notifications,
+      error: ''
+    };
+    res.json(ret);
+
+  } catch (err) {
+    console.error('Delete notification error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
+// DELETE ALL NOTIFICATIONS ENDPOINT - Clear all notifications for a user
+// DELETE /api/users/:userId/notifications
+// Response: { success, message, error }
+app.delete('/api/users/:userId/notifications', async (req, res) => {
+  var error = '';
+
+  try {
+    const { userId } = req.params;
+
+    // Find user and clear notifications
+    const user = await User.findById(userId);
+    if (!user) {
+      error = 'User not found';
+      return res.status(404).json({ error });
+    }
+
+    user.notifications = [];
+    await user.save();
+
+    var ret = {
+      success: true,
+      message: 'All notifications cleared',
+      error: ''
+    };
+    res.json(ret);
+
+  } catch (err) {
+    console.error('Clear notifications error:', err);
     error = err.message;
     res.status(500).json({ error });
   }
