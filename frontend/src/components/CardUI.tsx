@@ -111,8 +111,6 @@ function CardUI() {
         
         catch (error: any) {
             console.log("Frontend Error");
-            alert(error.toString());
-            setResults(error.toString());
         }
     };
 
