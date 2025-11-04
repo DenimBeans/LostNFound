@@ -42,23 +42,25 @@ function Login() {
 
     catch (error: any) {
       alert(error.toString());
+      
       return;
     }
   };
 
   return (
     <div id="loginDiv">
-      <span id="inner-title">PLEASE LOG IN</span><br />
-       <input type="text" id="loginName" placeholder="Username"
+      <span id="inner-title">Record thine login credentials...</span><br />
+      <span id="loginResult"> {message} </span>
+
+       <input type="text" id="loginName" placeholder="Email"
         onChange={handleSetLoginName} />
        <input type="password" id="loginPassword" placeholder="Password"
         onChange={handleSetPassword} />
+        <p id="passReset"><a href = "http://174.138.65.216/PasswordResetEmail">Forgot Password?</a></p>
 
       <input type="submit" id="loginButton" className="buttons" value="Submit"
         onClick={doLogin} />
-      <span id="loginResult">{message}</span>
-      <a href = "http://174.138.65.216/Register">Temp Register</a>
-      <a href = "http://174.138.65.216/PasswordResetEmail">Temp Pass Reset</a>
+      <p id="regLink">New user?<a href = "http://174.138.65.216/Register"> Create an Account!</a></p>
     </div>
   );
 };
