@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { buildPath } from './Path';
+import { buildPath, buildAPIPath } from './Path';
 import {useParams} from 'react-router-dom';
 import '../Styles/FrontPage.css';
 
@@ -21,7 +21,7 @@ function passreset() {
     
     try {
       
-      const response = await fetch(buildPath(`api/auth/reset-password/${token}`),
+      const response = await fetch(buildAPIPath(`api/auth/reset-password/${token}`),
         { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
       var res = JSON.parse(await response.text());

@@ -1,28 +1,30 @@
 #registerDiv{
-width: 80%;
-margin-left: 10%;
-height: 70vh;
-background-color: rgb(101, 101, 101);
+width: 60%;
+margin-left: 20%;
+background-color: rgb(56, 56, 61);
 display:flex;
 flex-direction: column;
 
 border-width: 3px;
 border-radius: 20px;
 border-style:solid;
-border-color:black;
+border-color:rgb(41, 42, 46);
 }
 
 #RegisterTitle{
     margin-top: 5%;
     font-size: x-large;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
     display:flex;
     justify-content:center;
+    color: white;
+    text-shadow: 1px 1px 2px rgb(175, 173, 173);
 }
 
-#FirstName{
+#FirstName, #LastName, #Email, #Password{
     width: 50%;
     margin-left: 25%;
+    margin-top: 15px;
     display:flex;
     justify-content: center;
     height: 40px;
@@ -31,102 +33,77 @@ border-color:black;
     font-size: large;
 
     border-width: 3px;
-    border-radius: 20px;
+    border-radius: 10px;
     border-style:solid;
-    border-color:black;
+    border-color:rgb(41, 42, 46);
 }
 
-#FirstName:focus{
+#FirstName:focus, #LastName:focus,
+#Email:focus, #Password:focus, a:focus,
+#RegisterButton:focus
+{
     outline-color: darkgoldenrod;
     outline-style: solid;
     outline-width: 3px;
 }
 
-#LastName{
-    margin-top: 20px;
-    width: 50%;
-    margin-left: 25%;
-    display:flex;
-    justify-content: center;
-    height: 40px;
-    text-align: center;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: large;
-
-    border-width: 3px;
-    border-radius: 20px;
-    border-style:solid;
-    border-color:black;
-
-}
-#LastName:focus{
-    outline-color: darkgoldenrod;
-    outline-style: solid;
-    outline-width: 3px;
+#FirstName:hover, #LastName:hover,
+#Email:hover, #Password:hover 
+{
+    border-color: darkgoldenrod;
+    animation: glow 0.5s ease-in-out infinite alternate;
 }
 
-#Email{
-    margin-top: 20px;
-    width: 50%;
-    margin-left: 25%;
-    display:flex;
-    justify-content: center;
-    height: 40px;
-    text-align: center;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: large;
-
-    border-width: 3px;
-    border-radius: 20px;
-    border-style:solid;
-    border-color:black;
-
+@keyframes glow 
+{
+    from { filter: brightness(1); }
+    to { filter: brightness(1.3); }
 }
 
-#Email:focus{
-    outline-color: darkgoldenrod;
-    outline-style: solid;
-    outline-width: 3px;
-}
-#Password{
-    margin-top: 20px;
-    width: 50%;
-    margin-left: 25%;
-    display:flex;
-    justify-content: center;
-    height: 40px;
-    text-align: center;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: large;
-
-    border-width: 3px;
-    border-radius: 20px;
-    border-style:solid;
-    border-color:black;
-
-}
-#Password:focus{
-    outline-color: darkgoldenrod;
-    outline-style: solid;
-    outline-width: 3px;
-}
 #RegisterButton{
     margin-top: 20px;
-    height: 35px;
-    width: 10%;
-    margin-left: 45%;
+    height: 45px;
+    width: 20%;
+    margin-left: 40%;
+    margin-bottom: 20px;
     display: flex;
     justify-content: center;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    background: linear-gradient(-45deg, darkgoldenrod 40%,  rgb(216, 159, 14) 50%,  darkgoldenrod 60%); 
+    background-size: 300%;
+    background-position-x: 100%;
 
     border-width: 3px;
     border-radius: 20px;
     border-style:solid;
-    border-color:black;
+    border-color: rgb(170, 125, 11);
+    filter: drop-shadow(2px 2px 15px rgba(170, 125, 11, 0.541));
+    box-shadow: 0 8px rgb(134, 99, 9);
 }
 
-#RegisterButton:hover{
-    outline-color: darkgoldenrod;
-    outline-style: solid;
-    cursor: pointer;
+#RegisterButton:hover, #RegisterButton:focus{
+    border-color: rgb(170, 125, 11);
+    animation: shimmer 1s infinite linear;
+}
+
+@keyframes shimmer {
+   to {
+      background-position-x: 0%
+   }
+}
+
+#RegisterButton:active {
+  background-color:  rgb(167, 122, 10);
+  box-shadow: 0 4px rgb(134, 99, 9);
+  transform: translateY(4px);
+}
+
+#RegisterResult
+{
+    display: flex;
+    justify-content: center;
+    color: rgb(231, 67, 67);
+    font-weight: bold;
 }

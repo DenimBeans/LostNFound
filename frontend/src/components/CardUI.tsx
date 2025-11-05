@@ -50,7 +50,7 @@ function CardUI() {
 
     }
 
-    async function DeleteItem(itemId){
+    async function DeleteItem(itemId : String): Promise<void>{
         let obj = {id: itemId}
         let js = JSON.stringify(obj)
 
@@ -119,7 +119,7 @@ function CardUI() {
         //let js = JSON.stringify(obj);
 
         try {
-            const response = await fetch(buildPath('api/items'),
+            const response = await fetch(buildPath('api/items:id'),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
@@ -196,7 +196,7 @@ function CardUI() {
                         <input type = "text" id = "ContainerTitle" value = {ItemContainer.title} readOnly/>
                         <button type = "button" id = "ContainerData" onClick = {ItemData}>Info</button>
                         <button type = "button" id = "ContainerEdit" onClick = {EditItem}>Edit</button>
-                        <button type = "button" id = "ContainerDelete" onClick = {DeleteItem(ItemContainer._id)}>Delete</button>
+                        <button type = "button" id = "ContainerDelete" onClick = {(e:any) => DeleteItem(ItemContainer._id)}>Delete</button>
                         <input type = "text" id = "ContainerStatus" value = {ItemContainer.status} readOnly/>
                     </div>
                 ))}

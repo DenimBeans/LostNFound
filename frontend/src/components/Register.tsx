@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { buildPath } from './Path';
+import { buildPath, buildAPIPath } from './Path';
 import '../Styles/Register.css';
 
 function Register(){
@@ -10,6 +10,8 @@ const [LastName,setLastName] = React.useState('');
 const [RegisterEmail,setRegisterEmail] = React.useState('');
 const [RegisterPassword,setRegisterPassword] = React.useState('');
 //const [RegisterPasswordRepeat,SetRegisterPasswordRepeat] = React.useState('');
+
+const loginPath = buildPath("");
 
 function handleSetFirstName(e: any): void{
     setFirstName(e.target.value);
@@ -44,7 +46,7 @@ async function doRegister(event: any): Promise<void> {
     
      try {
         
-      const response = await fetch(buildPath('api/auth/register'),
+      const response = await fetch(buildAPIPath('api/auth/register'),
         { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
       var res = JSON.parse(await response.text());
@@ -70,7 +72,8 @@ async function doRegister(event: any): Promise<void> {
 
     return(
       <div id = "registerDiv">
-        <span id = "RegisterTitle">Register</span><br/>
+        <span id = "RegisterTitle">Submit thine registration...</span><br/>
+        <span id="RegisterResult">{message}</span>
         <input type = "text" id = "FirstName" placeholder = "First Name" onChange={handleSetFirstName} />
         <input type = "text" id = "LastName" placeholder = "Last Name" onChange ={handleSetLastName} />
  
@@ -78,7 +81,7 @@ async function doRegister(event: any): Promise<void> {
         <input type = "password" id = "Password" placeholder = "Password" onChange = {handleSetRegisterPassword} />
         
         <input type = "Submit" id = "RegisterButton" className = "buttons" value = "Register" onClick = {doRegister} />
-        <span id="RegisterResult">{message}</span>
+        <p id="regLink">Returning User?<a href = {loginPath}> Login!</a></p>
       </div>  
     )
 }

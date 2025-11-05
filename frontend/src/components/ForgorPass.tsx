@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { buildPath } from './Path';
+import { buildPath, buildAPIPath } from './Path';
 import '../Styles/FrontPage.css';
 
 function ForgorPass() {
@@ -19,7 +19,7 @@ function ForgorPass() {
     
     try {
       
-      const response = await fetch(buildPath('api/auth/forgot-password'),
+      const response = await fetch(buildAPIPath('api/auth/forgot-password'),
         { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
       var res = JSON.parse(await response.text());

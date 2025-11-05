@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { buildPath } from './Path';
+import { buildPath, buildAPIPath } from './Path';
 import '../Styles/FrontPage.css';
 
 function Login() {
   const [message, setMessage] = useState('');
   const [loginName, setLoginName] = React.useState('');
   const [loginPassword, setPassword] = React.useState('');
+  const regPath = buildPath("Register");
+  const resetPath = buildPath("PasswordResetEmail");
 
   function handleSetLoginName(e: any): void {
     setLoginName(e.target.value);
@@ -23,7 +25,7 @@ function Login() {
     
     try {
       
-      const response = await fetch(buildPath('api/auth/login'),
+      const response = await fetch(buildAPIPath('api/auth/login'),
         { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
       var res = JSON.parse(await response.text());
@@ -56,11 +58,11 @@ function Login() {
         onChange={handleSetLoginName} />
        <input type="password" id="loginPassword" placeholder="Password"
         onChange={handleSetPassword} />
-        <p id="passReset"><a href = "http://174.138.65.216/PasswordResetEmail">Forgot Password?</a></p>
+        <p id="passReset"><a href = {resetPath}>Forgot Password?</a></p>
 
       <input type="submit" id="loginButton" className="buttons" value="Submit"
         onClick={doLogin} />
-      <p id="regLink">New user?<a href = "http://174.138.65.216/Register"> Create an Account!</a></p>
+      <p id="regLink">New user?<a href = {regPath}> Create an Account!</a></p>
     </div>
   );
 };
