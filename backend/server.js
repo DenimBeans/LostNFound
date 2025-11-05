@@ -32,12 +32,17 @@ if (MONGO_URI) {
 
 // ==================== DATABASE CONNECTION ====================
 // Connect to MongoDB database
-mongoose.connect(MONGO_URI)
-  .then(() => console.log('✅ Connected to MongoDB'))
-  .catch((err) => {
-    console.error('❌ MongoDB connection error:', err.message);
-    process.exit(1);  // Exit if database connection fails
-  });
+// Skip auto-connection during tests (tests manage their own DB connection)
+if (process.env.NODE_ENV !== 'test') {
+  mongoose.connect(MONGO_URI)
+    .then(() => console.log('✅ Connected to MongoDB'))
+    .catch((err) => {
+      console.error('❌ MongoDB connection error:', err.message);
+      process.exit(1);  // Exit if database connection fails
+    });
+} else {
+  console.log('⏭️  Skipping DB connection (test environment)');
+}
 
 // ==================== EMAIL CONFIGURATION ====================
 // Configure SendGrid for email delivery (using Web API, not SMTP)
@@ -1381,8 +1386,14 @@ app.use((err, req, res, next) => {
 
 // ==================== START SERVER ====================
 // Start Express server and listen for requests
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-  console.log(`📍 Environment: ${NODE_ENV}`);
-  console.log(`📧 Email configured:`, SENDGRID_API_KEY ? 'Yes ✅' : 'No ❌');
-});
+// Only start server if this file is run directly (not imported for testing)
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on http://localhost:${PORT}`);
+    console.log(`📝 Environment: ${NODE_ENV}`);
+    console.log(`📧 Email configured:`, SENDGRID_API_KEY ? 'Yes ✅' : 'No ❌');
+  });
+}
+
+// Export app for testing
+module.exports = app;
