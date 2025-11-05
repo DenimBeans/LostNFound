@@ -189,7 +189,7 @@ class LoginFormState extends State<LoginForm> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => ItemSearch(
+                builder: (context) => AppHome(
                   firstName: data['firstName'], 
                   lastName: data['lastName'],
                 ),
@@ -332,7 +332,7 @@ class RegisterFormState extends State<RegisterForm> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => ItemSearch(
+                builder: (context) => AppHome(
                   firstName: data['firstName'], 
                   lastName: data['lastName'],
                 ),
@@ -438,18 +438,23 @@ class RegisterFormState extends State<RegisterForm> {
 //  Email Verification Popup
 
 //  Search for Items Widgets
-class ItemSearch extends StatelessWidget {
+class AppHome extends StatefulWidget {
   final String firstName;
   final String lastName;
-  //final int userID;
   
-  const ItemSearch({
+  const AppHome({
     super.key, 
     required this.firstName, 
     required this.lastName, 
-    //required this.userID
     }
   );
+
+  @override
+  State<AppHome> createState() => _AppHomeState();
+}
+
+class _AppHomeState extends State<AppHome> {
+  int currentPageIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -464,32 +469,31 @@ class ItemSearch extends StatelessWidget {
       //  I'll rewrite the widget later so that the back arrow becomes optional
       //  + rename it from ArrowTitleBar to CenterTitleBar
       appBar: ArrowTitleBar(title: 'Search for Lost Items'),
-      body: Column(
-        children: [
-          FormField(label: 'Search Item', isObscure: false,),
-          SizedBox(
-            width: 350,
-            height: 250,
-            //  Container widget is placeholder
-            //  As this will be where we output the items, ListView may be better
-            child: Container(
-              color: Colors.grey,
-            ),
+      bottomNavigationBar: NavigationBar(
+        onDestinationSelected: (int index) {
+          setState(() {
+            currentPageIndex = index;
+          });
+        },
+        indicatorColor: Colors.grey,
+        selectedIndex: currentPageIndex,
+        destinations: const <Widget>[
+          NavigationDestination(
+            selectedIcon: Icon(Icons.document_scanner),
+            icon: Icon(Icons.document_scanner_outlined),
+            label: 'Report Lost'
           ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.document_scanner_rounded),
-            label: 'Report Lost',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
+          NavigationDestination(
+            selectedIcon: Icon(Icons.search),
+            icon: Icon(Icons.search_outlined),
+            label: 'Search'
           ),
         ]
       ),
+      body: <Widget>[
+        SearchDisplay(),
+        ReportDisplay(),
+      ][currentPageIndex],
       endDrawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -529,7 +533,48 @@ class ItemSearch extends StatelessWidget {
             ),
           ],
         ),
-      ), 
+      ),
+    );
+  }
+}
+
+class SearchDisplay extends StatelessWidget {
+  const SearchDisplay({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        FormField(label: 'Search Item', isObscure: false,),
+        SizedBox(
+          width: 350,
+          height: 250,
+          //  Container widget is placeholder
+          //  As this will be where we output the items, ListView may be better
+          child: Container(
+            color: Colors.grey,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ReportDisplay extends StatelessWidget {
+  const ReportDisplay({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        FormField(label: 'Item Name', isObscure: false,),
+        FormField(label: 'Item Description', isObscure: false,),
+        FormField(label: 'Last Known Location', isObscure: false,),
+      ],
     );
   }
 }
@@ -610,9 +655,20 @@ class AboutModal extends StatelessWidget {
   }
 }
 
+//  App Home Page
+
+
 //  Report a Lost Item Widgets
 class ItemReport extends StatelessWidget {
-  const ItemReport({super.key});
+  final String firstName;
+  final String lastName;
+  
+  const ItemReport({
+    super.key,
+    required this.firstName,
+    required this.lastName,
+  }
+);
 
   @override
   Widget build(BuildContext context) {
