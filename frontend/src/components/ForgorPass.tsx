@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { buildPath, buildAPIPath } from './Path';
+import { buildAPIPath } from './Path';
 import '../Styles/FrontPage.css';
 
 function ForgorPass() {

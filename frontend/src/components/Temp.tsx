@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import { buildPath} from './Path';
 import '../Styles/FrontPage.css';
 

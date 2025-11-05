@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { buildPath, buildAPIPath } from './Path';
+import { buildAPIPath } from './Path';
 import {useParams} from 'react-router-dom';
 import '../Styles/FrontPage.css';
 
