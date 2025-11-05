@@ -50,9 +50,30 @@ function CardUI() {
 
     }
 
-    async function DeleteItem(){
+    async function DeleteItem(itemId){
+        let obj = {id: itemId}
+        let js = JSON.stringify(obj)
 
-    }
+        try {
+            const response = await fetch(buildPath('api/items/:id'),
+                { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
+            
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if(res.error != ''){
+                setMessage(res.error)
+            }
+            else{
+                setItemContainer(ItemContainer.filter((ItemContainer) => ItemContainer._id != itemId))
+            }
+
+            
+        }
+        catch (error: any) {
+            setMessage(error.toString());
+        }
+    };
 
     async function addItem(e: any): Promise<void> {
         e.preventDefault();
@@ -104,8 +125,6 @@ function CardUI() {
             let txt = await response.text();
             let res = JSON.parse(txt);
             setItemContainer(res.results)
-            
-            
             }
             
         
@@ -177,7 +196,7 @@ function CardUI() {
                         <input type = "text" id = "ContainerTitle" value = {ItemContainer.title} readOnly/>
                         <button type = "button" id = "ContainerData" onClick = {ItemData}>Info</button>
                         <button type = "button" id = "ContainerEdit" onClick = {EditItem}>Edit</button>
-                        <button type = "button" id = "ContainerDelete" onClick = {DeleteItem}>Delete</button>
+                        <button type = "button" id = "ContainerDelete" onClick = {DeleteItem(ItemContainer._id)}>Delete</button>
                         <input type = "text" id = "ContainerStatus" value = {ItemContainer.status} readOnly/>
                     </div>
                 ))}
