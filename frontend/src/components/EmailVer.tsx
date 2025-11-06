@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { buildPath } from './Path';
+import { buildAPIPath } from './Path';
 import {useParams} from 'react-router-dom';
 import {useEffect} from 'react';
 import '../Styles/FrontPage.css';
@@ -17,7 +17,7 @@ async function Verify(token: any){
 
    try {
       
-      const response = await fetch(buildPath(`api/auth/verify/${token}`),
+      const response = await fetch(buildAPIPath(`api/auth/verify/${token}`),
         { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
       var res = JSON.parse(await response.text());
