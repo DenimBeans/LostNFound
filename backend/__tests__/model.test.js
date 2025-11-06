@@ -1,6 +1,12 @@
-import mongoose from "mongoose";
-import Item from '../src/models/Item.js';
-import User from '../src/models/User.js';
+const mongoose = require("mongoose");
+
+process.env.NODE_ENV = 'test';
+process.env.ACCESS_TOKEN_SECRET = 'none';
+process.env.BASE_URL = 'none';
+
+const app = require('../server');
+const Item = mongoose.model('Item');
+const User = mongoose.model('User');
 
 describe('Model Tests', () => {
     test('Item model exists', () => {
