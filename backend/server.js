@@ -1214,6 +1214,52 @@ app.get('/api/users/:userId/tracked-items', async (req, res) => {
   }
 });
 
+// GET USER'S OWN ITEMS ENDPOINT - Retrieve all items posted by a specific user (KAN-50)
+// GET /api/users/:userId/items
+// Query Params: status (optional) - filter by item status
+// Response: { results, count, error }
+app.get('/api/users/:userId/items', async (req, res) => {
+  console.log('🔍 GET USER ITEMS CALLED - userId:', req.params.userId); // ← ADD THIS
+  var error = '';
+  
+  try {
+    const { userId } = req.params;
+    const { status } = req.query;  // Optional status filter
+
+    // Verify user exists
+    const user = await User.findById(userId);
+    if (!user) {
+      error = 'User not found';
+      return res.status(404).json({ error });
+    }
+
+    // Build filter - find all items created by this user
+    var filter = { userId: userId };
+    
+    // Add optional status filter
+    if (status && ['lost', 'found', 'pending'].includes(status)) {
+      filter.status = status;
+    }
+
+    // Query database for items created by this user
+    const items = await Item.find(filter)
+      .sort({ createdAt: -1 });  // Newest items first
+
+    // Return items array with count
+    var ret = {
+      results: items,
+      count: items.length,
+      error: ''
+    };
+    res.json(ret);
+
+  } catch (err) {
+    console.error('Get user items error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
 // ==================== NOTIFICATION ENDPOINTS ====================
 
 // ADD NOTIFICATION ENDPOINT - Add a new notification for a user
