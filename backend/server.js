@@ -104,7 +104,7 @@ const itemSchema = new mongoose.Schema({
   category: { type: String, required: true },                        // Category (e.g., "Electronics")
   status: {                                                          // Item status
     type: String,
-    enum: ['lost', 'found', 'pending'],  // Only these 3 values allowed
+    enum: ['lost', 'found', 'pending', 'claimed', 'returned'],  // Only these 5 values allowed
     default: 'lost',                     // Default to 'lost'
     required: true
   },
@@ -120,7 +120,7 @@ const itemSchema = new mongoose.Schema({
   imageUrl: { type: String },                                        // URL to item photo (optional)
   isClaimed: { type: Boolean, default: false }                       // Whether item has been claimed
 }, { timestamps: true });  // Automatically add createdAt and updatedAt fields
-
+itemSchema.index({ userId: 1, createdAt: -1 });  // Optimize user item queries
 // Create Item model from schema
 const Item = mongoose.model('Item', itemSchema);
 
@@ -730,6 +730,51 @@ app.delete('/api/users/:userId', async (req, res) => {
   }
 });
 
+// GET USER PROFILE ENDPOINT - View Your Own Account Settings No edits
+// GET /api/users/:userId
+// Response: { user, error }
+app.get('/api/users/:userId', async (req, res) => {
+  var error = '';
+
+  try {
+    const { userId } = req.params;
+
+    // Validate userId format
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      error = 'Invalid user ID format';
+      return res.status(400).json({ error });
+    }
+
+    // Find user by ID, exclude sensitive fields
+    const user = await User.findById(userId).select('-password -verificationToken -resetPasswordToken -verificationTokenExpires -resetPasswordExpires');
+
+    if (!user) {
+      error = 'User not found';
+      return res.status(404).json({ error });
+    }
+
+    // Return user profile without sensitive data
+    var ret = {
+      user: {
+        _id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        isVerified: user.isVerified,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      },
+      error: ''
+    };
+    res.json(ret);
+
+  } catch (err) {
+    console.error('Get user profile error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
 // ==================== ITEM ENDPOINTS ====================
 
 // CREATE ITEM ENDPOINT - Report a lost or found item
@@ -853,7 +898,7 @@ app.get('/api/items/nearby', async (req, res) => {
         $gte: longitude - lngRange,
         $lte: longitude + lngRange
       },
-      status: { $ne: 'returned' }  // Exclude returned items
+      status: { $nin: ['returned', 'claimed'] }    // Exclude returned items and claimed items
     })
       .populate('userId', 'firstName lastName email')
       .sort({ createdAt: -1 })
@@ -992,8 +1037,8 @@ app.patch('/api/items/:id/status', async (req, res) => {
     const { status } = req.body;
 
     // Validate: Status must be one of the allowed values
-    if (!status || !['lost', 'found', 'claimed', 'returned'].includes(status)) {
-      error = 'Invalid status. Must be: lost, found, claimed, or returned';
+    if (!status || !['lost', 'found', 'pending', 'claimed', 'returned'].includes(status)) {
+      error = 'Invalid status. Must be: lost, found, pending, claimed, or returned';
       var ret = { error: error };
       return res.status(400).json(ret);
     }
@@ -1219,12 +1264,17 @@ app.get('/api/users/:userId/tracked-items', async (req, res) => {
 // Query Params: status (optional) - filter by item status
 // Response: { results, count, error }
 app.get('/api/users/:userId/items', async (req, res) => {
-  console.log('🔍 GET USER ITEMS CALLED - userId:', req.params.userId); // ← ADD THIS
   var error = '';
   
   try {
     const { userId } = req.params;
     const { status } = req.query;  // Optional status filter
+
+    // Validate userId format
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      error = 'Invalid user ID format';
+      return res.status(400).json({ error });
+    }
 
     // Verify user exists
     const user = await User.findById(userId);
@@ -1237,12 +1287,13 @@ app.get('/api/users/:userId/items', async (req, res) => {
     var filter = { userId: userId };
     
     // Add optional status filter
-    if (status && ['lost', 'found', 'pending'].includes(status)) {
+    if (status && ['lost', 'found', 'pending', 'claimed', 'returned'].includes(status)) {
       filter.status = status;
     }
 
     // Query database for items created by this user
     const items = await Item.find(filter)
+      .populate('userId', 'firstName lastName email')
       .sort({ createdAt: -1 });  // Newest items first
 
     // Return items array with count
