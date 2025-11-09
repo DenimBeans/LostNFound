@@ -15,6 +15,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.amber,
+        )
+      ),
       home: Scaffold(
         resizeToAvoidBottomInset: true,
         backgroundColor: mainCol,
@@ -30,7 +35,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         body: Column(
-          //mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextHeading(),
             SizedBox(
@@ -113,6 +118,7 @@ class LoginText extends StatelessWidget {
             onPressed: () {
               showModalBottomSheet<void>(
                 context: context,
+                isScrollControlled: true,
                 builder: (BuildContext context) {
                   return LoginModal();
                 },
@@ -132,19 +138,22 @@ class LoginModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      color: Colors.amber,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Text('Login', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            LoginForm(),
-          ],
+    return Padding (
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom,), 
+      child: Container(
+        height: 300,
+        color: Colors.amber,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Text('Login', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              LoginForm(),
+            ],
+          ),
         ),
-      ),
+      )
     );
   }
 }

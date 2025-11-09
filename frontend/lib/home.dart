@@ -54,11 +54,17 @@ class _AppHomeState extends State<AppHome> {
             icon: Icon(Icons.search_outlined),
             label: 'Search'
           ),
+          NavigationDestination(
+            selectedIcon: Icon(Icons.mail),
+            icon: Icon(Icons.mail_outline),
+            label: 'Inbox'
+          ),
         ]
       ),
       body: <Widget>[
         SearchDisplay(),
         ReportDisplay(),
+        InboxDisplay(),
       ][currentPageIndex],
       endDrawer: Drawer(
         child: ListView(
@@ -151,6 +157,20 @@ class ReportDisplay extends StatelessWidget {
   }
 }
 
+class InboxDisplay extends StatelessWidget {
+  const InboxDisplay({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+   // return ListView.builder(
+     // itemBuilder:
+   // );
+   return Scaffold();
+  }
+}
+
 //  Hamburger Menu Contents
 class NotificationsModal extends StatelessWidget {
   const NotificationsModal({
@@ -199,7 +219,7 @@ class AboutModal extends StatelessWidget {
           padding: EdgeInsetsGeometry.all(20),
           //  Might want to find a way to change this so that the text itself is hyperlinked instead of
           //  just a plaintext link
-          child: Text('Created in X weeks for COP 4331\n\nGithub: https://github.com/DenimBeans/LostNFound'),
+          child: Text('Created for COP 4331\n\nGithub: https://github.com/DenimBeans/LostNFound'),
         )
       ]
     );
