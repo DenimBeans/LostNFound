@@ -107,3 +107,30 @@ border-color:rgb(41, 42, 46);
     color: rgb(231, 67, 67);
     font-weight: bold;
 }
+
+.successModal
+{
+    background-color: rgb(56, 56, 61);
+    justify-content: center; 
+    align-items: center;   
+    margin-top: 125px; 
+    height: 50%; 
+    width: 70%;
+    margin-left: 15%;
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:rgb(41, 42, 46);      
+}
+
+#modalLink
+{
+    text-align: center;
+}
+
+#successText
+{
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    color: white;
+    text-align: center;
+}
