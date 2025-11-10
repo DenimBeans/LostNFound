@@ -19,13 +19,15 @@ flex-direction: column;
 
 overflow-y: scroll;
 }
+
 #AddItemPopup{
 width: 80%;
 background-color: rgb(101, 101, 101);
 
 flex-direction: column;
 z-index: 3;
-display: none;
+display: flex;
+visibility: hidden;
 
 position: fixed;
 top: 50%;
@@ -38,11 +40,40 @@ border-style:solid;
 border-color:black;
 
 }
+
 #ButtonHolster{
 display: flex;
 flex-direction: row;
 padding-right: 20px;
 
+}
+
+#itemTitle, #Desc, #locationText, #ImageUp{
+    width: 50%;
+    margin-left: 25%;
+    margin-top: 15px;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 10px;
+    border-style:solid;
+    border-color:rgb(41, 42, 46);
+}
+
+#itemTitle
+{
+    float: left;
+}
+
+#Desc
+{
+    min-height: 100px;
+    float: right;
 }
 
 /* Removed #title*/
@@ -62,6 +93,22 @@ padding-right: 20px;
     border-color:black;
     
 }
+
+#category
+{
+    margin-top: 15px;
+    width: 50%;
+    margin-left: 25%;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    height: 25px;
+    font-size: medium;
+    border-width: 3px;
+    border-radius: 5px;
+    border-style:solid;
+    border-color:rgb(41, 42, 46);
+    
+}
+
 #title:focus,#lat:focus,#long:focus{
     outline-color: darkgoldenrod;
     outline-style: solid;
@@ -69,22 +116,6 @@ padding-right: 20px;
     
 }
 
-#locationText{
-    width: 50%;
-    margin-left: 25%;
-    display:flex;
-    justify-content: center;
-    height: 40px;
-    text-align: center;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: large;
-
-    border-width: 3px;
-    border-radius: 20px;
-    border-style:solid;
-    border-color:black;
-    
-}
 #locationText:focus{
     outline-color: darkgoldenrod;
     outline-style: solid;
@@ -176,4 +207,32 @@ padding-right: 20px;
     outline-color: darkgoldenrod;
     outline-style: solid;
     cursor: pointer;
+}
+
+.leaflet-container
+{
+    height: 325px;
+    width: 60%;
+    margin-left: 20%;  
+}
+
+#reportHeader
+{
+    text-align: center;
+    color: white;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    text-shadow: 1px 1px 2px rgb(175, 173, 173);
+}
+
+#map
+{
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+}
+
+.reportButton
+{
+    margin-bottom: 30px;
 }

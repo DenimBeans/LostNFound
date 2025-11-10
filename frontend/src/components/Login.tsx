@@ -51,6 +51,7 @@ function Login() {
 
   return (
     <div id="loginDiv">
+
       <span id="inner-title">Record thine login credentials...</span><br />
       <span id="loginResult"> {message} </span>
 
