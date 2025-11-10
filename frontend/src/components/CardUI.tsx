@@ -46,9 +46,7 @@ function CardUI() {
     const ucfCoords:LatLng = new LatLng(28.6024, -81.2001);
     const [position, setPosition] = useState(ucfCoords);
 
-    async function SearchItem(){
 
-    }
 
     async function ItemPage(){
         if (AddPopupRef.current){
