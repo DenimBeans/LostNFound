@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { buildPath, buildAPIPath } from './Path';
+import { buildAPIPath } from './Path';
 import {useEffect} from 'react';
 import {useRef} from 'react';
 import '../Styles/MainPage.css';
@@ -192,7 +192,7 @@ function CardUI() {
     //  Draggable marker for map
     function DraggableMarker() {
         const [draggable, setDraggable] = useState(false)
-        const markerRef = useRef(null)
+        const markerRef = useRef<any>(null)
         const eventHandlers = useMemo(
             () => ({
             dragend() {
@@ -217,7 +217,7 @@ function CardUI() {
                 <Popup minWidth={90}>
                     <span onClick={toggleDraggable}>
                     {draggable
-                        ? `Marker is draggable Position ${itemUSERID}`
+                        ? `Marker is draggable Position`
                         : 'Click here to make marker draggable'}
                     </span>
                 </Popup>
