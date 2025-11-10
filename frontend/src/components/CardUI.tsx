@@ -29,6 +29,8 @@ function CardUI() {
     
     const [ItemContainer,setItemContainer] = useState<ContainerData[]>([]);
 
+    const [Search,setSearchItem] = React.useState('');
+
     const [itemTitle, setItemNameValue] = React.useState('');
     const [itemDesc, setItemDescValue] = React.useState('');
     const [itemCat, setItemCatValue] = React.useState('');
@@ -43,6 +45,10 @@ function CardUI() {
 
     const ucfCoords:LatLng = new LatLng(28.6024, -81.2001);
     const [position, setPosition] = useState(ucfCoords);
+
+    async function SearchItem(){
+
+    }
 
     async function ItemPage(){
         if (AddPopupRef.current){
@@ -126,7 +132,7 @@ function CardUI() {
         //let js = JSON.stringify(obj);
 
         try {
-            const response = await fetch(buildAPIPath(`/api/users/${itemUSERID}/items`),
+            const response = await fetch(buildAPIPath(`/api/items/:${Search}`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
@@ -147,6 +153,9 @@ function CardUI() {
             setSearchValue( e.target.value );
         }
     */
+   function handleSearchItemChange(e: any): void{
+        setSearchItem(e.target.value);
+   }
 
     function handleItemTextChange(e: any): void {
         setItemNameValue(e.target.value);
@@ -286,6 +295,7 @@ function CardUI() {
                     <br />
                         <span id="itemAddResult">{message}</span>
                     <br />
+                <input type = "text" id = "search" placeholder = "Search" onChange={handleSearchItemChange}/>
                 <button type="button" id="searchItemButton" className="buttons"
                     onClick={searchItem}>Display All Items</button><br />
            </div>
