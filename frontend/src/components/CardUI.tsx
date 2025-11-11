@@ -13,6 +13,8 @@ import 'leaflet/dist/leaflet.css';
 
 function CardUI() {
     const AddPopupRef = useRef<HTMLDivElement>(null);
+    const EditPopupRef = useRef<HTMLDivElement>(null);
+
 
     interface ContainerData{
         _id : string;
@@ -48,7 +50,7 @@ function CardUI() {
         }
     }
 
-    async function EditPage(){
+    async function EditPage(Item){
         if (EditPopupRef.current){
             setItemNameValue(Item.title);
             setItemDescValue(Item.description);
@@ -75,7 +77,6 @@ function CardUI() {
     }
 
     async function EditItem(){
-         e.preventDefault();
 
         
         
@@ -188,9 +189,11 @@ function CardUI() {
     };
 
     async function searchItemSpecific(e: any): Promise<void>{
+         e.preventDefault();
+
         let obj = {search: Search}
         let js = JSON.stringify(obj)
-        setItemContainer('')
+        setItemContainer([])
 
         try {
             const response = await fetch(buildAPIPath(`api/items`),
@@ -286,8 +289,8 @@ function CardUI() {
                 {ItemContainer.map(ItemContainer => (
                     <div key = {ItemContainer._id} className = "ItemContainers">
                         <input type = "text" id = "ContainerTitle" value = {ItemContainer.title} readOnly/>
-                        <button type = "button" id = "ContainerData" onClick = {() => ItemData(ItemContainer)}>Info</button>
-                        <button type = "button" id = "ContainerEdit" onClick = {() => EditItem(ItemContainer)}>Edit</button>
+                        <button type = "button" id = "ContainerData" onClick = {() => ItemPage()}>Info</button>
+                        <button type = "button" id = "ContainerEdit" onClick = {() => EditPage(ItemContainer)}>Edit</button>
                         <button type = "button" id = "ContainerDelete" onClick = {() => DeleteItem(ItemContainer._id)}>Delete</button>
                         <input type = "text" id = "ContainerStatus" value = {ItemContainer.status} readOnly/>
                     </div>
@@ -339,7 +342,7 @@ function CardUI() {
             </div>
 
             <div id = "EditItemPopup" ref = {EditPopupRef}>
-                <button type = "button" id="exitReportEdit" onClick={() => exitReport()}>X</button>
+                <button type = "button" id="exitReportEdit" onClick={() => exitReportEdit()}>X</button>
                 <h2 id = 'reportHeader'>Lost Item Report</h2>
 
                 <span id="itemAddResult">{repMessage}</span>
