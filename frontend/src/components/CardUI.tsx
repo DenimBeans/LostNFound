@@ -130,7 +130,7 @@ function CardUI() {
         //let js = JSON.stringify(obj);
 
         try {
-            const response = await fetch(buildAPIPath(`api/items/:${itemUSERID}`),
+            const response = await fetch(buildAPIPath(`api/users/:${itemUSERID}/items`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
