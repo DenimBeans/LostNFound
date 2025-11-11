@@ -24,6 +24,7 @@ function CardUI() {
     }
 
     const [message, setMessage] = useState('');
+    const [repMessage, setRepMessage] = useState('');
     //const [searchResults, setResults] = useState('');
     //const [itemList, setItemList] = useState('');
     
@@ -51,6 +52,12 @@ function CardUI() {
     async function ItemPage(){
         if (AddPopupRef.current){
             AddPopupRef.current.style.visibility = 'visible';
+        }
+    }
+
+    async function exitReport(){
+        if (AddPopupRef.current){
+            AddPopupRef.current.style.visibility = 'hidden';
         }
     }
 
@@ -102,7 +109,7 @@ function CardUI() {
             let res = JSON.parse(txt);
 
             if (res.error != '') {
-                setMessage(res.error)
+                setRepMessage(res.error)
             }
             else {
                 if (AddPopupRef.current){
@@ -119,7 +126,7 @@ function CardUI() {
             }
         }
         catch (error: any) {
-            setMessage(error.toString());
+            setRepMessage(error.toString());
         }
     };
 
@@ -190,6 +197,7 @@ function CardUI() {
         if(Data != null){
             const UserData = JSON.parse(Data);
             setItemUSERIDValue(UserData?.userId);
+            searchItem(true);
         }
         else{
             setItemUSERIDValue('');
@@ -224,8 +232,8 @@ function CardUI() {
                 <Popup minWidth={90}>
                     <span onClick={toggleDraggable}>
                     {draggable
-                        ? `Marker is draggable Position`
-                        : 'Click here to make marker draggable'}
+                        ? `Marker is draggable!`
+                        : 'Click here to make marker draggable.'}
                     </span>
                 </Popup>
             </Marker>
@@ -248,8 +256,10 @@ function CardUI() {
             </div>
 
             <div id = "AddItemPopup" ref = {AddPopupRef}>
-
+                <button type = "button" id="exitReport" onClick={() => exitReport()}>X</button>
                 <h2 id = 'reportHeader'>Lost Item Report</h2>
+
+                <span id="itemAddResult">{repMessage}</span>
 
                 <MapContainer id = "map" center = {ucfCoords} zoom={17} scrollWheelZoom={false} placeholder>
                     <TileLayer
@@ -283,20 +293,21 @@ function CardUI() {
                 <input type="text" id = "ImageUp" placeholder = "Image URL" 
                     onChange = {handleItemImageChange}></input>
 
-                <input type = "button" id="loginButton" className = "reportButton"
+                <input type = "button" id="reportButton" className = "button"
                     onClick={addItem} value = "Submit"/>
                 
             </div>
            <div id = "ButtonHolster">
-                <button type="button" id="addItemButton" className="buttons"
-                    onClick={ItemPage}> Add Item </button>
-                    <br />
-                        <span id="itemAddResult">{message}</span>
-                    <br />
-               
-                <button type="button" id="searchItemButton" className="buttons"
-                    onClick={searchItem}>Display All Items</button><br />
+                <input type="button" id="addItemButton" className="button"
+                    onClick={ItemPage} value = "Add Item"></input>
+
+                <input type="button" id="searchItemButton" className="button"
+                    onClick={searchItem} value = "Display All Items"></input>
            </div>
+
+            <br />
+                <span id="itemAddResult">{message}</span>
+            <br />
             
         </div>
 
