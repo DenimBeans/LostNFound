@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { buildAPIPath } from './Path';
 import {useEffect} from 'react';
 import {useRef} from 'react';
+import mongoose from 'mongoose';
 import '../Styles/MainPage.css';
 import '../Styles/FrontPage.css';
 
@@ -189,7 +190,8 @@ function CardUI() {
         const Data = localStorage.getItem('user_data');
         if(Data != null){
             const UserData = JSON.parse(Data);
-            setItemUSERIDValue(UserData?.userId);
+            const MonData = mongoose.Types.ObjectId(UserData?.userId);
+            setItemUSERIDValue(MonData);
         }
         else{
             setItemUSERIDValue('');
