@@ -67,8 +67,8 @@ function CardUI() {
         let js = JSON.stringify(obj)
 
         try {
-            const response = await fetch(buildAPIPath('api/items/:id'),
-                { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
+            const response = await fetch(buildAPIPath(`api/items/${itemId}`),
+                { method: 'DELETE', body: js, headers: { 'Content-Type': 'application/json' } });
             
             let txt = await response.text();
             let res = JSON.parse(txt);
