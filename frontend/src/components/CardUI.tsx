@@ -2,7 +2,6 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { buildAPIPath } from './Path';
 import {useEffect} from 'react';
 import {useRef} from 'react';
-import mongoose from 'mongoose';
 import '../Styles/MainPage.css';
 import '../Styles/FrontPage.css';
 
@@ -131,7 +130,7 @@ function CardUI() {
         //let js = JSON.stringify(obj);
 
         try {
-            const response = await fetch(buildAPIPath(`api/users/:${itemUSERID}/items`),
+            const response = await fetch(buildAPIPath(`api/users/${itemUSERID}/items`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
@@ -190,8 +189,7 @@ function CardUI() {
         const Data = localStorage.getItem('user_data');
         if(Data != null){
             const UserData = JSON.parse(Data);
-            const MonData = mongoose.Types.ObjectId(UserData?.userId);
-            setItemUSERIDValue(MonData);
+            setItemUSERIDValue(UserData?.userId);
         }
         else{
             setItemUSERIDValue('');
