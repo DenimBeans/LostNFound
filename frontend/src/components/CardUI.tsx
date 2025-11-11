@@ -10,7 +10,6 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import {LatLng} from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-//CHANGE AS NEEDED. Taken from MERN App, retooled for testing purposes.
 
 function CardUI() {
     const AddPopupRef = useRef<HTMLDivElement>(null);
@@ -21,28 +20,22 @@ function CardUI() {
         description : string;
         category : string;
         status : string;
+        imageUrl: string;
     }
 
     const [message, setMessage] = useState('');
     const [repMessage, setRepMessage] = useState('');
-    //const [searchResults, setResults] = useState('');
-    //const [itemList, setItemList] = useState('');
     
     const [ItemContainer,setItemContainer] = useState<ContainerData[]>([]);
 
-    //const [Search,setSearchItem] = React.useState('');
+    const [Search,setSearchItem] = React.useState('');
 
     const [itemTitle, setItemNameValue] = React.useState('');
     const [itemDesc, setItemDescValue] = React.useState('');
     const [itemCat, setItemCatValue] = React.useState('');
     const [itemImage, setItemImageValue] = React.useState('');
-    //const [itemLat, setItemLatValue] = React.useState('');
-    //const [itemLong, setItemLongValue] = React.useState('');
     const [itemLocation, setLocationValue] = React.useState('');
-    //const [itemDate, setItemDateValue] = React.useState('');
     const [itemUSERID, setItemUSERIDValue] = React.useState('');
-    //const [ownerName, setNameValue] = React.useState('');
-    //const [ownerEmail, setEmailValue] = React.useState('');
 
     const ucfCoords:LatLng = new LatLng(28.6024, -81.2001);
     const [position, setPosition] = useState(ucfCoords);
@@ -55,17 +48,66 @@ function CardUI() {
         }
     }
 
+    async function EditPage(){
+        if (EditPopupRef.current){
+            setItemNameValue(Item.title);
+            setItemDescValue(Item.description);
+            setItemCatValue(Item.category);
+            setItemImageValue(Item.imageUrl);
+            EditPopupRef.current.style.visibility = 'visible';
+        }
+    }
+
     async function exitReport(){
         if (AddPopupRef.current){
             AddPopupRef.current.style.visibility = 'hidden';
         }
     }
 
-    async function ItemData(){
+    async function exitReportEdit(){
+        if (EditPopupRef.current){
+            EditPopupRef.current.style.visibility = 'hidden';
+        }
+    }
 
+    async function ItemData(){
+       
     }
 
     async function EditItem(){
+         e.preventDefault();
+
+        
+        
+        let obj = { title: itemTitle,description: itemDesc,category: itemCat,imageUrl: itemImage,lat: position.lat,
+            lng: position.lng, locationText: itemLocation,userId: itemUSERID };
+        let js = JSON.stringify(obj);
+
+         try {
+            const response = await fetch(buildAPIPath('api/items'),
+                { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
+
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if (res.error != '') {
+                setRepMessage(res.error)
+            }
+            else {
+                if (AddPopupRef.current){
+                    AddPopupRef.current.style.display = 'none';
+                }
+                setItemNameValue('');
+                setItemDescValue('');
+                setItemCatValue('');
+                setItemImageValue('');
+                setLocationValue('');
+            }
+        }
+        catch (error: any) {
+            setRepMessage(error.toString());
+        }
+
 
     }
 
@@ -120,9 +162,6 @@ function CardUI() {
                 setItemCatValue('');
                 setItemImageValue('');
                 setLocationValue('');
-                //setItemDateValue('');
-                //setNameValue('');
-                //setEmailValue('');
             }
         }
         catch (error: any) {
@@ -133,9 +172,6 @@ function CardUI() {
     async function searchItem(e: any): Promise<void> {
         e.preventDefault();
 
-        //let obj = {id:search};
-        //let js = JSON.stringify(obj);
-
         try {
             const response = await fetch(buildAPIPath(`api/users/${itemUSERID}/items`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
@@ -143,7 +179,6 @@ function CardUI() {
             let txt = await response.text();
             let res = JSON.parse(txt);
             setItemContainer(res.results);
-            console.log(res);
             }
             
         
@@ -152,15 +187,28 @@ function CardUI() {
         }
     };
 
-    /*
-        function handleSearchTextChange( e: any ) : void
-        {
-            setSearchValue( e.target.value );
+    async function searchItemSpecific(e: any): Promise<void>{
+        let obj = {search: Search}
+        let js = JSON.stringify(obj)
+        setItemContainer('')
+
+        try {
+            const response = await fetch(buildAPIPath(`api/items`),
+                { method: 'GET',body: js, headers: { 'Content-Type': 'application/json' } });
+
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+            setItemContainer(res.results);
+            }
+            catch (error: any) {
+            console.log("Frontend Error");
         }
-    */
-   /*function handleSearchItemChange(e: any): void{
+    }
+
+        
+   function handleSearchItemChange(e: any): void{
         setSearchItem(e.target.value);
-   }*/
+   }
 
     function handleItemTextChange(e: any): void {
         setItemNameValue(e.target.value);
@@ -178,18 +226,6 @@ function CardUI() {
     function handleLocationTextChange(e: any): void {
         setLocationValue(e.target.value);
     }
-
-/*  function handleItemDateChange(e: any): void {
-        setItemDateValue(e.target.value);
-    }
-
-    function handleNameTextChange(e: any): void {
-        setNameValue(e.target.value);
-    }
-
-    function handleEmailTextChange(e: any): void {
-        setEmailValue(e.target.value);
-    }*/
 
     //Grab userid
     useEffect(() => {
@@ -242,12 +278,16 @@ function CardUI() {
 
     return (
         <div id="MainUIDiv">
+            <div id = "SearchBar">
+                <input type = "text" id = "Searchtab" placeholder = "Search..." onChange = {handleSearchItemChange}/>
+                <button type = "button" id = "SearchItem" onClick = {searchItemSpecific}>Search</button>
+            </div>
             <div id = "LostItemPage">
                 {ItemContainer.map(ItemContainer => (
                     <div key = {ItemContainer._id} className = "ItemContainers">
                         <input type = "text" id = "ContainerTitle" value = {ItemContainer.title} readOnly/>
-                        <button type = "button" id = "ContainerData" onClick = {ItemData}>Info</button>
-                        <button type = "button" id = "ContainerEdit" onClick = {EditItem}>Edit</button>
+                        <button type = "button" id = "ContainerData" onClick = {() => ItemData(ItemContainer)}>Info</button>
+                        <button type = "button" id = "ContainerEdit" onClick = {() => EditItem(ItemContainer)}>Edit</button>
                         <button type = "button" id = "ContainerDelete" onClick = {() => DeleteItem(ItemContainer._id)}>Delete</button>
                         <input type = "text" id = "ContainerStatus" value = {ItemContainer.status} readOnly/>
                     </div>
@@ -297,6 +337,50 @@ function CardUI() {
                     onClick={addItem} value = "Submit"/>
                 
             </div>
+
+            <div id = "EditItemPopup" ref = {EditPopupRef}>
+                <button type = "button" id="exitReportEdit" onClick={() => exitReport()}>X</button>
+                <h2 id = 'reportHeader'>Lost Item Report</h2>
+
+                <span id="itemAddResult">{repMessage}</span>
+
+                <MapContainer id = "map" center = {ucfCoords} zoom={17} scrollWheelZoom={false} placeholder>
+                    <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+
+                    <DraggableMarker/>
+                </MapContainer>
+
+                <input type="text" id="itemTitle" placeholder="Item Name"
+                    onChange={handleItemTextChange} />
+
+                <textarea 
+                    id="Desc" 
+                    placeholder="Item Description"
+                    onChange={handleDescTextChange}>
+                </textarea>
+
+                <input type="text" id = "locationText" placeholder = "Building Name/Classroom Number/Floor" 
+                    onChange = {handleLocationTextChange}></input>
+
+                <select id = 'category' value = {itemCat} onChange = {handleItemCatChange}>
+                    <option value = " ">Select Option</option>
+                    <option value = "Electronic">Electronic</option>
+                    <option value = "Apparal">Apparal</option>
+                    <option value = "Container">Container</option>
+                    <option value = "Personal">Personal</option>
+                </select>
+
+                <input type="text" id = "ImageUp" placeholder = "Image URL" 
+                    onChange = {handleItemImageChange}></input>
+
+                <input type = "button" id="reportButton" className = "button"
+                    onClick={EditItem} value = "Submit"/>
+                
+            </div>
+
            <div id = "ButtonHolster">
                 <input type="button" id="addItemButton" className="button"
                     onClick={ItemPage} value = "Add Item"></input>

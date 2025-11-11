@@ -21,7 +21,7 @@ flex-direction: column;
 overflow-y: auto;
 }
 
-#AddItemPopup{
+#AddItemPopup,#EditItemPopup{
 width: 80%;
 background-color: rgb(101, 101, 101);
 
@@ -40,8 +40,10 @@ border-radius: 20px;
 border-style:solid;
 border-color:black;
 
-overflow-y: auto;
+overflow-y: scroll;
 }
+
+
 
 #ButtonHolster{
 display: flex;
