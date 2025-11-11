@@ -30,6 +30,9 @@ function CardUI() {
     
     const [ItemContainer,setItemContainer] = useState<ContainerData[]>([]);
 
+    //SearchBar
+    const [status,setstatus] = React.useState('');
+    const [Category,setCategory] = React.useState('');
     const [Search,setSearchItem] = React.useState('');
 
     const [itemTitle, setItemNameValue] = React.useState('');
@@ -92,8 +95,8 @@ function CardUI() {
                 setRepMessage(res.error)
             }
             else {
-                if (AddPopupRef.current){
-                    AddPopupRef.current.style.display = 'none';
+                if (EditPopupRef.current){
+                    EditPopupRef.current.style.display = 'none';
                 }
                 setItemNameValue('');
                 setItemDescValue('');
@@ -155,11 +158,6 @@ function CardUI() {
                 if (AddPopupRef.current){
                     AddPopupRef.current.style.display = 'none';
                 }
-                setItemNameValue('');
-                setItemDescValue('');
-                setItemCatValue('');
-                setItemImageValue('');
-                setLocationValue('');
             }
         }
         catch (error: any) {
@@ -188,13 +186,11 @@ function CardUI() {
     async function searchItemSpecific(e: any): Promise<void>{
          e.preventDefault();
 
-        let obj = {search: Search}
-        let js = JSON.stringify(obj)
         setItemContainer([])
 
         try {
-            const response = await fetch(buildAPIPath(`api/items`),
-                { method: 'GET',body: js, headers: { 'Content-Type': 'application/json' } });
+            const response = await fetch(buildAPIPath(`api/items?status=${status}&category=${Category}&search=${Search}`),
+                { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
             let res = JSON.parse(txt);
@@ -204,12 +200,18 @@ function CardUI() {
             console.log("Frontend Error");
         }
     }
-
-        
+    //All for searchbar
+    function handleStatusChange(e: any): void{
+        setstatus(e.target.value);
+    }
+    function handleCategoryChange(e: any): void{
+        setCategory(e.target.value);
+   }  
    function handleSearchItemChange(e: any): void{
         setSearchItem(e.target.value);
    }
 
+    //add
     function handleItemTextChange(e: any): void {
         setItemNameValue(e.target.value);
     }
@@ -279,6 +281,18 @@ function CardUI() {
     return (
         <div id="MainUIDiv">
             <div id = "SearchBar">
+                <select id = 'category'  onChange = {handleStatusChange}>
+                    <option value = " ">Select Option</option>
+                    <option value = "lost">Electronic</option>
+                    <option value = "Found">Apparal</option>
+                </select>
+                <select id = 'category'  onChange = {handleCategoryChange}>
+                    <option value = " ">Select Option</option>
+                    <option value = "Electronic">Electronic</option>
+                    <option value = "Apparal">Apparal</option>
+                    <option value = "Container">Container</option>
+                    <option value = "Personal">Personal</option>
+                </select>
                 <input type = "text" id = "Searchtab" placeholder = "Search..." onChange = {handleSearchItemChange}/>
                 <button type = "button" id = "SearchItem" onClick = {searchItemSpecific}>Search</button>
             </div>
