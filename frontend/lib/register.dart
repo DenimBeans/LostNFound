@@ -51,7 +51,7 @@ class RegisterFormState extends State<RegisterForm> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://174.138.65.216:4000/api/auth/register'),  //  Android emulation
+        Uri.parse('http://174.138.65.216:4000/api/auth/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'firstName': _fnameController.text,
@@ -66,16 +66,9 @@ class RegisterFormState extends State<RegisterForm> {
 
         if(data['error'] == null || data['error'].isEmpty) {
           if(mounted) {
-            //  Must add email verification
-            //  For now just jump to next screen
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AppHome(
-                  firstName: data['firstName'], 
-                  lastName: data['lastName'],
-                ),
-              ),
+            //  After verification, user must return to the start page and login
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Verfication email sent!')),
             );
           }
         } else {
@@ -142,9 +135,6 @@ class RegisterFormState extends State<RegisterForm> {
             onPressed: () {
               // Validate returns true if the form is valid, or false otherwise.
               if (_registerFormKey.currentState!.validate()) {
-                //  ScaffoldMessenger.of(context).showSnackBar(
-                //    const SnackBar(content: Text('Processing Data')),
-                //  );
                 _isLoading ? null : _register();
               }
             }, 

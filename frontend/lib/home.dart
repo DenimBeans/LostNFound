@@ -62,8 +62,8 @@ class _AppHomeState extends State<AppHome> {
         ]
       ),
       body: <Widget>[
-        SearchDisplay(),
         ReportDisplay(),
+        SearchDisplay(),
         InboxDisplay(),
       ][currentPageIndex],
       endDrawer: Drawer(
@@ -140,6 +140,17 @@ class SearchDisplay extends StatelessWidget {
 }
 
 //  Item Report Widgets
+class ItemReport extends StatefulWidget {
+  const ItemReport({
+    super.key,
+  });
+
+  @override
+  ItemReportState createState() {
+    return ItemReportState();
+  }
+}
+
 class ReportDisplay extends StatelessWidget {
   const ReportDisplay({
     super.key,
@@ -154,6 +165,62 @@ class ReportDisplay extends StatelessWidget {
         InputTextField(label: 'Last Known Location', isObscure: false,),
       ],
     );
+  }
+}
+
+class ItemReportState extends State<ItemReport> {
+  final _itemReportKey = GlobalKey<FormState>();
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _descripController = TextEditingController();
+  String _errorMessage = '';
+  bool _isLoading = false;
+
+  Future<void> _report() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://174.138.65.216:4000/api/items'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'title': _titleController,
+          'description': _descripController,
+          //  'reporterName': 
+          //  'reporterEmail': 
+        }),
+      );
+
+      if(response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+
+        if(data['error'] == null || data['error'].isEmpty) {
+          if(mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Report uploaded!')),
+            );
+          }
+        } else {
+          setState(() {
+            _errorMessage = data['error'];
+          });
+        }
+      } else {
+        setState(() {
+          _errorMessage = 'Failed to submit report.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Network error. Please check your connection.';
+    });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 }
 

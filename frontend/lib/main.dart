@@ -173,7 +173,7 @@ class LoginFormState extends State<LoginForm> {
   final _loginFormKey = GlobalKey<FormState>();
   final TextEditingController _loginController = TextEditingController(); 
   final TextEditingController _passwordController = TextEditingController(); 
-  String _errorMessage = ''; 
+  String _errorMessage = '';
   bool _isLoading = false; 
 
   Future<void> _login() async {
@@ -184,7 +184,7 @@ class LoginFormState extends State<LoginForm> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://174.138.65.216:4000/api/auth/login'), //  For Android emulator only
+        Uri.parse('http://174.138.65.216:4000/api/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': _loginController.text,
