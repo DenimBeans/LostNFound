@@ -47,6 +47,7 @@ if (process.env.NODE_ENV !== 'test') {
 // ==================== EMAIL CONFIGURATION ====================
 // Configure SendGrid for email delivery (using Web API, not SMTP)
 const sgMail = require('@sendgrid/mail');
+const { title } = require('process');
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Helper function to send emails
@@ -964,12 +965,21 @@ app.get('/api/items', async (req, res) => {
 
   try {
     // Extract optional filter parameters from query string
-    const { status, category } = req.query;
+    const { status, category, search } = req.query;
 
     // Build filter object for MongoDB query
     var filter = {};
     if (status) filter.status = status;        // Filter by status if provided
     if (category) filter.category = category;  // Filter by category if provided
+
+    // New Search By titile or description keyword (not case sensitive)
+    if (search) {  
+      const searchRegex = new RegExp(search.trim(), 'i'); 
+      filter.$or = [
+        { title: searchRegex },
+        { description: searchRegex }
+      ];
+    }
 
     // Query database with filters, populate user info, sort by newest first
     const items = await Item.find(filter)
