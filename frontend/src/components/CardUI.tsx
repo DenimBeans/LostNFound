@@ -50,7 +50,7 @@ function CardUI() {
         }
     }
 
-    async function EditPage(Item){
+    async function EditPage(Item: any): Promise<void>{
         if (EditPopupRef.current){
             setItemNameValue(Item.title);
             setItemDescValue(Item.description);
@@ -72,9 +72,6 @@ function CardUI() {
         }
     }
 
-    async function ItemData(){
-       
-    }
 
     async function EditItem(){
 
