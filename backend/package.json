@@ -9,7 +9,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:unit": "jest auth.test.js",
+    "test:auth": "jest auth.test.js",
+    "test:hamburgapi": "jest hamburgapi.test.js",
+    "test:searchtrack": "jest searchlostitemapi.test.js",
     "test:integration": "jest api.test.js",
     "test:models": "jest model.test.js"
   },

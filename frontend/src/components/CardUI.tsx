@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
-import { buildPath, buildAPIPath } from './Path';
+import React, { useState, useMemo, useCallback } from 'react';
+import { buildAPIPath } from './Path';
 import {useEffect} from 'react';
 import {useRef} from 'react';
 import '../Styles/MainPage.css';
+import '../Styles/FrontPage.css';
 
+//Map imports - Jean
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import {LatLng} from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 //CHANGE AS NEEDED. Taken from MERN App, retooled for testing purposes.
 
@@ -19,26 +24,40 @@ function CardUI() {
     }
 
     const [message, setMessage] = useState('');
+    const [repMessage, setRepMessage] = useState('');
     //const [searchResults, setResults] = useState('');
     //const [itemList, setItemList] = useState('');
     
     const [ItemContainer,setItemContainer] = useState<ContainerData[]>([]);
 
+    //const [Search,setSearchItem] = React.useState('');
+
     const [itemTitle, setItemNameValue] = React.useState('');
     const [itemDesc, setItemDescValue] = React.useState('');
     const [itemCat, setItemCatValue] = React.useState('');
     const [itemImage, setItemImageValue] = React.useState('');
-    const [itemLat, setItemLatValue] = React.useState('');
-    const [itemLong, setItemLongValue] = React.useState('');
+    //const [itemLat, setItemLatValue] = React.useState('');
+    //const [itemLong, setItemLongValue] = React.useState('');
     const [itemLocation, setLocationValue] = React.useState('');
-    const [itemDate, setItemDateValue] = React.useState('');
+    //const [itemDate, setItemDateValue] = React.useState('');
     const [itemUSERID, setItemUSERIDValue] = React.useState('');
-    const [ownerName, setNameValue] = React.useState('');
-    const [ownerEmail, setEmailValue] = React.useState('');
+    //const [ownerName, setNameValue] = React.useState('');
+    //const [ownerEmail, setEmailValue] = React.useState('');
+
+    const ucfCoords:LatLng = new LatLng(28.6024, -81.2001);
+    const [position, setPosition] = useState(ucfCoords);
+
+
 
     async function ItemPage(){
         if (AddPopupRef.current){
-            AddPopupRef.current.style.display = 'flex';
+            AddPopupRef.current.style.visibility = 'visible';
+        }
+    }
+
+    async function exitReport(){
+        if (AddPopupRef.current){
+            AddPopupRef.current.style.visibility = 'hidden';
         }
     }
 
@@ -55,8 +74,8 @@ function CardUI() {
         let js = JSON.stringify(obj)
 
         try {
-            const response = await fetch(buildPath('api/items/:id'),
-                { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
+            const response = await fetch(buildAPIPath(`api/items/${itemId}`),
+                { method: 'DELETE', body: js, headers: { 'Content-Type': 'application/json' } });
             
             let txt = await response.text();
             let res = JSON.parse(txt);
@@ -78,7 +97,8 @@ function CardUI() {
     async function addItem(e: any): Promise<void> {
         e.preventDefault();
 
-        let obj = { title: itemTitle,description: itemDesc,category: itemCat,imageUrl: itemImage,lat: itemLat,lng: itemLong, locationText: itemLocation,lostAt: itemDate,userId: itemUSERID, reporterName: ownerName, reporterEmail: ownerEmail };
+        let obj = { title: itemTitle,description: itemDesc,category: itemCat,imageUrl: itemImage,lat: position.lat,
+            lng: position.lng, locationText: itemLocation,userId: itemUSERID };
         let js = JSON.stringify(obj);
 
         try {
@@ -89,7 +109,7 @@ function CardUI() {
             let res = JSON.parse(txt);
 
             if (res.error != '') {
-                setMessage(res.error)
+                setRepMessage(res.error)
             }
             else {
                 if (AddPopupRef.current){
@@ -99,16 +119,14 @@ function CardUI() {
                 setItemDescValue('');
                 setItemCatValue('');
                 setItemImageValue('');
-                setItemLatValue('');
-                setItemLongValue('');
                 setLocationValue('');
-                setItemDateValue('');
-                setNameValue('');
-                setEmailValue('');
+                //setItemDateValue('');
+                //setNameValue('');
+                //setEmailValue('');
             }
         }
         catch (error: any) {
-            setMessage(error.toString());
+            setRepMessage(error.toString());
         }
     };
 
@@ -119,12 +137,13 @@ function CardUI() {
         //let js = JSON.stringify(obj);
 
         try {
-            const response = await fetch(buildAPIPath('api/items:id'),
+            const response = await fetch(buildAPIPath(`api/users/${itemUSERID}/items`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
             let res = JSON.parse(txt);
-            setItemContainer(res.results)
+            setItemContainer(res.results);
+            console.log(res);
             }
             
         
@@ -139,6 +158,9 @@ function CardUI() {
             setSearchValue( e.target.value );
         }
     */
+   /*function handleSearchItemChange(e: any): void{
+        setSearchItem(e.target.value);
+   }*/
 
     function handleItemTextChange(e: any): void {
         setItemNameValue(e.target.value);
@@ -150,35 +172,16 @@ function CardUI() {
         setItemCatValue(e.target.value);
     }
     function handleItemImageChange(e: any): void {
-        setItemImageValue(e.target.files[0]);
-    }
-    function handleItemLatChange(e: any): void {
-        setItemLatValue(e.target.value);
-    }
-    function handleItemLongChange(e: any): void {
-        setItemLongValue(e.target.value);
+        setItemImageValue(e.target.value);
     }
 
     function handleLocationTextChange(e: any): void {
         setLocationValue(e.target.value);
     }
 
-     function handleItemDateChange(e: any): void {
+/*  function handleItemDateChange(e: any): void {
         setItemDateValue(e.target.value);
     }
-    //Grab userid
-    useEffect(() => {
-        const Data = localStorage.getItem('user_data');
-        if(Data != null){
-            const UserData = JSON.parse(Data);
-            setItemUSERIDValue(UserData?.userId);
-        }
-        else{
-            setItemUSERIDValue('');
-        }
-    },[]);
-    
-  
 
     function handleNameTextChange(e: any): void {
         setNameValue(e.target.value);
@@ -186,6 +189,55 @@ function CardUI() {
 
     function handleEmailTextChange(e: any): void {
         setEmailValue(e.target.value);
+    }*/
+
+    //Grab userid
+    useEffect(() => {
+        const Data = localStorage.getItem('user_data');
+        if(Data != null){
+            const UserData = JSON.parse(Data);
+            setItemUSERIDValue(UserData?.userId);
+            searchItem(true);
+        }
+        else{
+            setItemUSERIDValue('');
+        }
+    },[]);
+    
+    //  Draggable marker for map
+    function DraggableMarker() {
+        const [draggable, setDraggable] = useState(false)
+        const markerRef = useRef<any>(null)
+        const eventHandlers = useMemo(
+            () => ({
+            dragend() {
+                const marker = markerRef.current
+                if (marker != null) {
+                    setPosition(marker.getLatLng())
+                }
+            },
+            }),
+            [],
+        )
+        const toggleDraggable = useCallback(() => {
+            setDraggable((d) => !d)
+        }, [])
+
+        return (
+            <Marker
+            draggable={draggable}
+            eventHandlers={eventHandlers}
+            position={position}
+            ref={markerRef}>
+                <Popup minWidth={90}>
+                    <span onClick={toggleDraggable}>
+                    {draggable
+                        ? `Marker is draggable!`
+                        : 'Click here to make marker draggable.'}
+                    </span>
+                </Popup>
+            </Marker>
+        )
     }
 
     return (
@@ -202,15 +254,35 @@ function CardUI() {
                 ))}
                 
             </div>
-            <div id = "AddItemPopup" ref = {AddPopupRef}>
 
-                <input type="text" id="title" placeholder="Item"
+            <div id = "AddItemPopup" ref = {AddPopupRef}>
+                <button type = "button" id="exitReport" onClick={() => exitReport()}>X</button>
+                <h2 id = 'reportHeader'>Lost Item Report</h2>
+
+                <span id="itemAddResult">{repMessage}</span>
+
+                <MapContainer id = "map" center = {ucfCoords} zoom={17} scrollWheelZoom={false} placeholder>
+                    <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+
+                    <DraggableMarker/>
+                </MapContainer>
+
+                <input type="text" id="itemTitle" placeholder="Item Name"
                     onChange={handleItemTextChange} />
 
-                <textarea id="Desc" placeholder="Item"
-                    onChange={handleDescTextChange}></textarea>
+                <textarea 
+                    id="Desc" 
+                    placeholder="Item Description"
+                    onChange={handleDescTextChange}>
+                </textarea>
 
-                <select value = {itemCat} onChange = {handleItemCatChange}>
+                <input type="text" id = "locationText" placeholder = "Building Name/Classroom Number/Floor" 
+                    onChange = {handleLocationTextChange}></input>
+
+                <select id = 'category' value = {itemCat} onChange = {handleItemCatChange}>
                     <option value = " ">Select Option</option>
                     <option value = "Electronic">Electronic</option>
                     <option value = "Apparal">Apparal</option>
@@ -218,38 +290,24 @@ function CardUI() {
                     <option value = "Personal">Personal</option>
                 </select>
 
-                <input type="file" id = "ImageUp" accept = "image/*" onChange = {handleItemImageChange}></input>
+                <input type="text" id = "ImageUp" placeholder = "Image URL" 
+                    onChange = {handleItemImageChange}></input>
 
-                <input type = "text" id = "lat" placeholder ="lat" onChange = {handleItemLatChange}></input>
-
-                <input type = "text" id = "long" placeholder ="long" onChange = {handleItemLongChange}></input>
-
-                <input type="text" id="locationText" placeholder="Location"
-                    onChange={handleLocationTextChange} />
-                
-                <input type="date" id="time" placeholder="date"
-                    onChange={handleItemDateChange} />
-
-                <input type="text" id="name" placeholder="First Name"
-                    onChange={handleNameTextChange} />
-
-                <input type="text" id="email" placeholder="Email"
-                    onChange={handleEmailTextChange} />
-
-
-                <button type = "button" id="SubmitItemButton" className = "buttons"
-                    onClick={addItem}>Submit</button>
+                <input type = "button" id="reportButton" className = "button"
+                    onClick={addItem} value = "Submit"/>
                 
             </div>
            <div id = "ButtonHolster">
-                <button type="button" id="addItemButton" className="buttons"
-                    onClick={ItemPage}> Add Item </button>
-                    <br />
-                        <span id="itemAddResult">{message}</span>
-                    <br />
-                <button type="button" id="searchItemButton" className="buttons"
-                    onClick={searchItem}>Display All Items</button><br />
+                <input type="button" id="addItemButton" className="button"
+                    onClick={ItemPage} value = "Add Item"></input>
+
+                <input type="button" id="searchItemButton" className="button"
+                    onClick={searchItem} value = "Display All Items"></input>
            </div>
+
+            <br />
+                <span id="itemAddResult">{message}</span>
+            <br />
             
         </div>
 

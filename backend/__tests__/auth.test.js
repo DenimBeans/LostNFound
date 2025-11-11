@@ -1,6 +1,6 @@
 // auth.test.js - Unit tests for authentication endpoints
 // Located in: backend/__tests__/auth.test.js
-// Run with: npm run test:unit
+// Run with: npm run test:auth
 
 const request = require('supertest');
 const mongoose = require('mongoose');

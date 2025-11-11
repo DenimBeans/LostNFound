@@ -1275,7 +1275,7 @@ app.get('/api/users/:userId/tracked-items', async (req, res) => {
 // Response: { results, count, error }
 app.get('/api/users/:userId/items', async (req, res) => {
   var error = '';
-  
+
   try {
     const { userId } = req.params;
     const { status } = req.query;  // Optional status filter
@@ -1295,7 +1295,7 @@ app.get('/api/users/:userId/items', async (req, res) => {
 
     // Build filter - find all items created by this user
     var filter = { userId: userId };
-    
+
     // Add optional status filter
     if (status && ['lost', 'found', 'pending', 'claimed', 'returned'].includes(status)) {
       filter.status = status;

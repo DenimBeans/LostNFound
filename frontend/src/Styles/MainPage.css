@@ -11,21 +11,24 @@ border-radius: 20px;
 border-style:solid;
 border-color:black;
 }
+
 #LostItemPage{
 height: 50vh;
 background-color: rgb(101, 101, 101);
 display:flex;
 flex-direction: column;
 
-overflow-y: scroll;
+overflow-y: auto;
 }
+
 #AddItemPopup{
 width: 80%;
 background-color: rgb(101, 101, 101);
 
 flex-direction: column;
 z-index: 3;
-display: none;
+display: flex;
+visibility: hidden;
 
 position: fixed;
 top: 50%;
@@ -37,12 +40,41 @@ border-radius: 20px;
 border-style:solid;
 border-color:black;
 
+overflow-y: auto;
 }
+
 #ButtonHolster{
 display: flex;
 flex-direction: row;
-padding-right: 20px;
 
+}
+
+#itemTitle, #Desc, #locationText, #ImageUp{
+    width: 50%;
+    margin-left: 25%;
+    margin-top: 15px;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 10px;
+    border-style:solid;
+    border-color:rgb(41, 42, 46);
+}
+
+#itemTitle
+{
+    float: left;
+}
+
+#Desc
+{
+    min-height: 100px;
+    float: right;
 }
 
 /* Removed #title*/
@@ -62,6 +94,22 @@ padding-right: 20px;
     border-color:black;
     
 }
+
+#category
+{
+    margin-top: 15px;
+    width: 50%;
+    margin-left: 25%;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    height: 25px;
+    font-size: medium;
+    border-width: 3px;
+    border-radius: 5px;
+    border-style:solid;
+    border-color:rgb(41, 42, 46);
+    
+}
+
 #title:focus,#lat:focus,#long:focus{
     outline-color: darkgoldenrod;
     outline-style: solid;
@@ -69,22 +117,6 @@ padding-right: 20px;
     
 }
 
-#locationText{
-    width: 50%;
-    margin-left: 25%;
-    display:flex;
-    justify-content: center;
-    height: 40px;
-    text-align: center;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-    font-size: large;
-
-    border-width: 3px;
-    border-radius: 20px;
-    border-style:solid;
-    border-color:black;
-    
-}
 #locationText:focus{
     outline-color: darkgoldenrod;
     outline-style: solid;
@@ -138,11 +170,99 @@ padding-right: 20px;
     
 }
 
-#addItemButton{
-    margin-top: 20px;
+.leaflet-container
+{
+    height: 325px;
+    width: 60%;
+    margin-left: 20%;  
+}
+
+#reportHeader
+{
+    text-align: center;
+    color: white;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    text-shadow: 1px 1px 2px rgb(175, 173, 173);
+}
+
+#map
+{
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+}
+
+#exitReport
+{
+    width: 35px;
     height: 35px;
-    width: 10%;
-    margin-left: 45%;
+    margin-left: 96.5%;
+    margin-top: 5px;
+    position: absolute;
+
+    text-align: center;
+    font-size: 20pt;
+    color: rgb(255, 176, 176);
+    background-color: rgba(255, 255, 255, 0);
+    border-width: 0px;
+
+}
+
+#exitReport:hover
+{
+    cursor: pointer;
+}
+
+.button{
+    margin-top: 20px;
+    height: 45px;
+    width: 20%;
+    margin-left: 40%;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    background: linear-gradient(-45deg, darkgoldenrod 40%,  rgb(216, 159, 14) 50%,  darkgoldenrod 60%); 
+    background-size: 300%;
+    background-position-x: 100%;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color: rgb(170, 125, 11);
+    filter: drop-shadow(2px 2px 15px rgba(170, 125, 11, 0.541));
+    box-shadow: 0 8px rgb(134, 99, 9);
+    
+}
+
+.button:focus, .button:hover
+{
+     border-color: rgb(170, 125, 11);
+    animation: shimmer 1s infinite linear;
+}
+
+@keyframes shimmer {
+   to {
+      background-position-x: 0%
+   }
+}
+
+.button:active {
+  background-color:  rgb(167, 122, 10);
+  box-shadow: 0 4px rgb(134, 99, 9);
+  transform: translateY(4px);
+}
+
+#reportButton
+{
+    margin-bottom: 30px;
+}
+
+#addItemButton, #searchItemButton
+{
+    height: 100%;
+    width: 20%;
+    margin-left: 25%;
     display: flex;
     justify-content: center;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -150,7 +270,11 @@ padding-right: 20px;
     border-width: 3px;
     border-radius: 20px;
     border-style:solid;
-    border-color:black;
+}
+
+#searchItemButton
+{
+    margin-left: 10%;
 }
 #addItemButton:hover{
     outline-color: darkgoldenrod;
@@ -158,22 +282,16 @@ padding-right: 20px;
     cursor: pointer;
 }
 
-#searchItemButton{
-    margin-top: 20px;
-    height: 35px;
-    width: 10%;
-    margin-left: 45%;
-    display: flex;
-    justify-content: center;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-
-    border-width: 3px;
-    border-radius: 20px;
-    border-style:solid;
-    border-color:black;
-}
 #searchItemButton:hover{
     outline-color: darkgoldenrod;
     outline-style: solid;
     cursor: pointer;
+}
+
+#itemAddResult{
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+    color: rgb(231, 67, 67);
+    font-weight: bold;
 }

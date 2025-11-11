@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import './register.dart';
+import './home.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,7 +15,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.amber,
+        )
+      ),
       home: Scaffold(
+        resizeToAvoidBottomInset: true,
         backgroundColor: mainCol,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(120.0),
@@ -27,7 +35,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
         body: Column(
-          //mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextHeading(),
             SizedBox(
@@ -110,6 +118,7 @@ class LoginText extends StatelessWidget {
             onPressed: () {
               showModalBottomSheet<void>(
                 context: context,
+                isScrollControlled: true,
                 builder: (BuildContext context) {
                   return LoginModal();
                 },
@@ -129,19 +138,22 @@ class LoginModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 300,
-      color: Colors.amber,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const Text('Login', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            LoginForm(),
-          ],
+    return Padding (
+      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom,), 
+      child: Container(
+        height: 300,
+        color: Colors.amber,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Text('Login', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              LoginForm(),
+            ],
+          ),
         ),
-      ),
+      )
     );
   }
 }
@@ -161,7 +173,7 @@ class LoginFormState extends State<LoginForm> {
   final _loginFormKey = GlobalKey<FormState>();
   final TextEditingController _loginController = TextEditingController(); 
   final TextEditingController _passwordController = TextEditingController(); 
-  String _errorMessage = ''; 
+  String _errorMessage = '';
   bool _isLoading = false; 
 
   Future<void> _login() async {
@@ -172,7 +184,7 @@ class LoginFormState extends State<LoginForm> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://10.0.2.2:4000/api/auth/login'), //  For Android emulator only
+        Uri.parse('http://174.138.65.216:4000/api/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': _loginController.text,
@@ -206,7 +218,7 @@ class LoginFormState extends State<LoginForm> {
           _errorMessage = 'Login failed. Please try again.'; 
         }); 
       } 
-    } catch (e) { 
+    } catch (e) {
       setState(() { 
         _errorMessage = 'Network error. Please check your connection.'; 
       });
@@ -225,7 +237,7 @@ class LoginFormState extends State<LoginForm> {
         children: [
           //  Pass email controller to EmailField
           EmailField(controller: _loginController,),
-          FormField(
+          InputTextField(
             label: 'Password',
             controller: _passwordController,
             isObscure: true,
@@ -264,321 +276,7 @@ class LoginFormState extends State<LoginForm> {
   }
 }
 
-//  Register Page Widgets
-class Register extends StatelessWidget {
-  const Register({super.key});
-  static const Color mainCol = Color(0xFFFFF4D9);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: mainCol,
-      appBar: ArrowTitleBar(title:  'Register'),
-      body: Column(
-        //mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          RegisterForm(),
-        ],
-      ),
-    );
-  }
-}
-
-class RegisterForm extends StatefulWidget {
-  const RegisterForm({
-    super.key,
-  });
-
-  @override
-  RegisterFormState createState() {
-    return RegisterFormState();
-  }
-}
-
-class RegisterFormState extends State<RegisterForm> {
-  final _registerFormKey = GlobalKey<FormState>();
-  final TextEditingController _fnameController = TextEditingController(); 
-  final TextEditingController _lnameController = TextEditingController(); 
-  final TextEditingController _emailController = TextEditingController(); 
-  final TextEditingController _passwordController = TextEditingController(); 
-  String _errorMessage = '';
-  bool _isLoading = false;
-
-  Future<void> _register() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
-
-    try {
-      final response = await http.post(
-        Uri.parse('http://10.0.2.2:4000/api/auth/register'),  //  Android emulation
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'firstName': _fnameController.text,
-          'lastName': _lnameController.text,
-          'email': _emailController.text,
-          'password': _passwordController.text,
-        }),
-      );
-
-      if(response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-
-        if(data['error'] == null || data['error'].isEmpty) {
-          if(mounted) {
-            //  Must add email verification
-            //  For now just jump to next screen
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AppHome(
-                  firstName: data['firstName'], 
-                  lastName: data['lastName'],
-                ),
-              ),
-            );
-          }
-        } else {
-          setState(() {
-            _errorMessage = data['error'];
-          });
-        }
-      } else {
-        setState(() {
-          _errorMessage = 'Registration failed. Please check your email for verification.';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Network error. Please check your connection.';
-    });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Form(
-      key: _registerFormKey,
-      child: Column(
-        children: [
-          FormField(
-            label: 'First Name',    
-            isObscure: false,       
-            controller: _fnameController, 
-            validator: (String? value) {
-              return (value == null || value.isEmpty) ? 'Please enter valid first name' : null;
-            }
-          ),
-          FormField(
-            label: 'Last Name',
-            isObscure: false,
-            controller: _lnameController,
-            validator: (String? value) {
-              return (value == null || value.isEmpty) ? 'Please enter valid last name' : null;
-            }
-          ),
-          EmailField(controller: _emailController,),
-          FormField(
-            label: 'Password',
-            isObscure: false,
-            controller: _passwordController,
-            validator: (String? value) {
-              return (value == null || value.isEmpty) ? 'Please enter valid password' : null;
-            }
-          ),
-          FormField(
-            label: 'Re-type Password',
-            isObscure: false,
-            validator: (String? value) {
-              return (value != _passwordController.text) ? 'Passwords should match' : null;
-            }
-          ),
-          BoldElevatedButton(
-            text: 'Next', 
-            onPressed: () {
-              // Validate returns true if the form is valid, or false otherwise.
-              if (_registerFormKey.currentState!.validate()) {
-                //  ScaffoldMessenger.of(context).showSnackBar(
-                //    const SnackBar(content: Text('Processing Data')),
-                //  );
-                _isLoading ? null : _register();
-              }
-            }, 
-            minWidth: 100, 
-            minHeight: 46,
-          ),
-          if (_errorMessage.isNotEmpty) Text(
-            _errorMessage,
-            style: const TextStyle( 
-              color: Colors.red, 
-              fontSize: 14, 
-            ), 
-            textAlign: TextAlign.center, 
-          ),
-        ]
-      ),
-    );
-  }
-
-  @override
-  void dispose() { 
-    _fnameController.dispose(); 
-    _lnameController.dispose();
-    _emailController.dispose();
-    _passwordController.dispose(); 
-    super.dispose(); 
-  }
-}
-
-//  Email Verification Popup
-
-//  Search for Items Widgets
-class AppHome extends StatefulWidget {
-  final String firstName;
-  final String lastName;
-  
-  const AppHome({
-    super.key, 
-    required this.firstName, 
-    required this.lastName, 
-    }
-  );
-
-  @override
-  State<AppHome> createState() => _AppHomeState();
-}
-
-class _AppHomeState extends State<AppHome> {
-  int currentPageIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    //  Should make the scaffold into its own "Home Page" widget
-    //  everything remains the same between the report and search
-    //  page except for:
-    //  The app bar title
-    //  Which icon is shadowed in the bottom navigation
-    //  And the actual content in the body
-    return Scaffold(
-      //  This doesn't actually need an arrow
-      //  I'll rewrite the widget later so that the back arrow becomes optional
-      //  + rename it from ArrowTitleBar to CenterTitleBar
-      appBar: ArrowTitleBar(title: 'Search for Lost Items'),
-      bottomNavigationBar: NavigationBar(
-        onDestinationSelected: (int index) {
-          setState(() {
-            currentPageIndex = index;
-          });
-        },
-        indicatorColor: Colors.grey,
-        selectedIndex: currentPageIndex,
-        destinations: const <Widget>[
-          NavigationDestination(
-            selectedIcon: Icon(Icons.document_scanner),
-            icon: Icon(Icons.document_scanner_outlined),
-            label: 'Report Lost'
-          ),
-          NavigationDestination(
-            selectedIcon: Icon(Icons.search),
-            icon: Icon(Icons.search_outlined),
-            label: 'Search'
-          ),
-        ]
-      ),
-      body: <Widget>[
-        SearchDisplay(),
-        ReportDisplay(),
-      ][currentPageIndex],
-      endDrawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            ContentPopup(title: 'Notifications', simpleModal: NotificationsModal(),),
-            ListTile(
-              title: const Text('Tracked Items'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              title: const Text('Your Reports'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              title: const Text('Account Settings'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ContentPopup(title: 'About', simpleModal: AboutModal(),),
-            Spacer(),
-            BoldElevatedButton(
-              text: 'Log Out', 
-              onPressed: () { 
-                //  Run log out function
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              }, 
-              minWidth: 40, 
-              minHeight: 30,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class SearchDisplay extends StatelessWidget {
-  const SearchDisplay({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        FormField(label: 'Search Item', isObscure: false,),
-        SizedBox(
-          width: 350,
-          height: 250,
-          //  Container widget is placeholder
-          //  As this will be where we output the items, ListView may be better
-          child: Container(
-            color: Colors.grey,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class ReportDisplay extends StatelessWidget {
-  const ReportDisplay({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        FormField(label: 'Item Name', isObscure: false,),
-        FormField(label: 'Item Description', isObscure: false,),
-        FormField(label: 'Last Known Location', isObscure: false,),
-      ],
-    );
-  }
-}
-
+//  App-Wide Reusable Widgets
 class ContentPopup extends StatelessWidget {
   final String title;
   final Widget simpleModal;
@@ -601,122 +299,6 @@ class ContentPopup extends StatelessWidget {
   }
 }
 
-class NotificationsModal extends StatelessWidget {
-  const NotificationsModal({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SimpleDialog(
-      title: const Text('Notifications'),
-      children: <Widget>[
-        SwitchListTile(
-          title: const Text('Reported items tracked'),
-          value: true,
-          onChanged: (bool newVal) {},
-        ),
-        //  Honestly would probably get rid of this one as I cannot see a linear way for us
-        //  to direct the user to retrieve their found item without at least notifying them
-        //  it's been found
-        SwitchListTile(
-          title: const Text('Reported items found'),
-          value: true,
-          onChanged: (bool newVal) {},
-        ),
-        SwitchListTile(
-          title: const Text('Item return meeting'),
-          value: true,
-          onChanged: (bool newVal) {},
-        ),
-      ],
-    );
-  }
-}
-
-class AboutModal extends StatelessWidget {
-  const AboutModal({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SimpleDialog(
-      title: const Text('About'),
-      children: <Widget>[
-        Padding(
-          padding: EdgeInsetsGeometry.all(20),
-          //  Might want to find a way to change this so that the text itself is hyperlinked instead of
-          //  just a plaintext link
-          child: Text('Created in X weeks for COP 4331\n\nGithub: https://github.com/DenimBeans/LostNFound'),
-        )
-      ]
-    );
-  }
-}
-
-//  App Home Page
-
-
-//  Report a Lost Item Widgets
-class ItemReport extends StatelessWidget {
-  final String firstName;
-  final String lastName;
-  
-  const ItemReport({
-    super.key,
-    required this.firstName,
-    required this.lastName,
-  }
-);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
-  }
-}
-
-//  User Tracked Items Widget
-class TrackedItems extends StatelessWidget {
-  const TrackedItems({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
-  }
-}
-
-//  User Reported Items Widget
-class SubmittedItems extends StatelessWidget {
-  const SubmittedItems({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
-  }
-}
-
-//  Account Settings Widget
-class AccountSettings extends StatelessWidget {
-  const AccountSettings({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
-  }
-}
-
-//  Item Found Meeting Popup
-class ItemFound extends StatelessWidget {
-  const ItemFound({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
-  }
-}
-
-//  App-Wide Reusable Widgets
 class ArrowTitleBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
 
@@ -749,13 +331,13 @@ class ArrowTitleBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-class FormField extends StatelessWidget {
+class InputTextField extends StatelessWidget {
   final String label;
   final bool isObscure;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
 
-  const FormField({
+  const InputTextField({
     super.key,
     required this.label,
     required this.isObscure,
@@ -789,7 +371,7 @@ class EmailField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FormField(
+    return InputTextField(
       label: 'Email',
       isObscure: false,
       controller: controller,

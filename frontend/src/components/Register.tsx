@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { buildPath, buildAPIPath } from './Path';
 import '../Styles/Register.css';
+import Modal from "react-modal";
 
 function Register(){
 const [message, setMessage] = useState('');
@@ -10,8 +11,12 @@ const [LastName,setLastName] = React.useState('');
 const [RegisterEmail,setRegisterEmail] = React.useState('');
 const [RegisterPassword,setRegisterPassword] = React.useState('');
 //const [RegisterPasswordRepeat,SetRegisterPasswordRepeat] = React.useState('');
+const [modalIsOpen, setIsOpen] = React.useState(false);
+const [isValid, setIsValid] = useState(false);
 
 const loginPath = buildPath("");
+
+const emailRegEx = /^[\w\-\.]+@([\w-]+\.)+[\w-]{2,}$/gm;
 
 function handleSetFirstName(e: any): void{
     setFirstName(e.target.value);
@@ -27,6 +32,7 @@ function handleSetLastName(e: any): void{
 
 function handleSetRegisterEmail(e: any): void{
     setRegisterEmail(e.target.value);
+    setIsValid(emailRegEx.test(RegisterEmail));
 }
 
 function handleSetRegisterPassword(e:any): void{
@@ -52,8 +58,15 @@ async function doRegister(event: any): Promise<void> {
       var res = JSON.parse(await response.text());
 
       if (res.error == '') {
-        setMessage("Check your email for verification.");
+        setMessage("Account Registered! Please check your email for verification.");
+        setIsOpen(true);
       }
+
+      else if(!isValid)
+      {
+        setMessage("Invalid Email");
+      }
+
       else {
         setMessage(res.error);
       }
@@ -64,8 +77,6 @@ async function doRegister(event: any): Promise<void> {
       return;
     }
   };
-
-
 
 //<input type = "password" id = "PasswordRepeat" placeholder = "Re-enter Password" onChange = {handleSetRegisterPasswordRepeat} />
 //<input type = "text" id = "UserName" placeholder = "Username" onChange = {handleSetRegisterUser} />
@@ -82,10 +93,16 @@ async function doRegister(event: any): Promise<void> {
         
         <input type = "Submit" id = "RegisterButton" className = "buttons" value = "Register" onClick = {doRegister} />
         <p id="regLink">Returning User?<a href = {loginPath}> Login!</a></p>
+
+        <Modal
+          isOpen={modalIsOpen}
+          className = "successModal"
+        >
+          <h2 id = "successText">Account created! Please check your email for verification.</h2>
+          <p id="modalLink"><a href = {loginPath}> Return to Login</a></p>
+        </Modal>
       </div>  
     )
 }
-
-
 
 export default Register;
