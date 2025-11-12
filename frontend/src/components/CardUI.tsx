@@ -283,8 +283,8 @@ function CardUI() {
             <div id = "SearchBar">
                 <select id = 'category'  onChange = {handleStatusChange}>
                     <option value = " ">Select Option</option>
-                    <option value = "lost">Electronic</option>
-                    <option value = "Found">Apparal</option>
+                    <option value = "lost">Lost</option>
+                    <option value = "found">Found</option>
                 </select>
                 <select id = 'category'  onChange = {handleCategoryChange}>
                     <option value = " ">Select Option</option>
