@@ -1,5 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'dart:convert';
 import 'main.dart';
 import 'register.dart';
@@ -62,15 +65,14 @@ class _AppHomeState extends State<AppHome> {
         ]
       ),
       body: <Widget>[
-        ReportDisplay(),
-        SearchDisplay(),
+        ItemReport(),
+        ItemSearch(),
         InboxDisplay(),
       ][currentPageIndex],
       endDrawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            ContentPopup(title: 'Notifications', simpleModal: NotificationsModal(),),
             ListTile(
               title: const Text('Tracked Items'),
               onTap: () {
@@ -115,10 +117,65 @@ class _AppHomeState extends State<AppHome> {
 }
 
 //  Item Search Widgets
-class SearchDisplay extends StatelessWidget {
-  const SearchDisplay({
+class ItemSearch extends StatefulWidget {
+  const ItemSearch({
     super.key,
   });
+
+  @override
+  ItemSearchState createState() {
+    return ItemSearchState();
+  }
+}
+
+class ItemSearchState extends State<ItemSearch> {
+  final _itemReportKey = GlobalKey<FormState>();
+  String _errorMessage = '';
+  bool _isLoading = false;
+
+  Future<void> _search() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://174.138.65.216:4000/api/items'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+        }),
+      );
+
+      if(response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+
+        if(data['error'] == null || data['error'].isEmpty) {
+          if(mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Report uploaded!')),
+            );
+          }
+        } else {
+          setState(() {
+            _errorMessage = data['error'];
+          });
+        }
+      } else {
+        setState(() {
+          _errorMessage = 'Failed to submit report.';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Network error. Please check your connection.';
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -130,15 +187,121 @@ class SearchDisplay extends StatelessWidget {
           height: 250,
           //  Container widget is placeholder
           //  As this will be where we output the items, ListView may be better
-          child: Container(
-            color: Colors.grey,
-          ),
+          child: const SearchMap(),
+        )
+      ]
+    );
+  }
+}
+          
+class SearchMap extends StatefulWidget {
+  const SearchMap({super.key});
+
+  @override
+  State<SearchMap> createState() => _SearchMapState();
+}
+
+class _SearchMapState extends State<SearchMap> {
+  static const LatLng _pontoCentral = LatLng(28.6024274, -81.2000599);
+
+  // A list that will hold our pins (markers)
+  late final List<Marker> _markers;
+  @override
+  void initState() {
+    super.initState();
+
+    _markers = [
+      _buildItemMarker(point: LatLng(28.6024274, -81.2000599), itemName: 'Student Union') 
+
+      //  This is where the item markers will be added
+      //  Will be filled with data from the appropiate API
+    ];
+  }
+
+  /// Helper function to create a custom Marker (pin)
+  /// May change this to be more general and have a isItem bool that will be checked to determine how to treat a pin
+  Marker _buildItemMarker({
+    required LatLng point,
+    required String itemName,
+    //  Maybe one color for own lost items, another for all others?
+    //  Not a requirment
+    //  required Color color,
+  }) {
+    return Marker(
+      point: point,
+      width: 95, // Fixed width that accommodates the longest name well
+      height: 65, // Fixed height for the pin
+      child: InkWell(
+        onTap: () {
+          // For item search page: this should open a popup that displays the item's in-depth information
+        },
+        // The visual content of the pin is a column with the icon and text
+        child: Column(
+          children: [
+            Icon(
+              Icons.location_pin,
+              //  color: color,
+              size: 40,
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(204),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                itemName,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MapUCF(pontoCentral: _pontoCentral, markers: _markers);
+  }
+}
+
+class MapUCF extends StatelessWidget {
+  const MapUCF({
+    super.key,
+    required LatLng pontoCentral,
+    required List<Marker> markers,
+  }) : _pontoCentral = pontoCentral, _markers = markers;
+
+  final LatLng _pontoCentral;
+  final List<Marker> _markers;
+
+  @override
+  Widget build(BuildContext context) {
+    return FlutterMap(
+      // Map options, such as initial center and zoom
+      options: MapOptions(
+        initialCenter: _pontoCentral,
+        initialZoom: 15.0, // Displays all of campus
+      ),
+      // The map is built in layers
+      children: [
+        // Layer 1: The base map from OpenStreetMap
+        TileLayer(
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          userAgentPackageName: 'com.example.flutter_map_example',
+        ),
+        // Layer 2: Our pins (markers)
+        MarkerLayer(
+          markers: _markers,
         ),
       ],
     );
   }
 }
-
 //  Item Report Widgets
 class ItemReport extends StatefulWidget {
   const ItemReport({
@@ -151,27 +314,13 @@ class ItemReport extends StatefulWidget {
   }
 }
 
-class ReportDisplay extends StatelessWidget {
-  const ReportDisplay({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        InputTextField(label: 'Item Name', isObscure: false,),
-        InputTextField(label: 'Item Description', isObscure: false,),
-        InputTextField(label: 'Last Known Location', isObscure: false,),
-      ],
-    );
-  }
-}
-
 class ItemReportState extends State<ItemReport> {
   final _itemReportKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descripController = TextEditingController();
+  String _categoryText = '';
+  final TextEditingController _imgController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
   String _errorMessage = '';
   bool _isLoading = false;
 
@@ -188,6 +337,9 @@ class ItemReportState extends State<ItemReport> {
         body: jsonEncode({
           'title': _titleController,
           'description': _descripController,
+          'category': _categoryText,
+          'imageUrl': _imgController,
+          'locationText': _locationController,
           //  'reporterName': 
           //  'reporterEmail': 
         }),
@@ -215,15 +367,112 @@ class ItemReportState extends State<ItemReport> {
     } catch (e) {
       setState(() {
         _errorMessage = 'Network error. Please check your connection.';
-    });
+      });
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
   }
+  
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _itemReportKey,
+      child: Column(
+        children: [
+          InputTextField(
+            label: '*Item Name',
+            isObscure: false,
+            controller: _titleController,
+            validator: (String? value) {
+              return (value == null || value.isEmpty) ? 'Please enter an item name!' : null;
+            },
+          ),
+          InputTextField(
+            label: 'Item Description',
+            isObscure: false,
+            controller: _descripController,
+          ),
+          InputTextField(
+            label: 'Building / Floor / Classroom Number',
+            isObscure: false,
+            controller: _locationController,
+          ),
+          DropdownMenu(
+            label: Text('Category'),
+            onSelected: (String? category) {
+              setState(() {
+                _categoryText = category!;
+              });
+            },
+            dropdownMenuEntries: <DropdownMenuEntry<String>>[
+              DropdownMenuEntry(value: 'Electronic', label: 'Electronic'),
+              DropdownMenuEntry(value: 'Apparel', label: 'Apparel'),
+              DropdownMenuEntry(value: 'Container', label: 'Container'),
+              DropdownMenuEntry(value: 'Personal', label: 'Personal'),
+            ],
+          ),
+          InputTextField(
+            label: 'Image URL',
+            isObscure: false,
+            controller: _imgController,
+          )
+        ],
+      ),
+    );
+  }
 }
 
+class ReportMap extends StatefulWidget {
+  const ReportMap({super.key});
+
+  @override
+  State<ReportMap> createState() => _ReportMapState();
+}
+
+class _ReportMapState extends State<ReportMap> {
+  static const LatLng _pontoCentral = LatLng(28.6024274, -81.2000599);
+
+  // A list that will hold our pins (markers)
+  late final List<Marker> _markers;
+  @override
+  void initState() {
+    super.initState();
+
+    _markers = [
+      //  Here only markers will be the one user drops onto map (similar to web app)
+    ];
+  }
+
+  /// Helper function to create a custom Marker (pin)
+  /// May change this to be more general and have a isItem bool that will be checked to determine how to treat a pin
+  Marker _buildLocationMarker({
+    required LatLng point,
+  }) {
+    return Marker(
+      point: point,
+      child: InkWell(
+        onTap: () {
+          // For item report page: this creates an illustrative marker where the tap was
+          // Also how the user enters the items coords that get passed to item report function
+        },
+        child: Icon(
+          Icons.location_pin,
+          //  color: color,
+          size: 40,
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MapUCF(pontoCentral: _pontoCentral, markers: _markers);
+  }
+}
+
+//  Notifications Inbox Widgets
 class InboxDisplay extends StatelessWidget {
   const InboxDisplay({
     super.key,
@@ -239,39 +488,6 @@ class InboxDisplay extends StatelessWidget {
 }
 
 //  Hamburger Menu Contents
-class NotificationsModal extends StatelessWidget {
-  const NotificationsModal({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SimpleDialog(
-      title: const Text('Notifications'),
-      children: <Widget>[
-        SwitchListTile(
-          title: const Text('Reported items tracked'),
-          value: true,
-          onChanged: (bool newVal) {},
-        ),
-        //  Honestly would probably get rid of this one as I cannot see a linear way for us
-        //  to direct the user to retrieve their found item without at least notifying them
-        //  it's been found
-        SwitchListTile(
-          title: const Text('Reported items found'),
-          value: true,
-          onChanged: (bool newVal) {},
-        ),
-        SwitchListTile(
-          title: const Text('Item return meeting'),
-          value: true,
-          onChanged: (bool newVal) {},
-        ),
-      ],
-    );
-  }
-}
-
 class AboutModal extends StatelessWidget {
   const AboutModal({
     super.key,
@@ -293,6 +509,8 @@ class AboutModal extends StatelessWidget {
   }
 }
 
+//  Moving these to be scrolled down to on the home pages instead of accessed through the hamburger menu
+/*
 //  User Tracked Items Widget
 class TrackedItems extends StatelessWidget {
   const TrackedItems({super.key});
@@ -312,6 +530,7 @@ class SubmittedItems extends StatelessWidget {
     return Scaffold();
   }
 }
+*/
 
 //  Account Settings Widget
 class AccountSettings extends StatelessWidget {
@@ -330,7 +549,9 @@ class AccountSettings extends StatelessWidget {
             Text('Change name'),
             InputTextField(label: 'Rename User', isObscure: false),
             Text('Change email'),
-            InputTextField(label: 'Change Email', isObscure: false),
+            InputTextField(label: 'Change Email', isObscure: false),            
+            Text('Reset password'),
+            InputTextField(label: 'Reset Password', isObscure: false),
             Text('Dsylexic font'),
             Switch(value: false, onChanged: (bool newVal) {},),
             Text('Light/Dark mode'),
