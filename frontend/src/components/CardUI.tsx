@@ -23,6 +23,7 @@ function CardUI() {
         category : string;
         status : string;
         imageUrl: string;
+        location: string;
     }
 
     const [message, setMessage] = useState('');
@@ -43,7 +44,6 @@ function CardUI() {
     const [VitemCat, setItemCatValueV] = React.useState('');
     const [VitemImage, setItemImageValueV] = React.useState('');
     const [VitemLocation, setLocationValueV] = React.useState('');
-    const [VitemUSERID, setItemUSERIDValueV] = React.useState('');
 
 
     //Edit
@@ -52,7 +52,6 @@ function CardUI() {
     const [EitemCat, setItemCatValueE] = React.useState('');
     const [EitemImage, setItemImageValueE] = React.useState('');
     const [EitemLocation, setLocationValueE] = React.useState('');
-    const [EitemUSERID, setItemUSERIDValueE] = React.useState('');
 
 
     //Add
@@ -68,22 +67,23 @@ function CardUI() {
 
     async function ItemPage(Item: any): Promise<void>{
         if (AddPopupRef.current){
-            setCurEditItemV(Item._id);
             setItemNameValueV(Item.title);
             setItemDescValueV(Item.description);
             setItemCatValueV(Item.category);
             setItemImageValueV(Item.imageUrl);
+            setLocationValueV(Item.location)
             AddPopupRef.current.style.visibility = 'visible';
         }
     }
 
     async function EditPage(Item: any): Promise<void>{
         if (EditPopupRef.current){
-            setCurEditItemE(Item._id);
+            setCurEditItem(Item._id);
             setItemNameValueE(Item.title);
             setItemDescValueE(Item.description);
             setItemCatValueE(Item.category);
             setItemImageValueE(Item.imageUrl);
+            setLocationValueE(Item.location);
             EditPopupRef.current.style.visibility = 'visible';
         }
     }
