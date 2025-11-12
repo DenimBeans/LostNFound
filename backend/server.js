@@ -1001,9 +1001,8 @@ app.get('/api/items', async (req, res) => {
     // New Search By titile or description keyword (not case sensitive)
     if (search) {
       const searchRegex = new RegExp(search.trim(), 'i');
-      filter.$or = [
-        { title: searchRegex },
-        { description: searchRegex }
+      filter = [
+        { title: searchRegex } //changed to just take title HY
       ];
     }
 
