@@ -5,7 +5,8 @@ import {useLocation} from 'react-router-dom';
 function PageTitle() {
 
   const location = useLocation().pathname;
-
+  
+  const HomeRef = useRef<HTMLInputElement>(null);
   const notifRef = useRef<HTMLInputElement>(null);
   const accountRef = useRef<HTMLInputElement>(null);
   const aboutRef = useRef<HTMLInputElement>(null);
@@ -16,6 +17,7 @@ function PageTitle() {
     if (notifRef.current && accountRef.current && aboutRef.current
         && logoutRef.current && location === '/main')
     {
+      HomeRef.current.style.visibility = 'none';
       notifRef.current.style.visibility = 'visible';
       accountRef.current.style.visibility = 'visible';
       aboutRef.current.style.visibility = 'visible';
@@ -24,6 +26,7 @@ function PageTitle() {
     else if(notifRef.current && accountRef.current && aboutRef.current
         && logoutRef.current && location === '/Notification')
     {
+      HomeRef.current.style.visibility = 'visible';
       notifRef.current.style.visibility = 'none';
       accountRef.current.style.visibility = 'visible';
       aboutRef.current.style.visibility = 'visible';
@@ -32,6 +35,7 @@ function PageTitle() {
     else if (notifRef.current && accountRef.current && aboutRef.current
         && logoutRef.current && location === '/AccountSettings')
     {
+      HomeRef.current.style.visibility = 'visible';
       notifRef.current.style.visibility = 'visible';
       accountRef.current.style.visibility = 'none';
       aboutRef.current.style.visibility = 'visible';
@@ -40,12 +44,17 @@ function PageTitle() {
     else if (notifRef.current && accountRef.current && aboutRef.current
         && logoutRef.current && location === '/About')
     {
+      HomeRef.current.style.visibility = 'visible';
       notifRef.current.style.visibility = 'visible';
       accountRef.current.style.visibility = 'visible';
       aboutRef.current.style.visibility = 'none';
       logoutRef.current.style.visibility = 'visible';
     }
     
+  }
+  function Home()
+  {
+    window.location.href = '/main';
   }
   function Notif()
   {
@@ -73,6 +82,8 @@ function PageTitle() {
   return (
     <div id = "TitleBorder">
       <h1 id="title">KnightFind</h1>
+      <input type = "button" id = "main" className = "headerBtn" value = "Home"
+        ref = {HomeRef} onClick = {Home}/>
       <input type = "button" id = "notifs" className = "headerBtn" value = "Notifications"
         ref = {notifRef} onClick = {Notif}/>
       <input type = "button" id = "account" className = "headerBtn" value = "Account Settings"

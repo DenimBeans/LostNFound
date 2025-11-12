@@ -236,6 +236,9 @@ border-color:black;
     cursor: pointer;
     position: absolute;
 }
+#main{
+    margin-left: 50%;
+}
 
 #notifs
 {
