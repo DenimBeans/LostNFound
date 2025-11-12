@@ -21,7 +21,7 @@ flex-direction: column;
 overflow-y: auto;
 }
 
-#AddItemPopup{
+#AddItemPopup,#EditItemPopup,#ViewItemPopup{
 width: 80%;
 background-color: rgb(101, 101, 101);
 
@@ -42,6 +42,8 @@ border-color:black;
 
 overflow-y: auto;
 }
+
+
 
 #ButtonHolster{
 display: flex;
@@ -193,7 +195,7 @@ flex-direction: row;
     border-color:black;
 }
 
-#exitReport
+#exitReport,#exitReportEdit,#ViewReportView
 {
     width: 35px;
     height: 35px;
@@ -209,7 +211,7 @@ flex-direction: row;
 
 }
 
-#exitReport:hover
+#exitReport:hover,#exitReportEdit:hover,#ViewReportView:hover
 {
     cursor: pointer;
 }

@@ -6,6 +6,9 @@ import RegisterPage from './pages/RegisterPage';
 import ForgorPassPage from './pages/ForgorPassPage';
 import PasswordResetPage from './pages/PasswordResetPage';
 import EmailVerificationPage from './pages/EmailVerificationPage';
+import NotificationPage from './pages/NotificationPage';
+import AccountSettingsPage from './pages/AccountSettingsPage';
+import AboutPage from './pages/AboutPage';
 
 
 //Removed Login Page to make changes work with Rian's Database/API functions - Jean
@@ -20,6 +23,9 @@ function App() {
         <Route path="/PasswordResetEmail" element={<ForgorPassPage />} />
         <Route path="/reset-password/:token" element={<PasswordResetPage/>} />
         <Route path = "/verify/:token" element={<EmailVerificationPage/>} />
+        <Route path="/Notification" element={<NotificationPage />} />
+        <Route path="/AccountSettings" element={<AccountSettingsPage />} />
+        <Route path="/About" element={<AboutPage />} />
       </Routes>
     </BrowserRouter>
   );

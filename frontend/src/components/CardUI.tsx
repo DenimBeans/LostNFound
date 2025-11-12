@@ -10,10 +10,11 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import {LatLng} from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-//CHANGE AS NEEDED. Taken from MERN App, retooled for testing purposes.
 
 function CardUI() {
     const AddPopupRef = useRef<HTMLDivElement>(null);
+    const EditPopupRef = useRef<HTMLDivElement>(null);
+    const ViewPopupRef = useRef<HTMLDivElement>(null);
 
     interface ContainerData{
         _id : string;
@@ -21,37 +22,69 @@ function CardUI() {
         description : string;
         category : string;
         status : string;
+        imageUrl: string;
+        locationText: string;
     }
 
     const [message, setMessage] = useState('');
     const [repMessage, setRepMessage] = useState('');
-    //const [searchResults, setResults] = useState('');
-    //const [itemList, setItemList] = useState('');
     
     const [ItemContainer,setItemContainer] = useState<ContainerData[]>([]);
 
-    //const [Search,setSearchItem] = React.useState('');
+    const [CurEditItem,setCurEditItem] = React.useState('');
 
+    //SearchBar
+    const [status,setstatus] = React.useState('');
+    const [Category,setCategory] = React.useState('');
+    const [Search,setSearchItem] = React.useState('');
+
+    //View
+    const [VitemTitle, setItemNameValueV] = React.useState('');
+    const [VitemDesc, setItemDescValueV] = React.useState('');
+    const [VitemCat, setItemCatValueV] = React.useState('');
+    const [VitemImage, setItemImageValueV] = React.useState('');
+
+
+    //Edit
+    const [EitemTitle, setItemNameValueE] = React.useState('');
+    const [EitemDesc, setItemDescValueE] = React.useState('');
+    const [EitemCat, setItemCatValueE] = React.useState('');
+    const [EitemImage, setItemImageValueE] = React.useState('');
+    const [EitemLocation, setLocationValueE] = React.useState('');
+
+
+    //Add
     const [itemTitle, setItemNameValue] = React.useState('');
     const [itemDesc, setItemDescValue] = React.useState('');
     const [itemCat, setItemCatValue] = React.useState('');
     const [itemImage, setItemImageValue] = React.useState('');
-    //const [itemLat, setItemLatValue] = React.useState('');
-    //const [itemLong, setItemLongValue] = React.useState('');
     const [itemLocation, setLocationValue] = React.useState('');
-    //const [itemDate, setItemDateValue] = React.useState('');
     const [itemUSERID, setItemUSERIDValue] = React.useState('');
-    //const [ownerName, setNameValue] = React.useState('');
-    //const [ownerEmail, setEmailValue] = React.useState('');
 
     const ucfCoords:LatLng = new LatLng(28.6024, -81.2001);
     const [position, setPosition] = useState(ucfCoords);
 
+    async function ItemPage(Item: any): Promise<void>{
+        if (ViewPopupRef.current){
+            
+            setItemNameValueV(Item.title);
+            setItemDescValueV(Item.description);
+            setItemCatValueV(Item.category);
+            setItemImageValueV(Item.imageUrl);
+            
+            ViewPopupRef.current.style.visibility = 'visible';
+        }
+    }
 
-
-    async function ItemPage(){
-        if (AddPopupRef.current){
-            AddPopupRef.current.style.visibility = 'visible';
+    async function EditPage(Item: any): Promise<void>{
+        if (EditPopupRef.current){
+            setCurEditItem(Item._id);
+            setItemNameValueE(Item.title);
+            setItemDescValueE(Item.description);
+            setItemCatValueE(Item.category);
+            setItemImageValueE(Item.imageUrl);
+            setLocationValueE(Item.locationText);
+            EditPopupRef.current.style.visibility = 'visible';
         }
     }
 
@@ -61,11 +94,52 @@ function CardUI() {
         }
     }
 
-    async function ItemData(){
-
+    async function exitReportEdit(){
+        if (EditPopupRef.current){
+            EditPopupRef.current.style.visibility = 'hidden';
+        }
     }
 
+    async function ViewexitReport(){
+        if (ViewPopupRef.current){
+            ViewPopupRef.current.style.visibility = 'hidden';
+        }
+    }
+
+
     async function EditItem(){
+
+        
+        
+        let obj = { title: itemTitle,description: itemDesc,category: itemCat,imageUrl: itemImage,lat: position.lat,
+            lng: position.lng, locationText: itemLocation,userId: itemUSERID };
+        let js = JSON.stringify(obj);
+
+         try {
+            const response = await fetch(buildAPIPath(`api/items/${CurEditItem}`),
+                { method: 'PATCH', body: js, headers: { 'Content-Type': 'application/json' } });
+
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if (res.error != '') {
+                setRepMessage(res.error)
+            }
+            else {
+                if (EditPopupRef.current){
+                    EditPopupRef.current.style.display = 'none';
+                }
+                setItemNameValue('');
+                setItemDescValue('');
+                setItemCatValue('');
+                setItemImageValue('');
+                setLocationValue('');
+            }
+        }
+        catch (error: any) {
+            setRepMessage(error.toString());
+        }
+
 
     }
 
@@ -115,14 +189,6 @@ function CardUI() {
                 if (AddPopupRef.current){
                     AddPopupRef.current.style.display = 'none';
                 }
-                setItemNameValue('');
-                setItemDescValue('');
-                setItemCatValue('');
-                setItemImageValue('');
-                setLocationValue('');
-                //setItemDateValue('');
-                //setNameValue('');
-                //setEmailValue('');
             }
         }
         catch (error: any) {
@@ -133,9 +199,6 @@ function CardUI() {
     async function searchItem(e: any): Promise<void> {
         e.preventDefault();
 
-        //let obj = {id:search};
-        //let js = JSON.stringify(obj);
-
         try {
             const response = await fetch(buildAPIPath(`api/users/${itemUSERID}/items`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
@@ -143,7 +206,6 @@ function CardUI() {
             let txt = await response.text();
             let res = JSON.parse(txt);
             setItemContainer(res.results);
-            console.log(res);
             }
             
         
@@ -152,16 +214,35 @@ function CardUI() {
         }
     };
 
-    /*
-        function handleSearchTextChange( e: any ) : void
-        {
-            setSearchValue( e.target.value );
-        }
-    */
-   /*function handleSearchItemChange(e: any): void{
-        setSearchItem(e.target.value);
-   }*/
+    async function searchItemSpecific(e: any): Promise<void>{
+         e.preventDefault();
 
+        setItemContainer([])
+
+        try {
+            const response = await fetch(buildAPIPath(`api/items?status=${status}&category=${Category}&search=${Search}`),
+                { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+            setItemContainer(res.results);
+            }
+            catch (error: any) {
+            console.log("Frontend Error");
+        }
+    }
+    //All for searchbar
+    function handleStatusChange(e: any): void{
+        setstatus(e.target.value);
+    }
+    function handleCategoryChange(e: any): void{
+        setCategory(e.target.value);
+   }  
+   function handleSearchItemChange(e: any): void{
+        setSearchItem(e.target.value);
+   }
+
+    //add
     function handleItemTextChange(e: any): void {
         setItemNameValue(e.target.value);
     }
@@ -179,28 +260,35 @@ function CardUI() {
         setLocationValue(e.target.value);
     }
 
-/*  function handleItemDateChange(e: any): void {
-        setItemDateValue(e.target.value);
+    //Edit
+    function EdithandleItemTextChange(e: any): void {
+        setItemNameValueE(e.target.value);
+    }
+    function EdithandleDescTextChange(e: any): void {
+        setItemDescValueE(e.target.value);
+    }
+    function EdithandleItemCatChange(e: any): void {
+        setItemCatValueE(e.target.value);
+    }
+    function EdithandleItemImageChange(e: any): void {
+        setItemImageValueE(e.target.value);
     }
 
-    function handleNameTextChange(e: any): void {
-        setNameValue(e.target.value);
+    function EdithandleLocationTextChange(e: any): void {
+        setLocationValueE(e.target.value);
     }
 
-    function handleEmailTextChange(e: any): void {
-        setEmailValue(e.target.value);
-    }*/
 
     //Grab userid
     useEffect(() => {
-        const Data = localStorage.getItem('user_data');
+        const Data = sessionStorage.getItem('user_data');
         if(Data != null){
             const UserData = JSON.parse(Data);
             setItemUSERIDValue(UserData?.userId);
             searchItem(true);
         }
         else{
-            setItemUSERIDValue('');
+            window.location.href = '/';
         }
     },[]);
     
@@ -242,12 +330,29 @@ function CardUI() {
 
     return (
         <div id="MainUIDiv">
+            <div id = "SearchBar">
+                <select id = 'category'  onChange = {handleStatusChange}>
+                    <option value = " ">Select Option</option>
+                    <option value = "lost">Lost</option>
+                    <option value = "found">Found</option>
+                </select>
+                <select id = 'category'  onChange = {handleCategoryChange}>
+                    <option value = " ">Select Option</option>
+                    <option value = "Electronic">Electronic</option>
+                    <option value = "Apparal">Apparal</option>
+                    <option value = "Container">Container</option>
+                    <option value = "Personal">Personal</option>
+                </select>
+                <input type = "text" id = "Searchtab" placeholder = "Search..." onChange = {handleSearchItemChange}/>
+                <button type = "button" id = "SearchItem" onClick = {searchItemSpecific}>Search</button>
+            </div>
+
             <div id = "LostItemPage">
                 {ItemContainer.map(ItemContainer => (
                     <div key = {ItemContainer._id} className = "ItemContainers">
                         <input type = "text" id = "ContainerTitle" value = {ItemContainer.title} readOnly/>
-                        <button type = "button" id = "ContainerData" onClick = {ItemData}>Info</button>
-                        <button type = "button" id = "ContainerEdit" onClick = {EditItem}>Edit</button>
+                        <button type = "button" id = "ContainerData" onClick = {() => ItemPage(ItemContainer)}>Info</button>
+                        <button type = "button" id = "ContainerEdit" onClick = {() => EditPage(ItemContainer)}>Edit</button>
                         <button type = "button" id = "ContainerDelete" onClick = {() => DeleteItem(ItemContainer._id)}>Delete</button>
                         <input type = "text" id = "ContainerStatus" value = {ItemContainer.status} readOnly/>
                     </div>
@@ -270,16 +375,17 @@ function CardUI() {
                     <DraggableMarker/>
                 </MapContainer>
 
-                <input type="text" id="itemTitle" placeholder="Item Name"
+                <input type="text" id="itemTitle" value = {itemTitle} placeholder="Item Name"
                     onChange={handleItemTextChange} />
 
                 <textarea 
                     id="Desc" 
+                    value = {itemDesc}
                     placeholder="Item Description"
                     onChange={handleDescTextChange}>
                 </textarea>
 
-                <input type="text" id = "locationText" placeholder = "Building Name/Classroom Number/Floor" 
+                <input type="text" id = "locationText" value= {itemLocation} placeholder = "Building Name/Classroom Number/Floor" 
                     onChange = {handleLocationTextChange}></input>
 
                 <select id = 'category' value = {itemCat} onChange = {handleItemCatChange}>
@@ -290,16 +396,91 @@ function CardUI() {
                     <option value = "Personal">Personal</option>
                 </select>
 
-                <input type="text" id = "ImageUp" placeholder = "Image URL" 
+                <input type="text" id = "ImageUp" value = {itemImage} placeholder = "Image URL" 
                     onChange = {handleItemImageChange}></input>
 
                 <input type = "button" id="reportButton" className = "button"
                     onClick={addItem} value = "Submit"/>
                 
             </div>
+
+            <div id = "EditItemPopup" ref = {EditPopupRef}>
+                <button type = "button" id="exitReportEdit" onClick={() => exitReportEdit()}>X</button>
+                <h2 id = 'reportHeader'>Lost Item Report</h2>
+
+                <span id="itemAddResult">{repMessage}</span>
+
+                <MapContainer id = "map" center = {ucfCoords} zoom={17} scrollWheelZoom={false} placeholder>
+                    <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+
+                    <DraggableMarker/>
+                </MapContainer>
+
+                <input type="text" id="itemTitle" value= {EitemTitle} placeholder="Item Name"
+                    onChange={EdithandleItemTextChange} />
+
+                <textarea 
+                    id="Desc" 
+                    value = {EitemDesc}
+                    placeholder="Item Description"
+                    onChange={EdithandleDescTextChange}>
+                </textarea>
+
+                <input type="text" id = "locationText" value = {EitemLocation} placeholder = "Building Name/Classroom Number/Floor" 
+                    onChange = {EdithandleLocationTextChange}></input>
+
+                <select id = 'category' value = {EitemCat} onChange = {EdithandleItemCatChange}>
+                    <option value = " ">Select Option</option>
+                    <option value = "Electronic">Electronic</option>
+                    <option value = "Apparal">Apparal</option>
+                    <option value = "Container">Container</option>
+                    <option value = "Personal">Personal</option>
+                </select>
+
+                <input type="text" id = "ImageUp" value = {EitemImage} placeholder = "Image URL" 
+                    onChange = {EdithandleItemImageChange}></input>
+
+                <input type = "button" id="reportButton" className = "button"
+                    onClick={EditItem} value = "Submit"/>
+                
+            </div>
+
+            <div id = "ViewItemPopup" ref = {ViewPopupRef}>
+                <button type = "button" id="ViewReportView" onClick={() => ViewexitReport()}>X</button>
+                <h2 id = 'reportHeader'>Lost Item Report</h2>
+
+                <span id="itemAddResult">{repMessage}</span>
+
+                <MapContainer id = "map" center = {ucfCoords} zoom={17} scrollWheelZoom={false} placeholder>
+                    <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+
+                    <DraggableMarker/>
+                </MapContainer>
+
+                <input type="text" id="itemTitle" value= {VitemTitle} placeholder="Item Name" readOnly/>
+
+                <textarea 
+                    id="Desc" 
+                    value = {VitemDesc}
+                    placeholder="Item Description">
+                    readOnly
+                </textarea>
+
+                <input type = "text" id = "CategoryView" value = {VitemCat} readOnly/>
+                    
+                <input type="text" id = "ImageUp" value = {VitemImage} placeholder = "Image URL" readOnly/>
+                
+            </div>
+
            <div id = "ButtonHolster">
                 <input type="button" id="addItemButton" className="button"
-                    onClick={ItemPage} value = "Add Item"></input>
+                    onClick={ItemPage} value = "Begin Report"/>
 
                 <input type="button" id="searchItemButton" className="button"
                     onClick={searchItem} value = "Display All Items"></input>
