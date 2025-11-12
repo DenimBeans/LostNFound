@@ -10,13 +10,14 @@ import 'register.dart';
 class AppHome extends StatefulWidget {
   final String firstName;
   final String lastName;
+  final String email;
   
   const AppHome({
     super.key, 
     required this.firstName, 
     required this.lastName, 
-    }
-  );
+    required this.email,
+  });
 
   @override
   State<AppHome> createState() => _AppHomeState();
@@ -65,8 +66,8 @@ class _AppHomeState extends State<AppHome> {
         ]
       ),
       body: <Widget>[
-        ItemReport(),
-        ItemSearch(),
+        ItemReport(firstName: widget.firstName, lastName: widget.lastName, email: widget.email),
+        ItemSearch(firstName: widget.firstName, lastName: widget.lastName, email: widget.email),
         InboxDisplay(),
       ][currentPageIndex],
       endDrawer: Drawer(
@@ -93,7 +94,7 @@ class _AppHomeState extends State<AppHome> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AccountSettings(),
+                    builder: (context) => AccountSettings(firstName: widget.firstName, lastName: widget.lastName, email: widget.email),
                   )
                 );
               },
@@ -118,8 +119,15 @@ class _AppHomeState extends State<AppHome> {
 
 //  Item Search Widgets
 class ItemSearch extends StatefulWidget {
+  final String firstName;
+  final String lastName;
+  final String email;
+
   const ItemSearch({
     super.key,
+    required this.firstName,
+    required this.lastName,
+    required this.email,
   });
 
   @override
@@ -256,7 +264,6 @@ class _SearchMapState extends State<SearchMap> {
   Widget build(BuildContext context) {
     _markers = [
       _buildItemMarker(point: LatLng(28.6024274, -81.2000599), itemName: 'Student Union')
-
       //  This is where the item markers will be added
       //  Will be filled with data from the appropiate API
     ];
@@ -313,10 +320,18 @@ class _MapUCFState extends State<MapUCF> {
     );
   }
 }
+
 //  Item Report Widgets
 class ItemReport extends StatefulWidget {
+  final String firstName;
+  final String lastName;
+  final String email;
+
   const ItemReport({
     super.key,
+    required this.firstName,
+    required this.lastName,
+    required this.email,
   });
 
   @override
@@ -351,8 +366,8 @@ class ItemReportState extends State<ItemReport> {
           'category': _categoryText,
           'imageUrl': _imgController,
           'locationText': _locationController,
-          //  'reporterName': 
-          //  'reporterEmail': 
+          'reporterName': widget.firstName,
+          'reporterEmail': widget.email,
         }),
       );
 
@@ -433,11 +448,29 @@ class ItemReportState extends State<ItemReport> {
             width: 350,
             height: 250,
             child: const ReportMap(),
-          )
+          ),
+          BoldElevatedButton(
+            text: 'Submit',
+            onPressed: () {
+              if (_itemReportKey.currentState!.validate()) {
+                _isLoading ? null : _report();
+              }
+            },
+            minWidth: 100,
+            minHeight: 80
+          ),
+          if (_errorMessage.isNotEmpty) Text(
+            _errorMessage,
+            style: const TextStyle( 
+              color: Colors.red, 
+              fontSize: 14, 
+            ), 
+            textAlign: TextAlign.center, 
+          ),
         ],
       ),
     );
-  }
+  } 
 }
 
 class ReportMap extends StatefulWidget {
@@ -546,7 +579,16 @@ class SubmittedItems extends StatelessWidget {
 
 //  Account Settings Widget
 class AccountSettings extends StatelessWidget {
-  const AccountSettings({super.key});
+  final String firstName;
+  final String lastName;
+  final String email;
+
+  const AccountSettings({
+    super.key,
+    required this.firstName,
+    required this.lastName,
+    required this.email,
+  });
 
   @override
   Widget build(BuildContext context) {

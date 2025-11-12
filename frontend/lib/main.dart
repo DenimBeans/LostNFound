@@ -204,6 +204,7 @@ class LoginFormState extends State<LoginForm> {
                 builder: (context) => AppHome(
                   firstName: data['firstName'], 
                   lastName: data['lastName'],
+                  email: _loginController.text,
                 ),
               ),
             );
