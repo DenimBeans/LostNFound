@@ -100,6 +100,12 @@ function CardUI() {
         }
     }
 
+    async function ViewexitReport(){
+        if (ViewPopupRef.current){
+            ViewPopupRef.current.style.visibility = 'hidden';
+        }
+    }
+
 
     async function EditItem(){
 
@@ -443,7 +449,7 @@ function CardUI() {
             </div>
 
             <div id = "ViewItemPopup" ref = {ViewPopupRef}>
-                <button type = "button" id="exitReportView" onClick={() => exitReport()}>X</button>
+                <button type = "button" id="ViewReportView" onClick={() => ViewexitReport()}>X</button>
                 <h2 id = 'reportHeader'>Lost Item Report</h2>
 
                 <span id="itemAddResult">{repMessage}</span>

@@ -195,7 +195,7 @@ flex-direction: row;
     border-color:black;
 }
 
-#exitReport
+#exitReport,#exitReportEdit,#ViewReportView
 {
     width: 35px;
     height: 35px;
@@ -211,7 +211,7 @@ flex-direction: row;
 
 }
 
-#exitReport:hover
+#exitReport:hover,#exitReportEdit:hover,#ViewReportView:hover
 {
     cursor: pointer;
 }
