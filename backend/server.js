@@ -957,20 +957,21 @@ app.get('/api/items/nearby', async (req, res) => {
 });
 
 // GET ALL ITEMS ENDPOINT - Retrieve all items with optional filters
-// GET /api/items?status=lost&category=Electronics
-// Query Params: status (optional), category (optional)
+// GET /api/items?status=lost&category=Electronics&search=iPhone&userId=123
+// Query Params: status (optional), category (optional), search (optional), userId (optional)
 // Response: { results, count, error }
 app.get('/api/items', async (req, res) => {
   var error = '';
 
   try {
     // Extract optional filter parameters from query string
-    const { status, category, search } = req.query;
+    const { status, category, search, userId } = req.query;
 
     // Build filter object for MongoDB query
     var filter = {};
     if (status) filter.status = status;        // Filter by status if provided
     if (category) filter.category = category;  // Filter by category if provided
+    if  (userId) filter.userId = userId;      // Filter by userId if provided
 
     // New Search By titile or description keyword (not case sensitive)
     if (search) {  
