@@ -30,6 +30,8 @@ function CardUI() {
     
     const [ItemContainer,setItemContainer] = useState<ContainerData[]>([]);
 
+    const [CurEditItem,setCurEditItem] = React.useState('');
+
     //SearchBar
     const [status,setstatus] = React.useState('');
     const [Category,setCategory] = React.useState('');
@@ -55,6 +57,7 @@ function CardUI() {
 
     async function EditPage(Item: any): Promise<void>{
         if (EditPopupRef.current){
+            setCurEditItem(Item._id);
             setItemNameValue(Item.title);
             setItemDescValue(Item.description);
             setItemCatValue(Item.category);
@@ -85,7 +88,7 @@ function CardUI() {
         let js = JSON.stringify(obj);
 
          try {
-            const response = await fetch(buildAPIPath('api/items'),
+            const response = await fetch(buildAPIPath(`api/items:${CurEditItem}`),
                 { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
