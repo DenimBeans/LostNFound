@@ -43,7 +43,6 @@ function CardUI() {
     const [VitemDesc, setItemDescValueV] = React.useState('');
     const [VitemCat, setItemCatValueV] = React.useState('');
     const [VitemImage, setItemImageValueV] = React.useState('');
-    const [VitemLocation, setLocationValueV] = React.useState('');
 
 
     //Edit
@@ -72,7 +71,7 @@ function CardUI() {
             setItemDescValueV(Item.description);
             setItemCatValueV(Item.category);
             setItemImageValueV(Item.imageUrl);
-            setLocationValueV(Item.locationText)
+            
             ViewPopupRef.current.style.visibility = 'visible';
         }
     }
@@ -221,7 +220,7 @@ function CardUI() {
         setItemContainer([])
 
         try {
-            const response = await fetch(buildAPIPath(`api/items?status=${status}&category=${Category}&search=${Search}`),
+            const response = await fetch(buildAPIPath(`api/items?status=${status}&category=${Category}&search=${Search}&userId=${itemUSERID}`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
@@ -477,8 +476,6 @@ function CardUI() {
                     placeholder="Item Description">
                     readOnly
                 </textarea>
-
-                <input type="text" id = "locationText" value = {VitemLocation} placeholder = "Building Name/Classroom Number/Floor" readOnly/>
 
                 <input type = "text" id = "CategoryView" value = {VitemCat} readOnly/>
                     

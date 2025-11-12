@@ -26,6 +26,7 @@ const app = require('../server');
 // Get models
 const User = mongoose.model('User');
 const Item = mongoose.model('Item');
+const Notification = mongoose.model('Notification');
 
 // ==================== TEST SETUP ====================
 
@@ -94,24 +95,247 @@ const createTestItem = async (itemData = {}) => {
     return await Item.create(defaultItem);
 };
 
+const createTestNotification = async (notificationData = {}) => {
+    let user = notificationData.userId;
+    if (!user) {
+        user = await createTestUser();
+    }
+    const defaultNotification = {
+        userId: user._id || user,
+        text: 'Test notification',
+        isRead: false,
+        isMeetup: false,
+        ...notificationData
+    };
+    return await Notification.create(defaultNotification);
+};
+
 // ==================== NOTIFICATION TESTS ====================
 
 describe('Notification Endpoints', () => {
 
-    describe('GET /api/users/:userId/notifications', () => {
+    describe('POST /api/notifications - Create Notification', () => {
+
+        test('Should successfully create a regular notification', async () => {
+            const user = await createTestUser();
+
+            const notificationData = {
+                userId: user._id,
+                text: 'Someone is interested in your lost item'
+            };
+
+            const response = await request(app)
+                .post('/api/notifications')
+                .send(notificationData)
+                .expect(201);
+
+            expect(response.body.success).toBe(true);
+            expect(response.body.message).toBe('Notification created successfully');
+            expect(response.body.notificationId).toBeDefined();
+            expect(response.body.notification.text).toBe('Someone is interested in your lost item');
+            expect(response.body.notification.isRead).toBe(false);
+            expect(response.body.notification.isMeetup).toBe(false);
+        });
+
+        test('Should create notification with sender and item references', async () => {
+            const user = await createTestUser();
+            const sender = await createTestUser();
+            const item = await createTestItem();
+
+            const notificationData = {
+                userId: user._id,
+                text: 'New message about your item',
+                senderId: sender._id,
+                itemId: item._id
+            };
+
+            const response = await request(app)
+                .post('/api/notifications')
+                .send(notificationData)
+                .expect(201);
+
+            expect(response.body.notification.senderId).toBeDefined();
+            expect(response.body.notification.senderId.firstName).toBe('John');
+            expect(response.body.notification.itemId).toBeDefined();
+            expect(response.body.notification.itemId.title).toBe('Lost iPhone');
+        });
+
+        test('Should create meet-up notification with location and time', async () => {
+            const user = await createTestUser();
+            const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+            const notificationData = {
+                userId: user._id,
+                text: 'Meet-up scheduled for item return',
+                isMeetup: true,
+                location: 'UCF Student Union',
+                meetTime: futureDate.toISOString()
+            };
+
+            const response = await request(app)
+                .post('/api/notifications')
+                .send(notificationData)
+                .expect(201);
+
+            expect(response.body.notification.isMeetup).toBe(true);
+            expect(response.body.notification.location).toBe('UCF Student Union');
+            expect(response.body.notification.meetTime).toBeDefined();
+        });
+
+        test('Should fail without userId', async () => {
+            const notificationData = {
+                text: 'Test notification'
+            };
+
+            const response = await request(app)
+                .post('/api/notifications')
+                .send(notificationData)
+                .expect(400);
+
+            expect(response.body.error).toBe('User ID and notification text are required');
+        });
+
+        test('Should fail without text', async () => {
+            const user = await createTestUser();
+
+            const notificationData = {
+                userId: user._id
+            };
+
+            const response = await request(app)
+                .post('/api/notifications')
+                .send(notificationData)
+                .expect(400);
+
+            expect(response.body.error).toBe('User ID and notification text are required');
+        });
+
+        test('Should fail with non-existent userId', async () => {
+            const fakeUserId = new mongoose.Types.ObjectId();
+
+            const notificationData = {
+                userId: fakeUserId,
+                text: 'Test notification'
+            };
+
+            const response = await request(app)
+                .post('/api/notifications')
+                .send(notificationData)
+                .expect(404);
+
+            expect(response.body.error).toBe('User not found');
+        });
+
+        test('Should fail meet-up notification without location', async () => {
+            const user = await createTestUser();
+            const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+            const notificationData = {
+                userId: user._id,
+                text: 'Meet-up notification',
+                isMeetup: true,
+                meetTime: futureDate.toISOString()
+            };
+
+            const response = await request(app)
+                .post('/api/notifications')
+                .send(notificationData)
+                .expect(400);
+
+            expect(response.body.error).toBe('Location and meet time are required for meet-up notifications');
+        });
+
+        test('Should fail meet-up notification without meetTime', async () => {
+            const user = await createTestUser();
+
+            const notificationData = {
+                userId: user._id,
+                text: 'Meet-up notification',
+                isMeetup: true,
+                location: 'UCF Student Union'
+            };
+
+            const response = await request(app)
+                .post('/api/notifications')
+                .send(notificationData)
+                .expect(400);
+
+            expect(response.body.error).toBe('Location and meet time are required for meet-up notifications');
+        });
+
+        test('Should fail meet-up with past meetTime', async () => {
+            const user = await createTestUser();
+            const pastDate = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+            const notificationData = {
+                userId: user._id,
+                text: 'Meet-up notification',
+                isMeetup: true,
+                location: 'UCF Student Union',
+                meetTime: pastDate.toISOString()
+            };
+
+            const response = await request(app)
+                .post('/api/notifications')
+                .send(notificationData)
+                .expect(400);
+
+            expect(response.body.error).toBe('Meet time must be in the future');
+        });
+
+        test('Should fail with non-existent senderId', async () => {
+            const user = await createTestUser();
+            const fakeSenderId = new mongoose.Types.ObjectId();
+
+            const notificationData = {
+                userId: user._id,
+                text: 'Test notification',
+                senderId: fakeSenderId
+            };
+
+            const response = await request(app)
+                .post('/api/notifications')
+                .send(notificationData)
+                .expect(404);
+
+            expect(response.body.error).toBe('Sender not found');
+        });
+
+        test('Should fail with non-existent itemId', async () => {
+            const user = await createTestUser();
+            const fakeItemId = new mongoose.Types.ObjectId();
+
+            const notificationData = {
+                userId: user._id,
+                text: 'Test notification',
+                itemId: fakeItemId
+            };
+
+            const response = await request(app)
+                .post('/api/notifications')
+                .send(notificationData)
+                .expect(404);
+
+            expect(response.body.error).toBe('Item not found');
+        });
+    });
+
+    describe('GET /api/users/:userId/notifications - Get User Notifications', () => {
 
         test('Should retrieve all notifications for a user', async () => {
-            const user = await createTestUser({
-                notifications: ['Notification 1', 'Notification 2', 'Notification 3']
-            });
+            const user = await createTestUser();
+
+            await createTestNotification({ userId: user._id, text: 'Notification 1' });
+            await createTestNotification({ userId: user._id, text: 'Notification 2' });
+            await createTestNotification({ userId: user._id, text: 'Notification 3' });
 
             const response = await request(app)
                 .get(`/api/users/${user._id}/notifications`)
                 .expect(200);
 
-            expect(response.body.notifications).toHaveLength(3);
+            expect(response.body.results).toHaveLength(3);
             expect(response.body.count).toBe(3);
-            expect(response.body.notifications).toContain('Notification 1');
+            expect(response.body.unreadCount).toBe(3);
         });
 
         test('Should return empty array for user with no notifications', async () => {
@@ -121,16 +345,135 @@ describe('Notification Endpoints', () => {
                 .get(`/api/users/${user._id}/notifications`)
                 .expect(200);
 
-            expect(response.body.notifications).toEqual([]);
+            expect(response.body.results).toEqual([]);
             expect(response.body.count).toBe(0);
+            expect(response.body.unreadCount).toBe(0);
         });
 
-        test('Should fail with invalid userId', async () => {
+        test('Should filter by isRead status', async () => {
+            const user = await createTestUser();
+
+            await createTestNotification({ userId: user._id, isRead: false });
+            await createTestNotification({ userId: user._id, isRead: false });
+            await createTestNotification({ userId: user._id, isRead: true });
+
+            const response = await request(app)
+                .get(`/api/users/${user._id}/notifications?isRead=false`)
+                .expect(200);
+
+            expect(response.body.results).toHaveLength(2);
+            expect(response.body.results.every(n => n.isRead === false)).toBe(true);
+        });
+
+        test('Should filter by isMeetup', async () => {
+            const user = await createTestUser();
+            const futureDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+            await createTestNotification({ userId: user._id, isMeetup: false });
+            await createTestNotification({
+                userId: user._id,
+                isMeetup: true,
+                location: 'Test Location',
+                meetTime: futureDate
+            });
+
+            const response = await request(app)
+                .get(`/api/users/${user._id}/notifications?isMeetup=true`)
+                .expect(200);
+
+            expect(response.body.results).toHaveLength(1);
+            expect(response.body.results[0].isMeetup).toBe(true);
+        });
+
+        test('Should populate sender information', async () => {
+            const user = await createTestUser();
+            const sender = await createTestUser({ firstName: 'Jane', lastName: 'Smith' });
+
+            await createTestNotification({
+                userId: user._id,
+                senderId: sender._id,
+                text: 'Message from Jane'
+            });
+
+            const response = await request(app)
+                .get(`/api/users/${user._id}/notifications`)
+                .expect(200);
+
+            expect(response.body.results[0].senderId).toBeDefined();
+            expect(response.body.results[0].senderId.firstName).toBe('Jane');
+            expect(response.body.results[0].senderId.lastName).toBe('Smith');
+        });
+
+        test('Should populate item information', async () => {
+            const user = await createTestUser();
+            const item = await createTestItem({ title: 'Lost Wallet' });
+
+            await createTestNotification({
+                userId: user._id,
+                itemId: item._id,
+                text: 'Update on your item'
+            });
+
+            const response = await request(app)
+                .get(`/api/users/${user._id}/notifications`)
+                .expect(200);
+
+            expect(response.body.results[0].itemId).toBeDefined();
+            expect(response.body.results[0].itemId.title).toBe('Lost Wallet');
+        });
+
+        test('Should sort notifications by newest first', async () => {
+            const user = await createTestUser();
+
+            await createTestNotification({ userId: user._id, text: 'Old' });
+            await new Promise(resolve => setTimeout(resolve, 10));
+            await createTestNotification({ userId: user._id, text: 'New' });
+
+            const response = await request(app)
+                .get(`/api/users/${user._id}/notifications`)
+                .expect(200);
+
+            expect(response.body.results[0].text).toBe('New');
+            expect(response.body.results[1].text).toBe('Old');
+        });
+
+        test('Should calculate correct unreadCount', async () => {
+            const user = await createTestUser();
+
+            await createTestNotification({ userId: user._id, isRead: false });
+            await createTestNotification({ userId: user._id, isRead: false });
+            await createTestNotification({ userId: user._id, isRead: true });
+            await createTestNotification({ userId: user._id, isRead: true });
+
+            const response = await request(app)
+                .get(`/api/users/${user._id}/notifications`)
+                .expect(200);
+
+            expect(response.body.unreadCount).toBe(2);
+            expect(response.body.count).toBe(4);
+        });
+
+        test('Should not return other users notifications', async () => {
+            const user1 = await createTestUser();
+            const user2 = await createTestUser();
+
+            await createTestNotification({ userId: user1._id, text: 'User 1 notification' });
+            await createTestNotification({ userId: user2._id, text: 'User 2 notification' });
+
+            const response = await request(app)
+                .get(`/api/users/${user1._id}/notifications`)
+                .expect(200);
+
+            expect(response.body.results).toHaveLength(1);
+            expect(response.body.results[0].text).toBe('User 1 notification');
+        });
+
+        test('Should fail with invalid userId format', async () => {
             const response = await request(app)
                 .get('/api/users/invalidid123/notifications')
-                .expect(500);
+                .expect(400);
 
-            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toBe('Invalid user ID format');
         });
 
         test('Should fail with non-existent userId', async () => {
@@ -144,398 +487,362 @@ describe('Notification Endpoints', () => {
         });
     });
 
-    describe('DELETE /api/users/:userId/notifications/:notificationIndex', () => {
+    describe('GET /api/notifications/:notificationId - Get Specific Notification', () => {
 
-        test('Should delete a specific notification by index', async () => {
-            const user = await createTestUser({
-                notifications: ['First', 'Second', 'Third']
+        test('Should retrieve specific notification by ID', async () => {
+            const user = await createTestUser();
+            const notification = await createTestNotification({
+                userId: user._id,
+                text: 'Specific notification'
             });
 
             const response = await request(app)
-                .delete(`/api/users/${user._id}/notifications/1`)
+                .get(`/api/notifications/${notification._id}`)
                 .expect(200);
 
-            expect(response.body.success).toBe(true);
-            expect(response.body.notifications).toHaveLength(2);
-            expect(response.body.notifications).not.toContain('Second');
-            expect(response.body.notifications).toContain('First');
-            expect(response.body.notifications).toContain('Third');
+            expect(response.body.notification).toBeDefined();
+            expect(response.body.notification.text).toBe('Specific notification');
+            expect(response.body.notification._id).toBe(notification._id.toString());
         });
 
-        test('Should delete first notification (index 0)', async () => {
-            const user = await createTestUser({
-                notifications: ['First', 'Second']
+        test('Should populate all references', async () => {
+            const user = await createTestUser({ firstName: 'John' });
+            const sender = await createTestUser({ firstName: 'Jane' });
+            const item = await createTestItem({ title: 'Lost Keys' });
+
+            const notification = await createTestNotification({
+                userId: user._id,
+                senderId: sender._id,
+                itemId: item._id,
+                text: 'Complete notification'
             });
 
             const response = await request(app)
-                .delete(`/api/users/${user._id}/notifications/0`)
+                .get(`/api/notifications/${notification._id}`)
                 .expect(200);
 
-            expect(response.body.notifications).toEqual(['Second']);
+            expect(response.body.notification.userId.firstName).toBe('John');
+            expect(response.body.notification.senderId.firstName).toBe('Jane');
+            expect(response.body.notification.itemId.title).toBe('Lost Keys');
         });
 
-        test('Should fail with invalid index (negative)', async () => {
-            const user = await createTestUser({
-                notifications: ['Test']
-            });
+        test('Should fail with non-existent notification ID', async () => {
+            const fakeId = new mongoose.Types.ObjectId();
 
             const response = await request(app)
-                .delete(`/api/users/${user._id}/notifications/-1`)
-                .expect(400);
-
-            expect(response.body.error).toBe('Invalid notification index');
-        });
-
-        test('Should fail with index out of range', async () => {
-            const user = await createTestUser({
-                notifications: ['Only one']
-            });
-
-            const response = await request(app)
-                .delete(`/api/users/${user._id}/notifications/5`)
+                .get(`/api/notifications/${fakeId}`)
                 .expect(404);
 
             expect(response.body.error).toBe('Notification not found');
         });
-
-        test('Should fail with non-numeric index', async () => {
-            const user = await createTestUser({
-                notifications: ['Test']
-            });
-
-            const response = await request(app)
-                .delete(`/api/users/${user._id}/notifications/abc`)
-                .expect(400);
-
-            expect(response.body.error).toBe('Invalid notification index');
-        });
     });
 
-    describe('DELETE /api/users/:userId/notifications', () => {
+    describe('PATCH /api/notifications/:notificationId/read - Mark Notification as Read', () => {
 
-        test('Should clear all notifications', async () => {
-            const user = await createTestUser({
-                notifications: ['One', 'Two', 'Three', 'Four']
+        test('Should mark notification as read', async () => {
+            const user = await createTestUser();
+            const notification = await createTestNotification({
+                userId: user._id,
+                isRead: false
             });
 
             const response = await request(app)
-                .delete(`/api/users/${user._id}/notifications`)
+                .patch(`/api/notifications/${notification._id}/read`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
-            expect(response.body.message).toBe('All notifications cleared');
+            expect(response.body.message).toBe('Notification marked as read');
+            expect(response.body.notification.isRead).toBe(true);
 
-            // Verify in database
-            const updatedUser = await User.findById(user._id);
-            expect(updatedUser.notifications).toEqual([]);
+            const updated = await Notification.findById(notification._id);
+            expect(updated.isRead).toBe(true);
         });
 
-        test('Should succeed even with no notifications', async () => {
+        test('Should handle already read notification', async () => {
+            const user = await createTestUser();
+            const notification = await createTestNotification({
+                userId: user._id,
+                isRead: true
+            });
+
+            const response = await request(app)
+                .patch(`/api/notifications/${notification._id}/read`)
+                .expect(200);
+
+            expect(response.body.success).toBe(true);
+            expect(response.body.notification.isRead).toBe(true);
+        });
+
+        test('Should fail with non-existent notification', async () => {
+            const fakeId = new mongoose.Types.ObjectId();
+
+            const response = await request(app)
+                .patch(`/api/notifications/${fakeId}/read`)
+                .expect(404);
+
+            expect(response.body.error).toBe('Notification not found');
+        });
+    });
+
+    describe('PATCH /api/users/:userId/notifications/read-all - Mark All as Read', () => {
+
+        test('Should mark all user notifications as read', async () => {
             const user = await createTestUser();
 
+            await createTestNotification({ userId: user._id, isRead: false });
+            await createTestNotification({ userId: user._id, isRead: false });
+            await createTestNotification({ userId: user._id, isRead: false });
+
             const response = await request(app)
-                .delete(`/api/users/${user._id}/notifications`)
+                .patch(`/api/users/${user._id}/notifications/read-all`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
+            expect(response.body.message).toBe('All notifications marked as read');
+            expect(response.body.modifiedCount).toBe(3);
+
+            const notifications = await Notification.find({ userId: user._id });
+            expect(notifications.every(n => n.isRead === true)).toBe(true);
         });
-    });
-});
 
-// ==================== ITEM MANAGEMENT TESTS ====================
+        test('Should only mark unread notifications', async () => {
+            const user = await createTestUser();
 
-describe('Item Management Endpoints', () => {
-
-    describe('PATCH /api/items/:id', () => {
-
-        test('Should successfully update item title', async () => {
-            const item = await createTestItem();
+            await createTestNotification({ userId: user._id, isRead: false });
+            await createTestNotification({ userId: user._id, isRead: true });
 
             const response = await request(app)
-                .patch(`/api/items/${item._id}`)
-                .send({ title: 'Updated Title' })
+                .patch(`/api/users/${user._id}/notifications/read-all`)
                 .expect(200);
 
-            expect(response.body.success).toBe(true);
-            expect(response.body.item.title).toBe('Updated Title');
-            expect(response.body.message).toBe('Item updated successfully');
+            expect(response.body.modifiedCount).toBe(1);
         });
 
-        test('Should update multiple fields at once', async () => {
-            const item = await createTestItem();
-
-            const updates = {
-                title: 'New Title',
-                description: 'New Description',
-                category: 'Books'
-            };
-
-            const response = await request(app)
-                .patch(`/api/items/${item._id}`)
-                .send(updates)
-                .expect(200);
-
-            expect(response.body.item.title).toBe('New Title');
-            expect(response.body.item.description).toBe('New Description');
-            expect(response.body.item.category).toBe('Books');
-        });
-
-        test('Should not allow changing userId', async () => {
+        test('Should not affect other users notifications', async () => {
             const user1 = await createTestUser();
             const user2 = await createTestUser();
-            const item = await createTestItem({ userId: user1._id });
+
+            await createTestNotification({ userId: user1._id, isRead: false });
+            await createTestNotification({ userId: user2._id, isRead: false });
 
             await request(app)
-                .patch(`/api/items/${item._id}`)
-                .send({ userId: user2._id })
+                .patch(`/api/users/${user1._id}/notifications/read-all`)
                 .expect(200);
 
-            // Verify userId didn't change
-            const updatedItem = await Item.findById(item._id);
-            expect(updatedItem.userId.toString()).toBe(user1._id.toString());
+            const user2Notifications = await Notification.find({ userId: user2._id });
+            expect(user2Notifications[0].isRead).toBe(false);
         });
 
-        test('Should fail with non-existent item', async () => {
-            const fakeId = new mongoose.Types.ObjectId();
-
-            const response = await request(app)
-                .patch(`/api/items/${fakeId}`)
-                .send({ title: 'Test' })
-                .expect(404);
-
-            expect(response.body.error).toBe('Item not found');
-        });
-
-        test('Should populate user info in response', async () => {
+        test('Should succeed even with no unread notifications', async () => {
             const user = await createTestUser();
-            const item = await createTestItem({ userId: user._id });
+
+            await createTestNotification({ userId: user._id, isRead: true });
 
             const response = await request(app)
-                .patch(`/api/items/${item._id}`)
-                .send({ title: 'Updated' })
-                .expect(200);
-
-            expect(response.body.item.userId).toBeDefined();
-            expect(response.body.item.userId.firstName).toBe('John');
-        });
-    });
-
-    describe('DELETE /api/items/:id', () => {
-
-        test('Should successfully delete an item', async () => {
-            const item = await createTestItem();
-
-            const response = await request(app)
-                .delete(`/api/items/${item._id}`)
+                .patch(`/api/users/${user._id}/notifications/read-all`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
-            expect(response.body.message).toBe('Item deleted successfully');
-
-            // Verify item is deleted
-            const deletedItem = await Item.findById(item._id);
-            expect(deletedItem).toBeNull();
+            expect(response.body.modifiedCount).toBe(0);
         });
 
-        test('Should fail with non-existent item', async () => {
-            const fakeId = new mongoose.Types.ObjectId();
-
+        test('Should fail with invalid userId format', async () => {
             const response = await request(app)
-                .delete(`/api/items/${fakeId}`)
-                .expect(404);
+                .patch('/api/users/invalidid/notifications/read-all')
+                .expect(400);
 
-            expect(response.body.error).toBe('Item not found');
-        });
-
-        test('Should fail with invalid item ID', async () => {
-            const response = await request(app)
-                .delete('/api/items/invalid123')
-                .expect(500);
-
-            expect(response.body).toHaveProperty('error');
+            expect(response.body.error).toBe('Invalid user ID format');
         });
     });
 
-    describe('PATCH /api/items/:id/status', () => {
+    describe('DELETE /api/notifications/:notificationId - Delete Notification', () => {
 
-        test('Should update item status to found', async () => {
-            const item = await createTestItem({ status: 'lost' });
+        test('Should successfully delete a notification', async () => {
+            const user = await createTestUser();
+            const notification = await createTestNotification({ userId: user._id });
 
             const response = await request(app)
-                .patch(`/api/items/${item._id}/status`)
-                .send({ status: 'found' })
+                .delete(`/api/notifications/${notification._id}`)
                 .expect(200);
 
             expect(response.body.success).toBe(true);
-            expect(response.body.item.status).toBe('found');
+            expect(response.body.message).toBe('Notification deleted successfully');
+
+            const deleted = await Notification.findById(notification._id);
+            expect(deleted).toBeNull();
         });
 
-        test('Should update status to pending', async () => {
-            const item = await createTestItem({ status: 'lost' });
-
-            const response = await request(app)
-                .patch(`/api/items/${item._id}/status`)
-                .send({ status: 'pending' })
-                .expect(200);
-
-            expect(response.body.item.status).toBe('pending');
-        });
-
-        test('Should update status to claimed', async () => {
-            const item = await createTestItem({ status: 'found' });
-
-            const response = await request(app)
-                .patch(`/api/items/${item._id}/status`)
-                .send({ status: 'claimed' })
-                .expect(200);
-
-            expect(response.body.item.status).toBe('claimed');
-        });
-
-        test('Should update status to returned', async () => {
-            const item = await createTestItem({ status: 'claimed' });
-
-            const response = await request(app)
-                .patch(`/api/items/${item._id}/status`)
-                .send({ status: 'returned' })
-                .expect(200);
-
-            expect(response.body.item.status).toBe('returned');
-        });
-
-        test('Should update status back to lost', async () => {
-            const item = await createTestItem({ status: 'found' });
-
-            const response = await request(app)
-                .patch(`/api/items/${item._id}/status`)
-                .send({ status: 'lost' })
-                .expect(200);
-
-            expect(response.body.item.status).toBe('lost');
-        });
-
-        test('Should fail with invalid status', async () => {
-            const item = await createTestItem();
-
-            const response = await request(app)
-                .patch(`/api/items/${item._id}/status`)
-                .send({ status: 'invalid_status' })
-                .expect(400);
-
-            expect(response.body.error).toContain('Invalid status');
-        });
-
-        test('Should fail with missing status', async () => {
-            const item = await createTestItem();
-
-            const response = await request(app)
-                .patch(`/api/items/${item._id}/status`)
-                .send({})
-                .expect(400);
-
-            expect(response.body.error).toContain('Invalid status');
-        });
-
-        test('Should fail with non-existent item', async () => {
+        test('Should fail with non-existent notification', async () => {
             const fakeId = new mongoose.Types.ObjectId();
 
             const response = await request(app)
-                .patch(`/api/items/${fakeId}/status`)
-                .send({ status: 'found' })
+                .delete(`/api/notifications/${fakeId}`)
                 .expect(404);
 
-            expect(response.body.error).toBe('Item not found');
+            expect(response.body.error).toBe('Notification not found');
         });
     });
 
-    describe('GET /api/users/:userId/items', () => {
+    describe('DELETE /api/users/:userId/notifications - Delete All User Notifications', () => {
 
-        test('Should retrieve all items posted by user', async () => {
+        test('Should delete all notifications for a user', async () => {
             const user = await createTestUser();
-            await createTestItem({ userId: user._id, title: 'Item 1' });
-            await createTestItem({ userId: user._id, title: 'Item 2' });
-            await createTestItem({ userId: user._id, title: 'Item 3' });
+
+            await createTestNotification({ userId: user._id });
+            await createTestNotification({ userId: user._id });
+            await createTestNotification({ userId: user._id });
 
             const response = await request(app)
-                .get(`/api/users/${user._id}/items`)
+                .delete(`/api/users/${user._id}/notifications`)
                 .expect(200);
 
-            expect(response.body.results).toHaveLength(3);
-            expect(response.body.count).toBe(3);
+            expect(response.body.success).toBe(true);
+            expect(response.body.message).toBe('All notifications deleted');
+            expect(response.body.deletedCount).toBe(3);
+
+            const remaining = await Notification.find({ userId: user._id });
+            expect(remaining).toHaveLength(0);
         });
 
-        test('Should not return items from other users', async () => {
+        test('Should not delete other users notifications', async () => {
             const user1 = await createTestUser();
             const user2 = await createTestUser();
 
-            await createTestItem({ userId: user1._id, title: 'User 1 Item' });
-            await createTestItem({ userId: user2._id, title: 'User 2 Item' });
+            await createTestNotification({ userId: user1._id });
+            await createTestNotification({ userId: user2._id });
 
-            const response = await request(app)
-                .get(`/api/users/${user1._id}/items`)
+            await request(app)
+                .delete(`/api/users/${user1._id}/notifications`)
                 .expect(200);
 
-            expect(response.body.results).toHaveLength(1);
-            expect(response.body.results[0].title).toBe('User 1 Item');
+            const user2Notifications = await Notification.find({ userId: user2._id });
+            expect(user2Notifications).toHaveLength(1);
         });
 
-        test('Should filter by status', async () => {
-            const user = await createTestUser();
-            await createTestItem({ userId: user._id, status: 'lost' });
-            await createTestItem({ userId: user._id, status: 'found' });
-            await createTestItem({ userId: user._id, status: 'lost' });
-
-            const response = await request(app)
-                .get(`/api/users/${user._id}/items?status=lost`)
-                .expect(200);
-
-            expect(response.body.results).toHaveLength(2);
-            expect(response.body.results.every(item => item.status === 'lost')).toBe(true);
-        });
-
-        test('Should return empty array for user with no items', async () => {
+        test('Should succeed with no notifications to delete', async () => {
             const user = await createTestUser();
 
             const response = await request(app)
-                .get(`/api/users/${user._id}/items`)
+                .delete(`/api/users/${user._id}/notifications`)
                 .expect(200);
 
-            expect(response.body.results).toEqual([]);
-            expect(response.body.count).toBe(0);
+            expect(response.body.success).toBe(true);
+            expect(response.body.deletedCount).toBe(0);
         });
 
-        test('Should fail with non-existent user', async () => {
-            const fakeId = new mongoose.Types.ObjectId();
+        test('Should fail with invalid userId format', async () => {
+            const response = await request(app)
+                .delete('/api/users/invalidid/notifications')
+                .expect(400);
+
+            expect(response.body.error).toBe('Invalid user ID format');
+        });
+    });
+
+    describe('Notification Integration Tests', () => {
+
+        test('Should create, read, and delete notification workflow', async () => {
+            const user = await createTestUser();
+            const sender = await createTestUser();
+            const item = await createTestItem();
+
+            const createResponse = await request(app)
+                .post('/api/notifications')
+                .send({
+                    userId: user._id,
+                    senderId: sender._id,
+                    itemId: item._id,
+                    text: 'Someone wants to return your item'
+                })
+                .expect(201);
+
+            const notificationId = createResponse.body.notificationId;
+
+            const getResponse = await request(app)
+                .get(`/api/users/${user._id}/notifications`)
+                .expect(200);
+
+            expect(getResponse.body.unreadCount).toBe(1);
+
+            await request(app)
+                .patch(`/api/notifications/${notificationId}/read`)
+                .expect(200);
+
+            const afterReadResponse = await request(app)
+                .get(`/api/users/${user._id}/notifications`)
+                .expect(200);
+
+            expect(afterReadResponse.body.unreadCount).toBe(0);
+
+            await request(app)
+                .delete(`/api/notifications/${notificationId}`)
+                .expect(200);
+
+            const finalResponse = await request(app)
+                .get(`/api/users/${user._id}/notifications`)
+                .expect(200);
+
+            expect(finalResponse.body.count).toBe(0);
+        });
+
+        test('Should handle multiple meet-up notifications', async () => {
+            const user = await createTestUser();
+            const futureDate1 = new Date(Date.now() + 24 * 60 * 60 * 1000);
+            const futureDate2 = new Date(Date.now() + 48 * 60 * 60 * 1000);
+
+            await request(app)
+                .post('/api/notifications')
+                .send({
+                    userId: user._id,
+                    text: 'Meet-up 1',
+                    isMeetup: true,
+                    location: 'Location 1',
+                    meetTime: futureDate1.toISOString()
+                })
+                .expect(201);
+
+            await request(app)
+                .post('/api/notifications')
+                .send({
+                    userId: user._id,
+                    text: 'Meet-up 2',
+                    isMeetup: true,
+                    location: 'Location 2',
+                    meetTime: futureDate2.toISOString()
+                })
+                .expect(201);
 
             const response = await request(app)
-                .get(`/api/users/${fakeId}/items`)
-                .expect(404);
+                .get(`/api/users/${user._id}/notifications?isMeetup=true`)
+                .expect(200);
 
-            expect(response.body.error).toBe('User not found');
+            expect(response.body.count).toBe(2);
+            expect(response.body.results.every(n => n.isMeetup === true)).toBe(true);
         });
 
-        test('Should sort items by newest first', async () => {
+        test('Should filter and mark multiple notifications', async () => {
             const user = await createTestUser();
 
-            const item1 = await createTestItem({
-                userId: user._id,
-                title: 'Old Item'
-            });
+            await createTestNotification({ userId: user._id, isRead: false, text: 'Unread 1' });
+            await createTestNotification({ userId: user._id, isRead: false, text: 'Unread 2' });
+            await createTestNotification({ userId: user._id, isRead: true, text: 'Read 1' });
 
-            // Wait a bit to ensure different timestamps
-            await new Promise(resolve => setTimeout(resolve, 10));
-
-            const item2 = await createTestItem({
-                userId: user._id,
-                title: 'New Item'
-            });
-
-            const response = await request(app)
-                .get(`/api/users/${user._id}/items`)
+            const unreadResponse = await request(app)
+                .get(`/api/users/${user._id}/notifications?isRead=false`)
                 .expect(200);
 
-            expect(response.body.results[0].title).toBe('New Item');
-            expect(response.body.results[1].title).toBe('Old Item');
+            expect(unreadResponse.body.count).toBe(2);
+
+            await request(app)
+                .patch(`/api/users/${user._id}/notifications/read-all`)
+                .expect(200);
+
+            const allResponse = await request(app)
+                .get(`/api/users/${user._id}/notifications`)
+                .expect(200);
+
+            expect(allResponse.body.unreadCount).toBe(0);
+            expect(allResponse.body.results.every(n => n.isRead === true)).toBe(true);
         });
     });
 });

@@ -206,17 +206,6 @@ class _SearchMapState extends State<SearchMap> {
 
   // A list that will hold our pins (markers)
   late final List<Marker> _markers;
-  @override
-  void initState() {
-    super.initState();
-
-    _markers = [
-      _buildItemMarker(point: LatLng(28.6024274, -81.2000599), itemName: 'Student Union') 
-
-      //  This is where the item markers will be added
-      //  Will be filled with data from the appropiate API
-    ];
-  }
 
   /// Helper function to create a custom Marker (pin)
   /// May change this to be more general and have a isItem bool that will be checked to determine how to treat a pin
@@ -231,7 +220,7 @@ class _SearchMapState extends State<SearchMap> {
       point: point,
       width: 95, // Fixed width that accommodates the longest name well
       height: 65, // Fixed height for the pin
-      child: InkWell(
+      child: GestureDetector(
         onTap: () {
           // For item search page: this should open a popup that displays the item's in-depth information
         },
@@ -265,26 +254,48 @@ class _SearchMapState extends State<SearchMap> {
 
   @override
   Widget build(BuildContext context) {
+    _markers = [
+      _buildItemMarker(point: LatLng(28.6024274, -81.2000599), itemName: 'Student Union')
+
+      //  This is where the item markers will be added
+      //  Will be filled with data from the appropiate API
+    ];
+
+
     return MapUCF(pontoCentral: _pontoCentral, markers: _markers);
   }
 }
 
-class MapUCF extends StatelessWidget {
+class MapUCF extends StatefulWidget {
   const MapUCF({
     super.key,
-    required LatLng pontoCentral,
-    required List<Marker> markers,
-  }) : _pontoCentral = pontoCentral, _markers = markers;
+    required this.pontoCentral,
+    required this.markers,
+  });
+  
+  final LatLng pontoCentral;
+  final List<Marker> markers;
 
-  final LatLng _pontoCentral;
-  final List<Marker> _markers;
+  @override
+  State<MapUCF> createState() => _MapUCFState();
+}
+
+class _MapUCFState extends State<MapUCF> {
+  final MapController _mapController = MapController();
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return FlutterMap(
+      mapController: _mapController,
       // Map options, such as initial center and zoom
       options: MapOptions(
-        initialCenter: _pontoCentral,
+        initialCenter: widget.pontoCentral,
         initialZoom: 15.0, // Displays all of campus
       ),
       // The map is built in layers
@@ -296,7 +307,7 @@ class MapUCF extends StatelessWidget {
         ),
         // Layer 2: Our pins (markers)
         MarkerLayer(
-          markers: _markers,
+          markers: widget.markers,
         ),
       ],
     );
@@ -418,7 +429,11 @@ class ItemReportState extends State<ItemReport> {
             isObscure: false,
             controller: _imgController,
           ),
-          ReportMap()
+          SizedBox(
+            width: 350,
+            height: 250,
+            child: const ReportMap(),
+          )
         ],
       ),
     );
@@ -437,14 +452,6 @@ class _ReportMapState extends State<ReportMap> {
 
   // A list that will hold our pins (markers)
   late final List<Marker> _markers;
-  @override
-  void initState() {
-    super.initState();
-
-    _markers = [
-      //  Here only markers will be the one user drops onto map (similar to web app)
-    ];
-  }
 
   /// Helper function to create a custom Marker (pin)
   /// May change this to be more general and have a isItem bool that will be checked to determine how to treat a pin
@@ -453,10 +460,9 @@ class _ReportMapState extends State<ReportMap> {
   }) {
     return Marker(
       point: point,
-      child: InkWell(
+      child: GestureDetector(
         onTap: () {
-          // For item report page: this creates an illustrative marker where the tap was
-          // Also how the user enters the items coords that get passed to item report function
+          // For item report page: this allows the user to move the pin around to signfiy where the item was lost
         },
         child: Icon(
           Icons.location_pin,
@@ -469,6 +475,11 @@ class _ReportMapState extends State<ReportMap> {
 
   @override
   Widget build(BuildContext context) {
+    _markers = [
+      _buildLocationMarker(point: LatLng(28.6024274, -81.2000599)),
+      //  Only marker marker will be the one user can click and drag (similar to web app)
+    ];
+
     return MapUCF(pontoCentral: _pontoCentral, markers: _markers);
   }
 }
