@@ -14,7 +14,7 @@ import 'leaflet/dist/leaflet.css';
 function CardUI() {
     const AddPopupRef = useRef<HTMLDivElement>(null);
     const EditPopupRef = useRef<HTMLDivElement>(null);
-
+    const ViewPopupRef = useRef<HTMLDivElement>(null);
 
     interface ContainerData{
         _id : string;
@@ -37,6 +37,25 @@ function CardUI() {
     const [Category,setCategory] = React.useState('');
     const [Search,setSearchItem] = React.useState('');
 
+    //View
+    const [VitemTitle, setItemNameValueV] = React.useState('');
+    const [VitemDesc, setItemDescValueV] = React.useState('');
+    const [VitemCat, setItemCatValueV] = React.useState('');
+    const [VitemImage, setItemImageValueV] = React.useState('');
+    const [VitemLocation, setLocationValueV] = React.useState('');
+    const [VitemUSERID, setItemUSERIDValueV] = React.useState('');
+
+
+    //Edit
+    const [EitemTitle, setItemNameValueE] = React.useState('');
+    const [EitemDesc, setItemDescValueE] = React.useState('');
+    const [EitemCat, setItemCatValueE] = React.useState('');
+    const [EitemImage, setItemImageValueE] = React.useState('');
+    const [EitemLocation, setLocationValueE] = React.useState('');
+    const [EitemUSERID, setItemUSERIDValueE] = React.useState('');
+
+
+    //Add
     const [itemTitle, setItemNameValue] = React.useState('');
     const [itemDesc, setItemDescValue] = React.useState('');
     const [itemCat, setItemCatValue] = React.useState('');
@@ -47,19 +66,24 @@ function CardUI() {
     const ucfCoords:LatLng = new LatLng(28.6024, -81.2001);
     const [position, setPosition] = useState(ucfCoords);
 
-    async function ItemPage(){
+    async function ItemPage(Item: any): Promise<void>{
         if (AddPopupRef.current){
+            setCurEditItemV(Item._id);
+            setItemNameValueV(Item.title);
+            setItemDescValueV(Item.description);
+            setItemCatValueV(Item.category);
+            setItemImageValueV(Item.imageUrl);
             AddPopupRef.current.style.visibility = 'visible';
         }
     }
 
     async function EditPage(Item: any): Promise<void>{
         if (EditPopupRef.current){
-            setCurEditItem(Item._id);
-            setItemNameValue(Item.title);
-            setItemDescValue(Item.description);
-            setItemCatValue(Item.category);
-            setItemImageValue(Item.imageUrl);
+            setCurEditItemE(Item._id);
+            setItemNameValueE(Item.title);
+            setItemDescValueE(Item.description);
+            setItemCatValueE(Item.category);
+            setItemImageValueE(Item.imageUrl);
             EditPopupRef.current.style.visibility = 'visible';
         }
     }
@@ -230,6 +254,25 @@ function CardUI() {
         setLocationValue(e.target.value);
     }
 
+    //Edit
+    function EdithandleItemTextChange(e: any): void {
+        setItemNameValueE(e.target.value);
+    }
+    function EdithandleDescTextChange(e: any): void {
+        setItemDescValueE(e.target.value);
+    }
+    function EdithandleItemCatChange(e: any): void {
+        setItemCatValueE(e.target.value);
+    }
+    function EdithandleItemImageChange(e: any): void {
+        setItemImageValueE(e.target.value);
+    }
+
+    function EdithandleLocationTextChange(e: any): void {
+        setLocationValueE(e.target.value);
+    }
+
+
     //Grab userid
     useEffect(() => {
         const Data = sessionStorage.getItem('user_data');
@@ -297,11 +340,12 @@ function CardUI() {
                 <input type = "text" id = "Searchtab" placeholder = "Search..." onChange = {handleSearchItemChange}/>
                 <button type = "button" id = "SearchItem" onClick = {searchItemSpecific}>Search</button>
             </div>
+
             <div id = "LostItemPage">
                 {ItemContainer.map(ItemContainer => (
                     <div key = {ItemContainer._id} className = "ItemContainers">
                         <input type = "text" id = "ContainerTitle" value = {ItemContainer.title} readOnly/>
-                        <button type = "button" id = "ContainerData" onClick = {() => ItemPage()}>Info</button>
+                        <button type = "button" id = "ContainerData" onClick = {() => ItemPage(ItemContainer)}>Info</button>
                         <button type = "button" id = "ContainerEdit" onClick = {() => EditPage(ItemContainer)}>Edit</button>
                         <button type = "button" id = "ContainerDelete" onClick = {() => DeleteItem(ItemContainer._id)}>Delete</button>
                         <input type = "text" id = "ContainerStatus" value = {ItemContainer.status} readOnly/>
@@ -369,20 +413,20 @@ function CardUI() {
                     <DraggableMarker/>
                 </MapContainer>
 
-                <input type="text" id="itemTitle" value= {itemTitle} placeholder="Item Name"
-                    onChange={handleItemTextChange} />
+                <input type="text" id="itemTitle" value= {EitemTitle} placeholder="Item Name"
+                    onChange={EdithandleItemTextChange} />
 
                 <textarea 
                     id="Desc" 
-                    value = {itemDesc}
+                    value = {EitemDesc}
                     placeholder="Item Description"
-                    onChange={handleDescTextChange}>
+                    onChange={EdithandleDescTextChange}>
                 </textarea>
 
-                <input type="text" id = "locationText" value = {itemLocation} placeholder = "Building Name/Classroom Number/Floor" 
-                    onChange = {handleLocationTextChange}></input>
+                <input type="text" id = "locationText" value = {EitemLocation} placeholder = "Building Name/Classroom Number/Floor" 
+                    onChange = {EdithandleLocationTextChange}></input>
 
-                <select id = 'category' value = {itemCat} onChange = {handleItemCatChange}>
+                <select id = 'category' value = {EitemCat} onChange = {EdithandleItemCatChange}>
                     <option value = " ">Select Option</option>
                     <option value = "Electronic">Electronic</option>
                     <option value = "Apparal">Apparal</option>
@@ -390,11 +434,48 @@ function CardUI() {
                     <option value = "Personal">Personal</option>
                 </select>
 
-                <input type="text" id = "ImageUp" value = {itemImage} placeholder = "Image URL" 
-                    onChange = {handleItemImageChange}></input>
+                <input type="text" id = "ImageUp" value = {EitemImage} placeholder = "Image URL" 
+                    onChange = {EdithandleItemImageChange}></input>
 
                 <input type = "button" id="reportButton" className = "button"
                     onClick={EditItem} value = "Submit"/>
+                
+            </div>
+
+            <div id = "ViewItemPopup" ref = {ViewPopupRef}>
+                <button type = "button" id="exitReportView" onClick={() => exitReport()}>X</button>
+                <h2 id = 'reportHeader'>Lost Item Report</h2>
+
+                <span id="itemAddResult">{repMessage}</span>
+
+                <MapContainer id = "map" center = {ucfCoords} zoom={17} scrollWheelZoom={false} placeholder>
+                    <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+
+                    <DraggableMarker/>
+                </MapContainer>
+
+                <input type="text" id="itemTitle" value= {VitemTitle} placeholder="Item Name" />
+
+                <textarea 
+                    id="Desc" 
+                    value = {VitemDesc}
+                    placeholder="Item Description">
+                </textarea>
+
+                <input type="text" id = "locationText" value = {VitemLocation} placeholder = "Building Name/Classroom Number/Floor"></input>
+
+                <select id = 'category' value = {VitemCat} onChange = {handleItemCatChange}>
+                    <option value = " ">Select Option</option>
+                    <option value = "Electronic">Electronic</option>
+                    <option value = "Apparal">Apparal</option>
+                    <option value = "Container">Container</option>
+                    <option value = "Personal">Personal</option>
+                </select>
+
+                <input type="text" id = "ImageUp" value = {VitemImage} placeholder = "Image URL"></input>
                 
             </div>
 

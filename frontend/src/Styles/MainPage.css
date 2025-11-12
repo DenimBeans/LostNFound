@@ -21,7 +21,7 @@ flex-direction: column;
 overflow-y: auto;
 }
 
-#AddItemPopup,#EditItemPopup{
+#AddItemPopup,#EditItemPopup,#ViewItemPopup{
 width: 80%;
 background-color: rgb(101, 101, 101);
 
