@@ -327,16 +327,17 @@ function CardUI() {
                     <DraggableMarker/>
                 </MapContainer>
 
-                <input type="text" id="itemTitle" placeholder="Item Name"
+                <input type="text" id="itemTitle" value = {itemTitle} placeholder="Item Name"
                     onChange={handleItemTextChange} />
 
                 <textarea 
                     id="Desc" 
+                    value = {itemDesc}
                     placeholder="Item Description"
                     onChange={handleDescTextChange}>
                 </textarea>
 
-                <input type="text" id = "locationText" placeholder = "Building Name/Classroom Number/Floor" 
+                <input type="text" id = "locationText" value= {itemLocation} placeholder = "Building Name/Classroom Number/Floor" 
                     onChange = {handleLocationTextChange}></input>
 
                 <select id = 'category' value = {itemCat} onChange = {handleItemCatChange}>
@@ -347,7 +348,7 @@ function CardUI() {
                     <option value = "Personal">Personal</option>
                 </select>
 
-                <input type="text" id = "ImageUp" placeholder = "Image URL" 
+                <input type="text" id = "ImageUp" value = {itemImage} placeholder = "Image URL" 
                     onChange = {handleItemImageChange}></input>
 
                 <input type = "button" id="reportButton" className = "button"
@@ -370,16 +371,17 @@ function CardUI() {
                     <DraggableMarker/>
                 </MapContainer>
 
-                <input type="text" id="itemTitle" placeholder="Item Name"
+                <input type="text" id="itemTitle" value= {itemTitle} placeholder="Item Name"
                     onChange={handleItemTextChange} />
 
                 <textarea 
                     id="Desc" 
+                    value = {itemDesc}
                     placeholder="Item Description"
                     onChange={handleDescTextChange}>
                 </textarea>
 
-                <input type="text" id = "locationText" placeholder = "Building Name/Classroom Number/Floor" 
+                <input type="text" id = "locationText" value = {itemLocation} placeholder = "Building Name/Classroom Number/Floor" 
                     onChange = {handleLocationTextChange}></input>
 
                 <select id = 'category' value = {itemCat} onChange = {handleItemCatChange}>
@@ -390,7 +392,7 @@ function CardUI() {
                     <option value = "Personal">Personal</option>
                 </select>
 
-                <input type="text" id = "ImageUp" placeholder = "Image URL" 
+                <input type="text" id = "ImageUp" value = {itemImage} placeholder = "Image URL" 
                     onChange = {handleItemImageChange}></input>
 
                 <input type = "button" id="reportButton" className = "button"
