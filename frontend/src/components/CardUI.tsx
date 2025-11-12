@@ -64,6 +64,15 @@ function CardUI() {
     const ucfCoords:LatLng = new LatLng(28.6024, -81.2001);
     const [position, setPosition] = useState(ucfCoords);
 
+     async function AddItemPage(Item: any): Promise<void>{
+        if (AddPopupRef.current){
+        
+            
+            AddPopupRef.current.style.visibility = 'visible';
+        }
+    }
+
+
     async function ItemPage(Item: any): Promise<void>{
         if (ViewPopupRef.current){
             
@@ -485,7 +494,7 @@ function CardUI() {
 
            <div id = "ButtonHolster">
                 <input type="button" id="addItemButton" className="button"
-                    onClick={ItemPage} value = "Begin Report"/>
+                    onClick={AddItemPage} value = "Begin Report"/>
 
                 <input type="button" id="searchItemButton" className="button"
                     onClick={searchItem} value = "Display All Items"></input>

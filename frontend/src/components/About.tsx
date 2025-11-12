@@ -1,3 +1,5 @@
+
+
 function About(){
 
 
@@ -5,7 +7,11 @@ function About(){
 
 
     return(
-        <h1>About</h1>
+        <div id = "AboutMain">
+            
+
+
+        </div>
     );
 };
 
