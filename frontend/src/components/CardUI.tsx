@@ -66,13 +66,13 @@ function CardUI() {
     const [position, setPosition] = useState(ucfCoords);
 
     async function ItemPage(Item: any): Promise<void>{
-        if (AddPopupRef.current){
+        if (ViewPopupRef.current){
             setItemNameValueV(Item.title);
             setItemDescValueV(Item.description);
             setItemCatValueV(Item.category);
             setItemImageValueV(Item.imageUrl);
             setLocationValueV(Item.location)
-            AddPopupRef.current.style.visibility = 'visible';
+            ViewPopupRef.current.style.visibility = 'visible';
         }
     }
 
