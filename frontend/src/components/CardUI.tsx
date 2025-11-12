@@ -47,8 +47,6 @@ function CardUI() {
     const ucfCoords:LatLng = new LatLng(28.6024, -81.2001);
     const [position, setPosition] = useState(ucfCoords);
 
-
-
     async function ItemPage(){
         if (AddPopupRef.current){
             AddPopupRef.current.style.visibility = 'visible';
@@ -193,14 +191,14 @@ function CardUI() {
 
     //Grab userid
     useEffect(() => {
-        const Data = localStorage.getItem('user_data');
+        const Data = sessionStorage.getItem('user_data');
         if(Data != null){
             const UserData = JSON.parse(Data);
             setItemUSERIDValue(UserData?.userId);
             searchItem(true);
         }
         else{
-            setItemUSERIDValue('');
+            window.location.href = '/';
         }
     },[]);
     
@@ -299,7 +297,7 @@ function CardUI() {
             </div>
            <div id = "ButtonHolster">
                 <input type="button" id="addItemButton" className="button"
-                    onClick={ItemPage} value = "Add Item"></input>
+                    onClick={ItemPage} value = "Begin Report"></input>
 
                 <input type="button" id="searchItemButton" className="button"
                     onClick={searchItem} value = "Display All Items"></input>
