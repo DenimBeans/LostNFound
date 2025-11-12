@@ -472,8 +472,6 @@ function CardUI() {
                     readOnly
                 </textarea>
 
-                <input type="text" id = "locationText" value = {VitemLocation} placeholder = "Building Name/Classroom Number/Floor" readOnly/>
-
                 <input type = "text" id = "CategoryView" value = {VitemCat} readOnly/>
                     
                 <input type="text" id = "ImageUp" value = {VitemImage} placeholder = "Image URL" readOnly/>
