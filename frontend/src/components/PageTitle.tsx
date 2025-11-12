@@ -21,7 +21,7 @@ function PageTitle() {
       aboutRef.current.style.visibility = 'visible';
       logoutRef.current.style.visibility = 'visible';
     }
-    elseif(notifRef.current && accountRef.current && aboutRef.current
+    else if(notifRef.current && accountRef.current && aboutRef.current
         && logoutRef.current && location === '/Notification')
     {
       notifRef.current.style.visibility = 'none';
@@ -29,7 +29,7 @@ function PageTitle() {
       aboutRef.current.style.visibility = 'visible';
       logoutRef.current.style.visibility = 'visible';
     }
-    elseif (notifRef.current && accountRef.current && aboutRef.current
+    else if (notifRef.current && accountRef.current && aboutRef.current
         && logoutRef.current && location === '/AccountSettings')
     {
       notifRef.current.style.visibility = 'visible';
@@ -37,7 +37,7 @@ function PageTitle() {
       aboutRef.current.style.visibility = 'visible';
       logoutRef.current.style.visibility = 'visible';
     }
-    elseif (notifRef.current && accountRef.current && aboutRef.current
+    else if (notifRef.current && accountRef.current && aboutRef.current
         && logoutRef.current && location === '/About')
     {
       notifRef.current.style.visibility = 'visible';
