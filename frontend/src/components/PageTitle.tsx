@@ -14,7 +14,7 @@ function PageTitle() {
 
   function headerVis()
   {
-    if (notifRef.current && accountRef.current && aboutRef.current
+    if (HomeRef.current && notifRef.current && accountRef.current && aboutRef.current
         && logoutRef.current && location === '/main')
     {
       HomeRef.current.style.visibility = 'none';
@@ -23,7 +23,7 @@ function PageTitle() {
       aboutRef.current.style.visibility = 'visible';
       logoutRef.current.style.visibility = 'visible';
     }
-    else if(notifRef.current && accountRef.current && aboutRef.current
+    else if(HomeRef.current && notifRef.current && accountRef.current && aboutRef.current
         && logoutRef.current && location === '/Notification')
     {
       HomeRef.current.style.visibility = 'visible';
@@ -32,7 +32,7 @@ function PageTitle() {
       aboutRef.current.style.visibility = 'visible';
       logoutRef.current.style.visibility = 'visible';
     }
-    else if (notifRef.current && accountRef.current && aboutRef.current
+    else if (HomeRef.current && notifRef.current && accountRef.current && aboutRef.current
         && logoutRef.current && location === '/AccountSettings')
     {
       HomeRef.current.style.visibility = 'visible';
@@ -41,7 +41,7 @@ function PageTitle() {
       aboutRef.current.style.visibility = 'visible';
       logoutRef.current.style.visibility = 'visible';
     }
-    else if (notifRef.current && accountRef.current && aboutRef.current
+    else if (HomeRef.current && notifRef.current && accountRef.current && aboutRef.current
         && logoutRef.current && location === '/About')
     {
       HomeRef.current.style.visibility = 'visible';
