@@ -7,9 +7,9 @@ import '../Styles/FrontPage.css';
 
 //Map imports - Jean
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import {LatLng} from 'leaflet';
+import {LatLng, Icon} from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-
+import markerIconPng from "leaflet/dist/images/marker-icon.png";
 
 function CardUI() {
     const AddPopupRef = useRef<HTMLDivElement>(null);
@@ -316,7 +316,12 @@ function CardUI() {
             draggable={draggable}
             eventHandlers={eventHandlers}
             position={position}
-            ref={markerRef}>
+            ref={markerRef}
+            icon = {new Icon ((
+            {
+                iconUrl: markerIconPng, 
+                iconSize: [25, 41], 
+            }))}>
                 <Popup minWidth={90}>
                     <span onClick={toggleDraggable}>
                     {draggable
@@ -482,6 +487,9 @@ function CardUI() {
                 </select>
 
                 <input type="text" id = "ImageUp" value = {VitemImage} placeholder = "Image URL"></input>
+
+                <input type="button" id="reportButton" className="button"
+                    onClick={addItem} value = "Submit"></input>
                 
             </div>
 
