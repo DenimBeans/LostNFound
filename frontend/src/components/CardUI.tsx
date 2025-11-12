@@ -23,7 +23,7 @@ function CardUI() {
         category : string;
         status : string;
         imageUrl: string;
-        location: string;
+        locationText: string;
     }
 
     const [message, setMessage] = useState('');
@@ -72,7 +72,7 @@ function CardUI() {
             setItemDescValueV(Item.description);
             setItemCatValueV(Item.category);
             setItemImageValueV(Item.imageUrl);
-            setLocationValueV(Item.location.type)
+            setLocationValueV(Item.locationText)
             ViewPopupRef.current.style.visibility = 'visible';
         }
     }
@@ -84,7 +84,7 @@ function CardUI() {
             setItemDescValueE(Item.description);
             setItemCatValueE(Item.category);
             setItemImageValueE(Item.imageUrl);
-            setLocationValueE(Item.location.type);
+            setLocationValueE(Item.locationText);
             EditPopupRef.current.style.visibility = 'visible';
         }
     }
