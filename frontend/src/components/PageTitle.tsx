@@ -5,12 +5,22 @@ import {useLocation} from 'react-router-dom';
 function PageTitle() {
 
   const location = useLocation().pathname;
+
+  const notifRef = useRef<HTMLInputElement>(null);
+  const accountRef = useRef<HTMLInputElement>(null);
+  const aboutRef = useRef<HTMLInputElement>(null);
   const logoutRef = useRef<HTMLInputElement>(null);
 
-  function logoutVis()
+  function headerVis()
   {
-    if (logoutRef.current && location === '/main')
+    if (notifRef.current && accountRef.current && aboutRef.current
+        && logoutRef.current && location === '/main')
+    {
+      notifRef.current.style.visibility = 'visible';
+      accountRef.current.style.visibility = 'visible';
+      aboutRef.current.style.visibility = 'visible';
       logoutRef.current.style.visibility = 'visible';
+    }
   }
 
   function logout()
@@ -21,14 +31,20 @@ function PageTitle() {
 
   useEffect(() => 
   {
-    logoutVis();
+    headerVis();
   },[]);
 
   return (
     <div id = "TitleBorder">
       <h1 id="title">KnightFind</h1>
-      <input type = "button" id = "logout" value = "Logout" ref = {logoutRef}
-      onClick = {logout}/>
+      <input type = "button" id = "notifs" className = "headerBtn" value = "Notifications"
+        ref = {notifRef}/>
+      <input type = "button" id = "account" className = "headerBtn" value = "Account Settings"
+        ref = {accountRef}/>
+      <input type = "button" id = "about" className = "headerBtn" value = "About"
+        ref = {aboutRef}/>
+      <input type = "button" id = "logout" className = "headerBtn" value = "Logout" 
+        ref = {logoutRef} onClick = {logout}/>
     </div>
     
   );
