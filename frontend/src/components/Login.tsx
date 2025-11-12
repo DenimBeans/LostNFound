@@ -35,8 +35,8 @@ function Login() {
       }
       else {
         var user = { firstName: res.firstName, lastName: res.lastName, userId: res.userId, accessToken: res.accessToken}
-        localStorage.setItem('user_data', JSON.stringify(user));
-        
+        sessionStorage.setItem('user_data', JSON.stringify(user));
+
         setMessage('');
         window.location.href = '/main';
       }
