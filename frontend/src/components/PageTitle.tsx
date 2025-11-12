@@ -21,8 +21,44 @@ function PageTitle() {
       aboutRef.current.style.visibility = 'visible';
       logoutRef.current.style.visibility = 'visible';
     }
+    elseif(notifRef.current && accountRef.current && aboutRef.current
+        && logoutRef.current && location === '/Notification')
+    {
+      notifRef.current.style.visibility = 'none';
+      accountRef.current.style.visibility = 'visible';
+      aboutRef.current.style.visibility = 'visible';
+      logoutRef.current.style.visibility = 'visible';
+    }
+    elseif (notifRef.current && accountRef.current && aboutRef.current
+        && logoutRef.current && location === '/AccountSettings')
+    {
+      notifRef.current.style.visibility = 'visible';
+      accountRef.current.style.visibility = 'none';
+      aboutRef.current.style.visibility = 'visible';
+      logoutRef.current.style.visibility = 'visible';
+    }
+    elseif (notifRef.current && accountRef.current && aboutRef.current
+        && logoutRef.current && location === '/About')
+    {
+      notifRef.current.style.visibility = 'visible';
+      accountRef.current.style.visibility = 'visible';
+      aboutRef.current.style.visibility = 'none';
+      logoutRef.current.style.visibility = 'visible';
+    }
+    
   }
-
+  function Notif()
+  {
+    window.location.href = '/Notification';
+  }
+  function AccountSetting()
+  {
+    window.location.href = '/AccountSettings';
+  }
+  function About()
+  {
+    window.location.href = '/About';
+  }
   function logout()
   {
     sessionStorage.removeItem('user_data');
@@ -38,11 +74,11 @@ function PageTitle() {
     <div id = "TitleBorder">
       <h1 id="title">KnightFind</h1>
       <input type = "button" id = "notifs" className = "headerBtn" value = "Notifications"
-        ref = {notifRef}/>
+        ref = {notifRef} onClick = {Notif}/>
       <input type = "button" id = "account" className = "headerBtn" value = "Account Settings"
-        ref = {accountRef}/>
+        ref = {accountRef} onClick = {AccountSetting}/>
       <input type = "button" id = "about" className = "headerBtn" value = "About"
-        ref = {aboutRef}/>
+        ref = {aboutRef} onClick = {About}/>
       <input type = "button" id = "logout" className = "headerBtn" value = "Logout" 
         ref = {logoutRef} onClick = {logout}/>
     </div>

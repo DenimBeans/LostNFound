@@ -43,7 +43,6 @@ function CardUI() {
     const [VitemDesc, setItemDescValueV] = React.useState('');
     const [VitemCat, setItemCatValueV] = React.useState('');
     const [VitemImage, setItemImageValueV] = React.useState('');
-    const [VitemLocation, setLocationValueV] = React.useState('');
 
 
     //Edit
@@ -72,7 +71,7 @@ function CardUI() {
             setItemDescValueV(Item.description);
             setItemCatValueV(Item.category);
             setItemImageValueV(Item.imageUrl);
-            setLocationValueV(Item.locationText)
+            
             ViewPopupRef.current.style.visibility = 'visible';
         }
     }
