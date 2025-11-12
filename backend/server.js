@@ -92,7 +92,6 @@ const userSchema = new mongoose.Schema({
   resetPasswordToken: { type: String },                              // Token for password reset link
   resetPasswordExpires: { type: Date },                               // When reset token expires
   trackedItems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }], // Items user is tracking
-  notifications: { type: [String], default: [] }
 }, { timestamps: true });  // Automatically add createdAt and updatedAt fields
 
 // Create User model from schema
@@ -122,8 +121,34 @@ const itemSchema = new mongoose.Schema({
   isClaimed: { type: Boolean, default: false }                       // Whether item has been claimed
 }, { timestamps: true });  // Automatically add createdAt and updatedAt fields
 itemSchema.index({ userId: 1, createdAt: -1 });  // Optimize user item queries
+
 // Create Item model from schema
 const Item = mongoose.model('Item', itemSchema);
+
+// NOTIFICATION SCHEMA - Defines structure of notifications in MongoDB
+const notificationSchema = new mongoose.Schema({
+  userId: {  // Who receives this notification
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  text: { type: String, required: true, trim: true },  // Notification message
+  isRead: { type: Boolean, default: false },  // Whether user has read the notification
+  isMeetup: { type: Boolean, default: false },  // Whether this is a meet-up notification
+  location: { type: String, trim: true, default: '' },  // Meet-up location (only for meet-up notifications)
+  meetTime: { type: Date }, // Meet-up date/time (only for meet-up notifications)
+  senderId: {  // Who sent this notification (optional, for tracking)
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  itemId: {  // Related item (optional, for context)
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Item'
+  }
+}, { timestamps: true });
+
+// Create Notification model from scehma
+const Notification = mongoose.model('Notification', notificationSchema);
 
 // ==================== UTILITY ENDPOINTS ====================
 
@@ -974,8 +999,8 @@ app.get('/api/items', async (req, res) => {
     if  (userId) filter.userId = userId;      // Filter by userId if provided
 
     // New Search By titile or description keyword (not case sensitive)
-    if (search) {  
-      const searchRegex = new RegExp(search.trim(), 'i'); 
+    if (search) {
+      const searchRegex = new RegExp(search.trim(), 'i');
       filter.$or = [
         { title: searchRegex },
         { description: searchRegex }
@@ -1324,69 +1349,147 @@ app.get('/api/users/:userId/items', async (req, res) => {
 
 // ==================== NOTIFICATION ENDPOINTS ====================
 
-// ADD NOTIFICATION ENDPOINT - Add a new notification for a user
-// POST /api/users/:userId/notifications
-// Body: { message }
-// Response: { success, message, notifications, error }
-app.post('/api/users/:userId/notifications', async (req, res) => {
+// CREATE NOTIFICATION ENDPOINT - Send a notification to a user
+// POST /api/notifications
+// Body: { userId, text, isMeetup, location, meetTime, senderId, itemId }
+// Response: { success, message, notificationId, notification, error }
+app.post('/api/notifications', async (req, res) => {
   var error = '';
 
   try {
-    const { userId } = req.params;
-    const { message } = req.body;
+    const { userId, text, isMeetup, location, meetTime, senderId, itemId } = req.body;
 
-    // Validate message
-    if (!message || typeof message !== 'string') {
-      error = 'Notification message required';
+    // Validate required fields
+    if (!userId || !text) {
+      error = 'User ID and notification text are required';
       return res.status(400).json({ error });
     }
 
-    // Find user
+    // Validate user exists
     const user = await User.findById(userId);
     if (!user) {
       error = 'User not found';
       return res.status(404).json({ error });
     }
 
-    // Add notification
-    user.notifications.push(message);
-    await user.save();
+    // If it's a meet-up notification, validate meet-up fields
+    if (isMeetup) {
+      if (!location || !meetTime) {
+        error = 'Location and meet time are required for meet-up notifications';
+        return res.status(400).json({ error });
+      }
+
+      // Validate meet time is in the future
+      const meetDateTime = new Date(meetTime);
+      if (meetDateTime <= new Date()) {
+        error = 'Meet time must be in the future';
+        return res.status(400).json({ error });
+      }
+    }
+
+    // Validate sender if provided
+    if (senderId) {
+      const sender = await User.findById(senderId);
+      if (!sender) {
+        error = 'Sender not found';
+        return res.status(404).json({ error });
+      }
+    }
+
+    // Validate item if provided
+    if (itemId) {
+      const item = await Item.findById(itemId);
+      if (!item) {
+        error = 'Item not found';
+        return res.status(404).json({ error });
+      }
+    }
+
+    // Create notification
+    const notification = await Notification.create({
+      userId,
+      text,
+      isRead: false,
+      isMeetup: isMeetup || false,
+      location: isMeetup ? location : '',
+      meetTime: isMeetup ? new Date(meetTime) : null,
+      senderId: senderId || null,
+      itemId: itemId || null
+    });
+
+    // Populate for response
+    const populatedNotification = await Notification.findById(notification._id)
+      .populate('senderId', 'firstName lastName')
+      .populate('itemId', 'title category')
+      .populate('userId', 'firstName lastName email');
 
     var ret = {
       success: true,
-      message: 'Notification added',
-      notifications: user.notifications,
+      message: 'Notification created successfully',
+      notificationId: notification._id,
+      notification: populatedNotification,
       error: ''
     };
     res.status(201).json(ret);
 
   } catch (err) {
-    console.error('Add notification error:', err);
+    console.error('Create notification error:', err);
     error = err.message;
     res.status(500).json({ error });
   }
 });
 
-// GET NOTIFICATIONS ENDPOINT - Retrieve all notifications for a user
-// GET /api/users/:userId/notifications
-// Response: { notifications, count, error }
+// GET USER NOTIFICATIONS ENDPOINT - Retrieve all notifications for a user
+// GET /api/users/:userId/notifications?isRead=false&isMeetup=true
+// Query Params: isRead (optional), isMeetup (optional)
+// Response: { results, count, unreadCount, error }
 app.get('/api/users/:userId/notifications', async (req, res) => {
   var error = '';
 
   try {
     const { userId } = req.params;
+    const { isRead, isMeetup } = req.query;
 
-    // Find user by ID
-    const user = await User.findById(userId).select('notifications');
+    // Validate userId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      error = 'Invalid user ID format';
+      return res.status(400).json({ error });
+    }
 
+    // Verify user exists
+    const user = await User.findById(userId);
     if (!user) {
       error = 'User not found';
       return res.status(404).json({ error });
     }
 
+    // Build filter
+    var filter = { userId: userId };
+
+    // Add optional filters
+    if (isRead !== undefined) {
+      filter.isRead = isRead === 'true';
+    }
+    if (isMeetup !== undefined) {
+      filter.isMeetup = isMeetup === 'true';
+    }
+
+    // Query notifications
+    const notifications = await Notification.find(filter)
+      .populate('senderId', 'firstName lastName')
+      .populate('itemId', 'title category imageUrl')
+      .sort({ createdAt: -1 });
+
+    // Get unread count
+    const unreadCount = await Notification.countDocuments({
+      userId: userId,
+      isRead: false
+    });
+
     var ret = {
-      notifications: user.notifications,
-      count: user.notifications.length,
+      results: notifications,
+      count: notifications.length,
+      unreadCount: unreadCount,
       error: ''
     };
     res.json(ret);
@@ -1398,43 +1501,130 @@ app.get('/api/users/:userId/notifications', async (req, res) => {
   }
 });
 
-// DELETE NOTIFICATION ENDPOINT - Remove a specific notification
-// DELETE /api/users/:userId/notifications/:notificationIndex
-// Response: { success, message, notifications, error }
-app.delete('/api/users/:userId/notifications/:notificationIndex', async (req, res) => {
+// GET NOTIFICATION BY ID ENDPOINT - Retrieve specific notification
+// GET /api/notifications/:notificationId
+// Response: { notification, error }
+app.get('/api/notifications/:notificationId', async (req, res) => {
   var error = '';
 
   try {
-    const { userId, notificationIndex } = req.params;
-    const index = parseInt(notificationIndex);
+    const { notificationId } = req.params;
 
-    // Validate index is a number
-    if (isNaN(index) || index < 0) {
-      error = 'Invalid notification index';
-      return res.status(400).json({ error });
-    }
+    const notification = await Notification.findById(notificationId)
+      .populate('senderId', 'firstName lastName')
+      .populate('itemId', 'title description category imageUrl')
+      .populate('userId', 'firstName lastName email');
 
-    // Find user
-    const user = await User.findById(userId);
-    if (!user) {
-      error = 'User not found';
-      return res.status(404).json({ error });
-    }
-
-    // Check if index exists
-    if (index >= user.notifications.length) {
+    if (!notification) {
       error = 'Notification not found';
       return res.status(404).json({ error });
     }
 
-    // Remove notification at index
-    user.notifications.splice(index, 1);
-    await user.save();
+    var ret = {
+      notification: notification,
+      error: ''
+    };
+    res.json(ret);
+
+  } catch (err) {
+    console.error('Get notification error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
+// MARK NOTIFICATION AS READ ENDPOINT - Mark a notification as read
+// PATCH /api/notifications/:notificationId/read
+// Response: { success, message, notification, error }
+app.patch('/api/notifications/:notificationId/read', async (req, res) => {
+  var error = '';
+
+  try {
+    const { notificationId } = req.params;
+
+    const notification = await Notification.findByIdAndUpdate(
+      notificationId,
+      { isRead: true },
+      { new: true }
+    )
+      .populate('senderId', 'firstName lastName')
+      .populate('itemId', 'title category');
+
+    if (!notification) {
+      error = 'Notification not found';
+      return res.status(404).json({ error });
+    }
+
+    var ret = {
+      success: true,
+      message: 'Notification marked as read',
+      notification: notification,
+      error: ''
+    };
+    res.json(ret);
+
+  } catch (err) {
+    console.error('Mark notification as read error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
+// MARK ALL NOTIFICATIONS AS READ ENDPOINT - Mark all user's notifications as read
+// PATCH /api/users/:userId/notifications/read-all
+// Response: { success, message, modifiedCount, error }
+app.patch('/api/users/:userId/notifications/read-all', async (req, res) => {
+  var error = '';
+
+  try {
+    const { userId } = req.params;
+
+    // Validate userId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      error = 'Invalid user ID format';
+      return res.status(400).json({ error });
+    }
+
+    // Update all unread notifications for this user
+    const result = await Notification.updateMany(
+      { userId: userId, isRead: false },
+      { isRead: true }
+    );
+
+    var ret = {
+      success: true,
+      message: 'All notifications marked as read',
+      modifiedCount: result.modifiedCount,
+      error: ''
+    };
+    res.json(ret);
+
+  } catch (err) {
+    console.error('Mark all as read error:', err);
+    error = err.message;
+    res.status(500).json({ error });
+  }
+});
+
+// DELETE NOTIFICATION ENDPOINT - Delete a specific notification
+// DELETE /api/notifications/:notificationId
+// Response: { success, message, error }
+app.delete('/api/notifications/:notificationId', async (req, res) => {
+  var error = '';
+
+  try {
+    const { notificationId } = req.params;
+
+    const notification = await Notification.findByIdAndDelete(notificationId);
+
+    if (!notification) {
+      error = 'Notification not found';
+      return res.status(404).json({ error });
+    }
 
     var ret = {
       success: true,
       message: 'Notification deleted successfully',
-      notifications: user.notifications,
       error: ''
     };
     res.json(ret);
@@ -1446,34 +1636,34 @@ app.delete('/api/users/:userId/notifications/:notificationIndex', async (req, re
   }
 });
 
-// DELETE ALL NOTIFICATIONS ENDPOINT - Clear all notifications for a user
+// DELETE ALL USER NOTIFICATIONS ENDPOINT - Clear all notifications for a user
 // DELETE /api/users/:userId/notifications
-// Response: { success, message, error }
+// Response: { success, message, deletedCount, error }
 app.delete('/api/users/:userId/notifications', async (req, res) => {
   var error = '';
 
   try {
     const { userId } = req.params;
 
-    // Find user and clear notifications
-    const user = await User.findById(userId);
-    if (!user) {
-      error = 'User not found';
-      return res.status(404).json({ error });
+    // Validate userId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      error = 'Invalid user ID format';
+      return res.status(400).json({ error });
     }
 
-    user.notifications = [];
-    await user.save();
+    // Delete all notifications for this user
+    const result = await Notification.deleteMany({ userId: userId });
 
     var ret = {
       success: true,
-      message: 'All notifications cleared',
+      message: 'All notifications deleted',
+      deletedCount: result.deletedCount,
       error: ''
     };
     res.json(ret);
 
   } catch (err) {
-    console.error('Clear notifications error:', err);
+    console.error('Delete all notifications error:', err);
     error = err.message;
     res.status(500).json({ error });
   }
