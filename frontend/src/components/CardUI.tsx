@@ -220,7 +220,7 @@ function CardUI() {
         setItemContainer([])
 
         try {
-            const response = await fetch(buildAPIPath(`api/items?status=${status}&category=${Category}&search=${Search}`),
+            const response = await fetch(buildAPIPath(`api/items?status=${status}&category=${Category}&search=${Search}&userId=${itemUSERID}`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
