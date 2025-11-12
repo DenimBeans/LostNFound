@@ -23,7 +23,7 @@ function CardUI() {
         category : string;
         status : string;
         imageUrl: string;
-        location: string;
+        locationText: string;
     }
 
     const [message, setMessage] = useState('');
@@ -67,11 +67,12 @@ function CardUI() {
 
     async function ItemPage(Item: any): Promise<void>{
         if (ViewPopupRef.current){
+            
             setItemNameValueV(Item.title);
             setItemDescValueV(Item.description);
             setItemCatValueV(Item.category);
             setItemImageValueV(Item.imageUrl);
-            setLocationValueV(Item.location)
+            setLocationValueV(Item.locationText)
             ViewPopupRef.current.style.visibility = 'visible';
         }
     }
@@ -83,7 +84,7 @@ function CardUI() {
             setItemDescValueE(Item.description);
             setItemCatValueE(Item.category);
             setItemImageValueE(Item.imageUrl);
-            setLocationValueE(Item.location);
+            setLocationValueE(Item.locationText);
             EditPopupRef.current.style.visibility = 'visible';
         }
     }
@@ -468,34 +469,26 @@ function CardUI() {
                     <DraggableMarker/>
                 </MapContainer>
 
-                <input type="text" id="itemTitle" value= {VitemTitle} placeholder="Item Name" />
+                <input type="text" id="itemTitle" value= {VitemTitle} placeholder="Item Name" readOnly/>
 
                 <textarea 
                     id="Desc" 
                     value = {VitemDesc}
                     placeholder="Item Description">
+                    readOnly
                 </textarea>
 
-                <input type="text" id = "locationText" value = {VitemLocation} placeholder = "Building Name/Classroom Number/Floor"></input>
+                <input type="text" id = "locationText" value = {VitemLocation} placeholder = "Building Name/Classroom Number/Floor" readOnly/>
 
-                <select id = 'category' value = {VitemCat} onChange = {handleItemCatChange}>
-                    <option value = " ">Select Option</option>
-                    <option value = "Electronic">Electronic</option>
-                    <option value = "Apparal">Apparal</option>
-                    <option value = "Container">Container</option>
-                    <option value = "Personal">Personal</option>
-                </select>
-
-                <input type="text" id = "ImageUp" value = {VitemImage} placeholder = "Image URL"></input>
-
-                <input type="button" id="reportButton" className="button"
-                    onClick={addItem} value = "Submit"></input>
+                <input type = "text" id = "CategoryView" value = {VitemCat} readOnly/>
+                    
+                <input type="text" id = "ImageUp" value = {VitemImage} placeholder = "Image URL" readOnly/>
                 
             </div>
 
            <div id = "ButtonHolster">
                 <input type="button" id="addItemButton" className="button"
-                    onClick={ItemPage} value = "Begin Report"></input>
+                    onClick={ItemPage} value = "Begin Report"/>
 
                 <input type="button" id="searchItemButton" className="button"
                     onClick={searchItem} value = "Display All Items"></input>

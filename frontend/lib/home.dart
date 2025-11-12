@@ -129,7 +129,7 @@ class ItemSearch extends StatefulWidget {
 }
 
 class ItemSearchState extends State<ItemSearch> {
-  final _itemReportKey = GlobalKey<FormState>();
+  final _itemSearchKey = GlobalKey<FormState>();
   String _errorMessage = '';
   bool _isLoading = false;
 
@@ -417,7 +417,8 @@ class ItemReportState extends State<ItemReport> {
             label: 'Image URL',
             isObscure: false,
             controller: _imgController,
-          )
+          ),
+          ReportMap()
         ],
       ),
     );
