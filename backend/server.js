@@ -994,17 +994,19 @@ app.get('/api/items', async (req, res) => {
 
     // Build filter object for MongoDB query
     var filter = {};
+
+    // New Search By titile or description keyword (not case sensitive)
+    // 11-12-25: Changed placement so that filter would properly occur, 
+    // Removed search by description as well - Jean
+    if (search) {
+      const searchRegex = new RegExp(search.trim(), 'i');
+      filter =
+        { title: searchRegex } //changed to just take title HY
+    }
+
     if (status) filter.status = status;        // Filter by status if provided
     if (category) filter.category = category;  // Filter by category if provided
     if  (userId) filter.userId = userId;      // Filter by userId if provided
-
-    // New Search By titile or description keyword (not case sensitive)
-    if (search) {
-      const searchRegex = new RegExp(search.trim(), 'i');
-      filter = [
-        { title: searchRegex } //changed to just take title HY
-      ];
-    }
 
     // Query database with filters, populate user info, sort by newest first
     const items = await Item.find(filter)
