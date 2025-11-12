@@ -89,7 +89,7 @@ function CardUI() {
 
          try {
             const response = await fetch(buildAPIPath(`api/items/${CurEditItem}`),
-                { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
+                { method: 'PATCH', body: js, headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
             let res = JSON.parse(txt);
