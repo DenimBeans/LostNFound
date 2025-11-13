@@ -9,7 +9,7 @@ import '../Styles/FrontPage.css';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import {LatLng, Icon} from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import markerIconPng from "leaflet/dist/images/marker-icon.png";
+import markerIconPng from "../assets/marker-icon.png";
 
 function CardUI() {
     const AddPopupRef = useRef<HTMLDivElement>(null);
