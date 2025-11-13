@@ -38,6 +38,7 @@ dependencies:
   http: any
   flutter_map: ^8.2.2
   latlong2: ^0.9.1
+  flutter_map_dragmarker: ^8.0.3
 
 dev_dependencies:
   flutter_test:

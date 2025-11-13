@@ -1,7 +1,11 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+import 'dart:io';
+
+//import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
 import 'package:latlong2/latlong.dart';
 import 'dart:convert';
 import 'main.dart';
@@ -302,49 +306,7 @@ class _SearchMapState extends State<SearchMap> {
       // Markers will be populated from API
     ];
 
-    return MapUCF(pontoCentral: _pontoCentral, markers: _markers);
-  }
-}
-
-class MapUCF extends StatefulWidget {
-  const MapUCF({super.key, required this.pontoCentral, required this.markers});
-
-  final LatLng pontoCentral;
-  final List<Marker> markers;
-
-  @override
-  State<MapUCF> createState() => _MapUCFState();
-}
-
-class _MapUCFState extends State<MapUCF> {
-  final MapController _mapController = MapController();
-
-  @override
-  void dispose() {
-    _mapController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FlutterMap(
-      mapController: _mapController,
-      // Map options, such as initial center and zoom
-      options: MapOptions(
-        initialCenter: widget.pontoCentral,
-        initialZoom: 15.0, // Displays all of campus
-      ),
-      // The map is built in layers
-      children: [
-        // Layer 1: The base map from OpenStreetMap
-        TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.example.flutter_map_example',
-        ),
-        // Layer 2: Our pins (markers)
-        MarkerLayer(markers: widget.markers),
-      ],
-    );
+    return MapUCF(pontoCentral: _pontoCentral, markers: _markers, dragMarker: null,);
   }
 }
 
@@ -374,14 +336,21 @@ class ItemReportState extends State<ItemReport> {
   String _categoryText = '';
   final TextEditingController _imgController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
+  String _reporterName = '';
+  String _reporterEmail = '';
   String _errorMessage = '';
   bool _isLoading = false;
 
   Future<void> _report() async {
     setState(() {
+      _reporterName = widget.firstName;
+      _reporterEmail = widget.email;
       _isLoading = true;
       _errorMessage = '';
     });
+
+    //printToConsole(_reporterName);
+    //printToConsole(_reporterEmail);
 
     try {
       final response = await http.post(
@@ -393,8 +362,8 @@ class ItemReportState extends State<ItemReport> {
           'category': _categoryText,
           'imageUrl': _imgController.text,
           'locationText': _locationController.text,
-          'reporterName': widget.firstName,
-          'reporterEmail': widget.email,
+          'reporterName': _reporterName,
+          'reporterEmail': _reporterEmail,
         }),
       );
 
@@ -414,14 +383,15 @@ class ItemReportState extends State<ItemReport> {
         }
       } else {
         setState(() {
-          _errorMessage = 'Failed to submit report.';
+          _errorMessage = 'Failed to submit report. Error code ${response.statusCode.toString()}';
         });
       }
     } catch (e) {
       setState(() {
         _errorMessage = 'Network error. Please check your connection.';
       });
-    } finally {
+    }
+    finally {
       setState(() {
         _isLoading = false;
       });
@@ -557,33 +527,91 @@ class _ReportMapState extends State<ReportMap> {
   static const LatLng _pontoCentral = LatLng(28.6024274, -81.2000599);
 
   // A list that will hold our pins (markers)
-  late final List<Marker> _markers;
+  late final List<DragMarker> _dragMarkers;
 
   /// Helper function to create a custom Marker (pin)
   /// May change this to be more general and have a isItem bool that will be checked to determine how to treat a pin
-  Marker _buildLocationMarker({required LatLng point}) {
-    return Marker(
+  DragMarker _buildLocationMarker({required LatLng point}) {
+    return DragMarker(
+      key: GlobalKey<DragMarkerWidgetState>(),
       point: point,
-      child: GestureDetector(
-        onTap: () {
-          // Allow user to move pin
-        },
-        child: const Icon(
-          Icons.location_pin,
-          //color: color,
-          size: 40,
-        ),
-      ),
+      size: const Size(95, 65),
+      builder: (_, pos, ___) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.location_pin,
+              //color: color,
+              size: 40,
+            ),
+          ],
+        );
+      },
+      onDragEnd: (details, point) => debugPrint("End point $point"),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    _markers = [
-      // Pin will be set by user when reporting
+    _dragMarkers = [
+      _buildLocationMarker(point: _pontoCentral)
     ];
 
-    return MapUCF(pontoCentral: _pontoCentral, markers: _markers);
+    return MapUCF(pontoCentral: _pontoCentral, markers: null, dragMarker: _dragMarkers,);
+  }
+}
+
+//  Reusable Map Widgets
+class MapUCF extends StatefulWidget {
+  const MapUCF({
+    super.key,
+    required this.pontoCentral,
+    this.markers,
+    this.dragMarker
+  });
+
+  final LatLng pontoCentral;
+  final List<Marker>? markers;
+  final List<DragMarker>? dragMarker;
+
+  @override
+  State<MapUCF> createState() => _MapUCFState();
+}
+
+class _MapUCFState extends State<MapUCF> {
+  final MapController _mapController = MapController();
+
+  @override
+  void dispose() {
+    _mapController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FlutterMap(
+      mapController: _mapController,
+      // Map options, such as initial center and zoom
+      options: MapOptions(
+        initialCenter: widget.pontoCentral,
+        initialZoom: 15.0, // Displays all of campus
+      ),
+      // The map is built in layers
+      children: [
+        // Layer 1: The base map from OpenStreetMap
+        TileLayer(
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          userAgentPackageName: 'com.example.flutter_map_example',
+        ),
+        // Marker Layer (optionally draggable)
+        if(widget.dragMarker != null)
+          DragMarkers(markers: widget.dragMarker ?? [])
+        else
+          MarkerLayer(markers: widget.markers ?? [])
+      ],
+    );
   }
 }
 
