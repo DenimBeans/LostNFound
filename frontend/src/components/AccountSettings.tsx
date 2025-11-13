@@ -89,12 +89,12 @@ function AccountSettings(){
     return(
         <div id = "AccountSettingsMain">
             <input type = "text" id = "id" className = "AccountSet" value = {itemUSERID}  readOnly/>
-            <input type = "text" id = "firstname" className = "AccountSet" defaultvalue = {userFirst} readOnly/>
-            <input type = "text" id = "lastname" className = "AccountSet" defaultvalue = {userLast}  readOnly/>
-            <input type = "text" id = "Accountemail" className = "AccountSet" defaultvalue = {userEmail} oreadOnly/>
-            <input type = "text" id = "isVer" className = "AccountSet" defaultvalue = {userVerified}  readOnly/>
-            <input type = "text" id = "created" className = "AccountSet" defaultvalue = {userCreated}  readOnly/>
-            <input type = "text" id = "updated" className = "AccountSet" defaultvalue = {userUpdated}  readOnly/>
+            <input type = "text" id = "firstname" className = "AccountSet" defaultValue = {userFirst} readOnly/>
+            <input type = "text" id = "lastname" className = "AccountSet" defaultValue = {userLast}  readOnly/>
+            <input type = "text" id = "Accountemail" className = "AccountSet" defaultValue = {userEmail} oreadOnly/>
+            <input type = "text" id = "isVer" className = "AccountSet" defaultValue = {userVerified}  readOnly/>
+            <input type = "text" id = "created" className = "AccountSet" defaultValue = {userCreated}  readOnly/>
+            <input type = "text" id = "updated" className = "AccountSet" defaultValue = {userUpdated}  readOnly/>
 
 
         </div>
