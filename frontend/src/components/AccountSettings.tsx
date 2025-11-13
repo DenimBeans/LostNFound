@@ -91,7 +91,7 @@ function AccountSettings(){
             <input type = "text" id = "id" className = "AccountSet" value = {itemUSERID}  readOnly/>
             <input type = "text" id = "firstname" className = "AccountSet" defaultValue = {userFirst} readOnly/>
             <input type = "text" id = "lastname" className = "AccountSet" defaultValue = {userLast}  readOnly/>
-            <input type = "text" id = "Accountemail" className = "AccountSet" defaultValue = {userEmail} oreadOnly/>
+            <input type = "text" id = "Accountemail" className = "AccountSet" defaultValue = {userEmail} readOnly/>
             <input type = "text" id = "isVer" className = "AccountSet" defaultValue = {userVerified}  readOnly/>
             <input type = "text" id = "created" className = "AccountSet" defaultValue = {userCreated}  readOnly/>
             <input type = "text" id = "updated" className = "AccountSet" defaultValue = {userUpdated}  readOnly/>
