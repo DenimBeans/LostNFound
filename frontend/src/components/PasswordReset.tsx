@@ -43,7 +43,7 @@ function passreset() {
 
   return (
     <div id="loginDiv">
-      <span id="inner-title">Insert new password.</span><br />
+      <span className="inner-title">Insert new password.</span><br />
        <input type="password" id="loginName" placeholder="New Password"
         onChange={handleSetPassName} />
 

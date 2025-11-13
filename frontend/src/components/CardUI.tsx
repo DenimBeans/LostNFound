@@ -68,8 +68,6 @@ function CardUI() {
          e.preventDefault();
 
         if (AddPopupRef.current){
-        
-            
             AddPopupRef.current.style.visibility = 'visible';
         }
     }
@@ -102,19 +100,32 @@ function CardUI() {
     async function exitReport(){
         if (AddPopupRef.current){
             AddPopupRef.current.style.visibility = 'hidden';
+            resetFields();
         }
     }
 
     async function exitReportEdit(){
         if (EditPopupRef.current){
             EditPopupRef.current.style.visibility = 'hidden';
+            resetFields();
         }
     }
 
     async function ViewexitReport(){
         if (ViewPopupRef.current){
             ViewPopupRef.current.style.visibility = 'hidden';
+            resetFields();
         }
+    }
+
+    async function resetFields() 
+    {
+        setItemNameValue('');
+        setItemDescValue('');
+        setItemCatValue('');
+        setItemImageValue('');
+        setLocationValue('');
+        setRepMessage('');
     }
 
 
@@ -140,11 +151,8 @@ function CardUI() {
                 if (EditPopupRef.current){
                     EditPopupRef.current.style.display = 'none';
                 }
-                setItemNameValue('');
-                setItemDescValue('');
-                setItemCatValue('');
-                setItemImageValue('');
-                setLocationValue('');
+
+                resetFields();
             }
         }
         catch (error: any) {
@@ -197,9 +205,7 @@ function CardUI() {
                 setRepMessage(res.error)
             }
             else {
-                if (AddPopupRef.current){
-                    AddPopupRef.current.style.display = 'none';
-                }
+                exitReport();
             }
         }
         catch (error: any) {
@@ -346,34 +352,37 @@ function CardUI() {
 
     return (
         <div id="MainUIDiv">
+
+            <h1 id = "homeHeader" className = "inner-title">Item Reports</h1>
+
+            <div id = "LostItemPage">
+                {ItemContainer.map(ItemContainer => (
+                    <div key = {ItemContainer._id} className = "ItemContainers">
+                        <input type = "text" id = "ContainerTitle" className = "containerInput" value = {ItemContainer.title} readOnly/>
+                        <input type = "text" id = "ContainerStatus" className = "containerInput" value = {ItemContainer.status} readOnly/>
+                        <button type = "button" id = "ContainerData" onClick = {() => ItemPage(ItemContainer)}>View Report</button>
+                        <button type = "button" id = "ContainerEdit" onClick = {() => EditPage(ItemContainer)}>Edit</button>
+                        <button type = "button" id = "ContainerDelete" onClick = {() => DeleteItem(ItemContainer._id)}>Delete</button>
+                    </div>
+                ))}
+                
+            </div>
+
             <div id = "SearchBar">
-                <select id = 'category'  onChange = {handleStatusChange}>
-                    <option value = " ">Select Option</option>
+                <select id = 'statusFilter' className = "filter" onChange = {handleStatusChange}>
+                    <option className = "default" value = " ">Filter By Status...</option>
                     <option value = "lost">Lost</option>
                     <option value = "found">Found</option>
                 </select>
-                <select id = 'category'  onChange = {handleCategoryChange}>
-                    <option value = " ">Select Option</option>
+                <select id = 'categoryFilter' className = "filter" onChange = {handleCategoryChange}>
+                    <option className = "default" value = " ">Filter By Category...</option>
                     <option value = "Electronic">Electronic</option>
                     <option value = "Apparal">Apparal</option>
                     <option value = "Container">Container</option>
                     <option value = "Personal">Personal</option>
                 </select>
-                <input type = "text" id = "Searchtab" placeholder = "Search..." onChange = {handleSearchItemChange}/>
+                <input type = "text" id = "Searchtab" placeholder = "Item Name..." onChange = {handleSearchItemChange}/>
                 <button type = "button" id = "SearchItem" onClick = {searchItemSpecific}>Search</button>
-            </div>
-
-            <div id = "LostItemPage">
-                {ItemContainer.map(ItemContainer => (
-                    <div key = {ItemContainer._id} className = "ItemContainers">
-                        <input type = "text" id = "ContainerTitle" value = {ItemContainer.title} readOnly/>
-                        <button type = "button" id = "ContainerData" onClick = {() => ItemPage(ItemContainer)}>Info</button>
-                        <button type = "button" id = "ContainerEdit" onClick = {() => EditPage(ItemContainer)}>Edit</button>
-                        <button type = "button" id = "ContainerDelete" onClick = {() => DeleteItem(ItemContainer._id)}>Delete</button>
-                        <input type = "text" id = "ContainerStatus" value = {ItemContainer.status} readOnly/>
-                    </div>
-                ))}
-                
             </div>
 
             <div id = "AddItemPopup" ref = {AddPopupRef}>
@@ -404,7 +413,7 @@ function CardUI() {
                 <input type="text" id = "locationText" value= {itemLocation} placeholder = "Building Name/Classroom Number/Floor" 
                     onChange = {handleLocationTextChange}></input>
 
-                <select id = 'category' value = {itemCat} onChange = {handleItemCatChange}>
+                <select id = 'category' className = "filter" value = {itemCat} onChange = {handleItemCatChange}>
                     <option value = " ">Select Option</option>
                     <option value = "Electronic">Electronic</option>
                     <option value = "Apparal">Apparal</option>
@@ -448,7 +457,7 @@ function CardUI() {
                 <input type="text" id = "locationText" value = {EitemLocation} placeholder = "Building Name/Classroom Number/Floor" 
                     onChange = {EdithandleLocationTextChange}></input>
 
-                <select id = 'category' value = {EitemCat} onChange = {EdithandleItemCatChange}>
+                <select id = 'category' className = "filter" value = {EitemCat} onChange = {EdithandleItemCatChange}>
                     <option value = " ">Select Option</option>
                     <option value = "Electronic">Electronic</option>
                     <option value = "Apparal">Apparal</option>
@@ -496,10 +505,7 @@ function CardUI() {
 
            <div id = "ButtonHolster">
                 <input type="button" id="addItemButton" className="button"
-                    onClick={AddItemPage} value = "Begin Report"/>
-
-                <input type="button" id="searchItemButton" className="button"
-                    onClick={searchItem} value = "Display All Items"></input>
+                    onClick={AddItemPage} value = "Make a Report"/>
            </div>
 
             <br />

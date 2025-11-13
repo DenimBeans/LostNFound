@@ -18,7 +18,48 @@ background-color: rgb(101, 101, 101);
 display:flex;
 flex-direction: column;
 
+border-bottom: 5px solid rgb(50, 50, 50);
+border-top-left-radius: 20px;
+border-top-right-radius: 20px;
+
 overflow-y: auto;
+overflow-x: auto;
+}
+
+#homeHeader
+{
+    margin-top: 2%;
+    margin-bottom: 2%;
+}
+
+.ItemContainers
+{
+    margin-top: 2px;
+    margin-bottom: 2px;
+    display:flex;
+    height: 50px;
+    width: 100%;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.containerInput
+{
+    background-color: rgb(239, 220, 174);
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    font-size: 16px;
+}
+
+#ContainerTitle
+{
+    border-right: 0px;
+}
+
+#ContainerStatus
+{
+    text-align: center;
+    width: 60px;
+    border-left: 0px;
 }
 
 #AddItemPopup,#EditItemPopup,#ViewItemPopup{
@@ -97,7 +138,7 @@ flex-direction: row;
     
 }
 
-#category
+.filter
 {
     margin-top: 15px;
     width: 50%;
@@ -260,11 +301,11 @@ flex-direction: row;
     margin-bottom: 30px;
 }
 
-#addItemButton, #searchItemButton
+#addItemButton
 {
     height: 100%;
     width: 20%;
-    margin-left: 25%;
+    margin-left: 40%;
     display: flex;
     justify-content: center;
     font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
@@ -274,10 +315,6 @@ flex-direction: row;
     border-style:solid;
 }
 
-#searchItemButton
-{
-    margin-left: 10%;
-}
 #addItemButton:hover{
     outline-color: darkgoldenrod;
     outline-style: solid;
@@ -296,4 +333,9 @@ flex-direction: row;
     margin-bottom: 20px;
     color: rgb(231, 67, 67);
     font-weight: bold;
+}
+
+.default
+{
+    color:rgb(101, 101, 101);
 }

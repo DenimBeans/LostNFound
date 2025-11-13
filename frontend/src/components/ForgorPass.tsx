@@ -41,7 +41,7 @@ function ForgorPass() {
 
   return (
     <div id="loginDiv">
-      <span id="inner-title">Forgot Password?</span><br />
+      <span className ="inner-title">Forgot Password?</span><br />
        <input type="text" id="loginName" placeholder="Email"
         onChange={handleSetEmailName} />
 

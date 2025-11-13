@@ -46,7 +46,7 @@ border-color:rgb(41, 42, 46);
 
 }
 
-#inner-title{
+.inner-title{
     margin-top: 5%;
     font-size: x-large;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
@@ -260,3 +260,4 @@ border-color:black;
 {
     background-color: rgb(167, 122, 9);
 }
+

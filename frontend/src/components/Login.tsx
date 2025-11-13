@@ -52,7 +52,7 @@ function Login() {
   return (
     <div id="loginDiv">
 
-      <span id="inner-title">Record thine login credentials...</span><br />
+      <span className ="inner-title">Record thine login credentials...</span><br />
       <span id="loginResult"> {message} </span>
 
        <input type="text" id="loginName" placeholder="Email"
