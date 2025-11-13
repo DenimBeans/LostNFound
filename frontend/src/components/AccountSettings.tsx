@@ -58,12 +58,12 @@ function AccountSettings(){
                 console.log(res.error)
             }
             else{
-            handleFirst(res.firstName);
-            handleLast(res.lastName);
-            handleEmail(res.email);
-            handleVerified(res.isVerified);
-            handleCreated(res.createdAt);
-            handleUpdated(res.updatedAt);
+            handleFirst(res.user.firstName);
+            handleLast(res.user.lastName);
+            handleEmail(res.user.email);
+            handleVerified(res.user.isVerified);
+            handleCreated(res.user.createdAt);
+            handleUpdated(res.user.updatedAt);
             }
 
             
