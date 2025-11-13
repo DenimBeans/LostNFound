@@ -51,7 +51,9 @@ function AccountSettings(){
             const response = await fetch(buildAPIPath(`api/users/${id}`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
-            var res = JSON.parse(await response.text());
+            
+            let txt = await response.text();
+            let res = JSON.parse(txt);
             console.log(res.firstName);
 
             if(res.error != ' '){
