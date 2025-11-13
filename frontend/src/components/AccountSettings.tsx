@@ -54,7 +54,9 @@ function AccountSettings(){
             
             let txt = await response.text();
             let res = JSON.parse(txt);
-            console.log(res.firstName);
+            console.log(res);
+            console.log(res.user);
+            console.log(res.user.firstName);
 
             if(res.error != ' '){
                 console.log(res.error)
