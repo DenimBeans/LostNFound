@@ -1,6 +1,7 @@
 import '../Styles/FrontPage.css';
 import {useRef, useEffect} from 'react';
 import {useLocation} from 'react-router-dom';
+import Logo from '../assets/KnightFindlogo.png';
 
 function PageTitle() {
 
@@ -81,7 +82,7 @@ function PageTitle() {
 
   return (
     <div id = "TitleBorder">
-      <h1 id="title">KnightFind</h1>
+      <img src = {Logo} id = "title"/>
       <input type = "button" id = "main" className = "headerBtn" value = "Home"
         ref = {HomeRef} onClick = {Home}/>
       <input type = "button" id = "notifs" className = "headerBtn" value = "Notifications"
