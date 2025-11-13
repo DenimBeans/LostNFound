@@ -1,3 +1,4 @@
+import '../Styles/About.css';
 
 
 function About(){

@@ -5,6 +5,9 @@ import { buildAPIPath } from './Path';
 import {useEffect} from 'react';
 //import {useRef} from 'react';
 
+import '../Styles/AccountSettings.css';
+
+
 function AccountSettings(){
 
     const [itemUSERID, setItemUSERIDValue] = React.useState('');
