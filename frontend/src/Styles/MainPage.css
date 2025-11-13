@@ -65,6 +65,7 @@ overflow-x: auto;
 #AddItemPopup,#EditItemPopup,#ViewItemPopup{
 width: 80%;
 background-color: rgb(101, 101, 101);
+height: 90vh;
 
 flex-direction: column;
 z-index: 3;
