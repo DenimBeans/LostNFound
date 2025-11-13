@@ -89,13 +89,13 @@ function AccountSettings(){
     // Feel free to change once variable is used elsewhere. - Jean
     return(
         <div id = "AccountSettingsMain">
-            <input type = "text" id = "id" className = "AccountSet" value = {itemUSERID} readOnly/>
-            <input type = "text" id = "firstname" className = "AccountSet" value = {userFirst} readOnly/>
-            <input type = "text" id = "lastname" className = "AccountSet" value = {userLast} readOnly/>
-            <input type = "text" id = "Accountemail" className = "AccountSet" value = {userEmail} readOnly/>
-            <input type = "text" id = "isVer" className = "AccountSet" value = {userVerified} readOnly/>
-            <input type = "text" id = "created" className = "AccountSet" value = {userCreated} readOnly/>
-            <input type = "text" id = "updated" className = "AccountSet" value = {userUpdated} readOnly/>
+            <input type = "text" id = "id" className = "AccountSet" value = {itemUSERID}  readOnly/>
+            <input type = "text" id = "firstname" className = "AccountSet" value = {userFirst} onChange = {handleFirst} readOnly/>
+            <input type = "text" id = "lastname" className = "AccountSet" value = {userLast} onChange = {handleLast} readOnly/>
+            <input type = "text" id = "Accountemail" className = "AccountSet" value = {userEmail} onChange = {handleEmail} readOnly/>
+            <input type = "text" id = "isVer" className = "AccountSet" value = {userVerified} onChange = {handleVerified} readOnly/>
+            <input type = "text" id = "created" className = "AccountSet" value = {userCreated} onChange = {handleCreated} readOnly/>
+            <input type = "text" id = "updated" className = "AccountSet" value = {userUpdated} onChange = {handleUpdated} readOnly/>
 
 
         </div>
