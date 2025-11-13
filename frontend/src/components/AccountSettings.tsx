@@ -15,7 +15,7 @@ function AccountSettings(){
     const [userCreated, setUserCreated] = React.useState('');
     const [userUpdated, setUserUpdated] = React.useState('');
 
-    async function ShowUserInfo(Id): Promise<void>{
+    async function ShowUserInfo(Id: any): Promise<void>{
         
 
         try {
