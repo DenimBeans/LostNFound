@@ -2,7 +2,7 @@
 
 function About(){
 
-    const Github = "https://github.com/DenimBeans/LostNFound/commits/main/";
+    const Github = "https://github.com/DenimBeans/LostNFound";
 
 
 
