@@ -52,6 +52,7 @@ function AccountSettings(){
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             var res = JSON.parse(await response.text());
+            console.log(res)
 
             if(res.error != ' '){
                 console.log(res.error)
