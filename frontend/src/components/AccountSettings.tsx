@@ -25,12 +25,12 @@ function AccountSettings(){
             let txt = await response.text();
             let res = JSON.parse(txt);
 
-            setUserFirst(res.firstname);
-            setUserLast(res.lastName);
-            setUserEmail(res.email);
-            setUserVerified(res.isVerified);
-            setUserCreated(res.createdAt);
-            setUserUpdated(res.updatedAt);
+            userFirst(res.firstname);
+            userLast(res.lastName);
+            userEmail(res.email);
+            userVerified(res.isVerified);
+            userCreated(res.createdAt);
+            userUpdated(res.updatedAt);
             }
             
         
@@ -60,7 +60,7 @@ function AccountSettings(){
             <input type = "text" id = "id" className = "AccountSet" value = {itemUSERID} readOnly/>
             <input type = "text" id = "firstname" className = "AccountSet" value = {userFirst} readOnly/>
             <input type = "text" id = "lastname" className = "AccountSet" value = {userLast} readOnly/>
-            <input type = "text" id = "email" className = "AccountSet" value = {userEmail} readOnly/>
+            <input type = "text" id = "Accountemail" className = "AccountSet" value = {userEmail} readOnly/>
             <input type = "text" id = "isVer" className = "AccountSet" value = {userVerified} readOnly/>
             <input type = "text" id = "created" className = "AccountSet" value = {userCreated} readOnly/>
             <input type = "text" id = "updated" className = "AccountSet" value = {userUpdated} readOnly/>
