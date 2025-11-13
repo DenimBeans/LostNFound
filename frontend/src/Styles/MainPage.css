@@ -154,6 +154,11 @@ flex-direction: row;
     
 }
 
+#CategoryView
+{
+    text-align: center;
+}
+
 #title:focus,#lat:focus,#long:focus{
     outline-color: darkgoldenrod;
     outline-style: solid;
