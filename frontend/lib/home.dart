@@ -1,9 +1,7 @@
-import 'dart:async';
-import 'dart:io';
-
-//import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:async';
+import 'dart:io';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
 import 'package:latlong2/latlong.dart';
@@ -336,21 +334,22 @@ class ItemReportState extends State<ItemReport> {
   String _categoryText = '';
   final TextEditingController _imgController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  String _reporterName = '';
-  String _reporterEmail = '';
+  LatLng _itemPosition = LatLng(28.6024274, -81.2000599);  //  Initial value UCF center
   String _errorMessage = '';
   bool _isLoading = false;
 
+  //  Update the stored position after the marker is moved
+  void _updateMarkerPosition(LatLng draggedTo) {
+    _itemPosition = draggedTo;
+  }
+
   Future<void> _report() async {
     setState(() {
-      _reporterName = widget.firstName;
-      _reporterEmail = widget.email;
       _isLoading = true;
       _errorMessage = '';
     });
 
-    //printToConsole(_reporterName);
-    //printToConsole(_reporterEmail);
+    debugPrint("End point $_itemPosition");
 
     try {
       final response = await http.post(
@@ -362,8 +361,10 @@ class ItemReportState extends State<ItemReport> {
           'category': _categoryText,
           'imageUrl': _imgController.text,
           'locationText': _locationController.text,
-          'reporterName': _reporterName,
-          'reporterEmail': _reporterEmail,
+          'reporterName': widget.firstName,
+          'reporterEmail': widget.lastName,
+          'lat': _itemPosition.latitude,
+          'lng': _itemPosition.longitude
         }),
       );
 
@@ -487,7 +488,11 @@ class ItemReportState extends State<ItemReport> {
               ),
             ),
             const SizedBox(height: 20),
-            SizedBox(width: 350, height: 250, child: const ReportMap()),
+            SizedBox(
+              width: 350,
+              height: 250,
+              child: ReportMap(positionedItem: _updateMarkerPosition)
+            ),
             const SizedBox(height: 20),
             BoldElevatedButton(
               text: 'Submit',
@@ -517,7 +522,11 @@ class ItemReportState extends State<ItemReport> {
 }
 
 class ReportMap extends StatefulWidget {
-  const ReportMap({super.key});
+  ReportMap({
+    super.key,
+    required this.positionedItem
+  });
+  final ValueChanged<LatLng> positionedItem;
 
   @override
   State<ReportMap> createState() => _ReportMapState();
@@ -526,8 +535,7 @@ class ReportMap extends StatefulWidget {
 class _ReportMapState extends State<ReportMap> {
   static const LatLng _pontoCentral = LatLng(28.6024274, -81.2000599);
 
-  // A list that will hold our pins (markers)
-  late final List<DragMarker> _dragMarkers;
+  //  late final List<DragMarker> _dragMarkers;
 
   /// Helper function to create a custom Marker (pin)
   /// May change this to be more general and have a isItem bool that will be checked to determine how to treat a pin
@@ -549,17 +557,17 @@ class _ReportMapState extends State<ReportMap> {
           ],
         );
       },
-      onDragEnd: (details, point) => debugPrint("End point $point"),
+      onDragEnd: (details, point) => widget.positionedItem(point), //debugPrint("End point $point"),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    _dragMarkers = [
+    final dragMarkers = [
       _buildLocationMarker(point: _pontoCentral)
     ];
 
-    return MapUCF(pontoCentral: _pontoCentral, markers: null, dragMarker: _dragMarkers,);
+    return MapUCF(pontoCentral: _pontoCentral, markers: null, dragMarker: dragMarkers,);
   }
 }
 
