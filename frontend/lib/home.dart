@@ -5,7 +5,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'dart:convert';
 import 'main.dart';
-import 'register.dart';
 
 class AppHome extends StatefulWidget {
   final String firstName;
@@ -161,7 +160,7 @@ class ItemSearchState extends State<ItemSearch> {
         if(data['error'] == null || data['error'].isEmpty) {
           if(mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Report uploaded!')),
+              const SnackBar(content: Text('')),
             );
           }
         } else {
@@ -187,17 +186,19 @@ class ItemSearchState extends State<ItemSearch> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        InputTextField(label: 'Search Item', isObscure: false,),
-        SizedBox(
-          width: 350,
-          height: 250,
-          //  Container widget is placeholder
-          //  As this will be where we output the items, ListView may be better
-          child: const SearchMap(),
-        )
-      ]
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          InputTextField(label: 'Search Item', isObscure: false,),
+          SizedBox(
+            width: 350,
+            height: 250,
+            //  Container widget is placeholder
+            //  As this will be where we output the items, ListView may be better
+            child: const SearchMap(),
+          )
+        ]
+      )
     );
   }
 }
@@ -403,74 +404,76 @@ class ItemReportState extends State<ItemReport> {
   
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _itemReportKey,
-      child: Column(
-        children: [
-          InputTextField(
-            label: '*Item Name',
-            isObscure: false,
-            controller: _titleController,
-            validator: (String? value) {
-              return (value == null || value.isEmpty) ? 'Please enter an item name!' : null;
-            },
-          ),
-          InputTextField(
-            label: 'Item Description',
-            isObscure: false,
-            controller: _descripController,
-          ),
-          InputTextField(
-            label: 'Building / Floor / Classroom Number',
-            isObscure: false,
-            controller: _locationController,
-          ),
-          DropdownMenu(
-            label: Text('Category'),
-            onSelected: (String? category) {
-              setState(() {
-                _categoryText = category!;
-              });
-            },
-            dropdownMenuEntries: <DropdownMenuEntry<String>>[
-              DropdownMenuEntry(value: 'Electronic', label: 'Electronic'),
-              DropdownMenuEntry(value: 'Apparel', label: 'Apparel'),
-              DropdownMenuEntry(value: 'Container', label: 'Container'),
-              DropdownMenuEntry(value: 'Personal', label: 'Personal'),
-            ],
-          ),
-          InputTextField(
-            label: 'Image URL',
-            isObscure: false,
-            controller: _imgController,
-          ),
-          SizedBox(
-            width: 350,
-            height: 250,
-            child: const ReportMap(),
-          ),
-          BoldElevatedButton(
-            text: 'Submit',
-            onPressed: () {
-              if (_itemReportKey.currentState!.validate()) {
-                _isLoading ? null : _report();
-              }
-            },
-            minWidth: 100,
-            minHeight: 80
-          ),
-          if (_errorMessage.isNotEmpty) Text(
-            _errorMessage,
-            style: const TextStyle( 
-              color: Colors.red, 
-              fontSize: 14, 
-            ), 
-            textAlign: TextAlign.center, 
-          ),
-        ],
-      ),
+    return SingleChildScrollView(
+      child: Form(
+        key: _itemReportKey,
+        child: Column(
+          children: [
+            InputTextField(
+              label: '*Item Name',
+              isObscure: false,
+              controller: _titleController,
+              validator: (String? value) {
+                return (value == null || value.isEmpty) ? 'Please enter an item name!' : null;
+              },
+            ),
+            InputTextField(
+              label: 'Item Description',
+              isObscure: false,
+              controller: _descripController,
+            ),
+            InputTextField(
+              label: 'Building / Floor / Classroom Number',
+              isObscure: false,
+              controller: _locationController,
+            ),
+            DropdownMenu(
+              label: Text('Category'),
+              onSelected: (String? category) {
+                setState(() {
+                  _categoryText = category!;
+                });
+              },
+              dropdownMenuEntries: <DropdownMenuEntry<String>>[
+                DropdownMenuEntry(value: 'Electronic', label: 'Electronic'),
+                DropdownMenuEntry(value: 'Apparel', label: 'Apparel'),
+                DropdownMenuEntry(value: 'Container', label: 'Container'),
+                DropdownMenuEntry(value: 'Personal', label: 'Personal'),
+              ],
+            ),
+            InputTextField(
+              label: 'Image URL',
+              isObscure: false,
+              controller: _imgController,
+            ),
+            SizedBox(
+              width: 350,
+              height: 250,
+              child: const ReportMap(),
+            ),
+            BoldElevatedButton(
+              text: 'Submit',
+              onPressed: () {
+                if (_itemReportKey.currentState!.validate()) {
+                  _isLoading ? null : _report();
+                }
+              },
+              minWidth: 70,
+              minHeight: 60
+            ),
+            if (_errorMessage.isNotEmpty) Text(
+              _errorMessage,
+              style: const TextStyle( 
+                color: Colors.red, 
+                fontSize: 14, 
+              ), 
+              textAlign: TextAlign.center, 
+            ),
+          ],
+        ),
+      )
     );
-  } 
+  }
 }
 
 class ReportMap extends StatefulWidget {
