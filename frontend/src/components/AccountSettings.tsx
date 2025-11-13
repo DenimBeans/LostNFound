@@ -26,7 +26,7 @@ function AccountSettings(){
     }*/
         
     function handleLast(e: any): void {
-        setUserLast(e.target.value);
+        setUserLast(e);
     }
         
     function handleEmail(e: any): void {
