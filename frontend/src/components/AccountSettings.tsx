@@ -21,9 +21,9 @@ function AccountSettings(){
     async function ShowUserInfo(id: any){
 
 
-    function handleFirst(e: any): void {
+   /* function handleFirst(e: any): void {
         setUserFirst(e.target.value);
-    }
+    }*/
         
     function handleLast(e: any): void {
         setUserLast(e.target.value);
@@ -62,12 +62,12 @@ function AccountSettings(){
                 console.log(res.error)
             }
             else{
-            handleFirst(res.firstName);
-            handleLast(res.lastName);
-            handleEmail(res.email);
-            handleVerified(res.isVerified);
-            handleCreated(res.createdAt);
-            handleUpdated(res.updatedAt);
+            setUserFirst(res.user.firstName);
+            handleLast(res.user.lastName);
+            handleEmail(res.user.email);
+            handleVerified(res.user.isVerified);
+            handleCreated(res.user.createdAt);
+            handleUpdated(res.user.updatedAt);
             }
 
             
@@ -97,12 +97,12 @@ function AccountSettings(){
     return(
         <div id = "AccountSettingsMain">
             <input type = "text" id = "id" className = "AccountSet" value = {itemUSERID}  readOnly/>
-            <input type = "text" id = "firstname" className = "AccountSet" defaultValue = {userFirst} readOnly/>
-            <input type = "text" id = "lastname" className = "AccountSet" defaultValue = {userLast}  readOnly/>
-            <input type = "text" id = "Accountemail" className = "AccountSet" defaultValue = {userEmail} readOnly/>
-            <input type = "text" id = "isVer" className = "AccountSet" defaultValue = {userVerified}  readOnly/>
-            <input type = "text" id = "created" className = "AccountSet" defaultValue = {userCreated}  readOnly/>
-            <input type = "text" id = "updated" className = "AccountSet" defaultValue = {userUpdated}  readOnly/>
+            <input type = "text" id = "firstname" className = "AccountSet" value = {userFirst} readOnly/>
+            <input type = "text" id = "lastname" className = "AccountSet" value = {userLast}  readOnly/>
+            <input type = "text" id = "Accountemail" className = "AccountSet" value = {userEmail} readOnly/>
+            <input type = "text" id = "isVer" className = "AccountSet" value = {userVerified}  readOnly/>
+            <input type = "text" id = "created" className = "AccountSet" value = {userCreated}  readOnly/>
+            <input type = "text" id = "updated" className = "AccountSet" value = {userUpdated}  readOnly/>
 
 
         </div>
