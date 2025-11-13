@@ -10,11 +10,11 @@ class AppHome extends StatefulWidget {
   final String firstName;
   final String lastName;
   final String email;
-  
+
   const AppHome({
-    super.key, 
-    required this.firstName, 
-    required this.lastName, 
+    super.key,
+    required this.firstName,
+    required this.lastName,
     required this.email,
   });
 
@@ -50,23 +50,31 @@ class _AppHomeState extends State<AppHome> {
           NavigationDestination(
             selectedIcon: Icon(Icons.document_scanner),
             icon: Icon(Icons.document_scanner_outlined),
-            label: 'Report Lost'
+            label: 'Report Lost',
           ),
           NavigationDestination(
             selectedIcon: Icon(Icons.search),
             icon: Icon(Icons.search_outlined),
-            label: 'Search'
+            label: 'Search',
           ),
           NavigationDestination(
             selectedIcon: Icon(Icons.mail),
             icon: Icon(Icons.mail_outline),
-            label: 'Inbox'
+            label: 'Inbox',
           ),
-        ]
+        ],
       ),
       body: <Widget>[
-        ItemReport(firstName: widget.firstName, lastName: widget.lastName, email: widget.email),
-        ItemSearch(firstName: widget.firstName, lastName: widget.lastName, email: widget.email),
+        ItemReport(
+          firstName: widget.firstName,
+          lastName: widget.lastName,
+          email: widget.email,
+        ),
+        ItemSearch(
+          firstName: widget.firstName,
+          lastName: widget.lastName,
+          email: widget.email,
+        ),
         InboxDisplay(),
       ][currentPageIndex],
       endDrawer: Drawer(
@@ -93,20 +101,24 @@ class _AppHomeState extends State<AppHome> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => AccountSettings(firstName: widget.firstName, lastName: widget.lastName, email: widget.email),
-                  )
+                    builder: (context) => AccountSettings(
+                      firstName: widget.firstName,
+                      lastName: widget.lastName,
+                      email: widget.email,
+                    ),
+                  ),
                 );
               },
             ),
-            ContentPopup(title: 'About', simpleModal: AboutModal(),),
+            ContentPopup(title: 'About', simpleModal: AboutModal()),
             Spacer(),
             BoldElevatedButton(
-              text: 'Log Out', 
-              onPressed: () { 
+              text: 'Log Out',
+              onPressed: () {
                 //  Run log out function
                 Navigator.of(context).popUntil((route) => route.isFirst);
-              }, 
-              minWidth: 40, 
+              },
+              minWidth: 40,
               minHeight: 30,
             ),
           ],
@@ -150,18 +162,17 @@ class ItemSearchState extends State<ItemSearch> {
       final response = await http.post(
         Uri.parse('http://174.138.65.216:4000/api/items'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-        }),
+        body: jsonEncode({}),
       );
 
-      if(response.statusCode == 201) {
+      if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
 
-        if(data['error'] == null || data['error'].isEmpty) {
-          if(mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('')),
-            );
+        if (data['error'] == null || data['error'].isEmpty) {
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('')));
           }
         } else {
           setState(() {
@@ -189,20 +200,20 @@ class ItemSearchState extends State<ItemSearch> {
     return SingleChildScrollView(
       child: Column(
         children: [
-          InputTextField(label: 'Search Item', isObscure: false,),
+          InputTextField(label: 'Search Item', isObscure: false),
           SizedBox(
             width: 350,
             height: 250,
             //  Container widget is placeholder
             //  As this will be where we output the items, ListView may be better
             child: const SearchMap(),
-          )
-        ]
-      )
+          ),
+        ],
+      ),
     );
   }
 }
-          
+
 class SearchMap extends StatefulWidget {
   const SearchMap({super.key});
 
@@ -264,23 +275,21 @@ class _SearchMapState extends State<SearchMap> {
   @override
   Widget build(BuildContext context) {
     _markers = [
-      _buildItemMarker(point: LatLng(28.6024274, -81.2000599), itemName: 'Student Union')
+      _buildItemMarker(
+        point: LatLng(28.6024274, -81.2000599),
+        itemName: 'Student Union',
+      ),
       //  This is where the item markers will be added
       //  Will be filled with data from the appropiate API
     ];
-
 
     return MapUCF(pontoCentral: _pontoCentral, markers: _markers);
   }
 }
 
 class MapUCF extends StatefulWidget {
-  const MapUCF({
-    super.key,
-    required this.pontoCentral,
-    required this.markers,
-  });
-  
+  const MapUCF({super.key, required this.pontoCentral, required this.markers});
+
   final LatLng pontoCentral;
   final List<Marker> markers;
 
@@ -314,9 +323,7 @@ class _MapUCFState extends State<MapUCF> {
           userAgentPackageName: 'com.example.flutter_map_example',
         ),
         // Layer 2: Our pins (markers)
-        MarkerLayer(
-          markers: widget.markers,
-        ),
+        MarkerLayer(markers: widget.markers),
       ],
     );
   }
@@ -372,14 +379,14 @@ class ItemReportState extends State<ItemReport> {
         }),
       );
 
-      if(response.statusCode == 201) {
+      if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
 
-        if(data['error'] == null || data['error'].isEmpty) {
-          if(mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Report uploaded!')),
-            );
+        if (data['error'] == null || data['error'].isEmpty) {
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Report uploaded!')));
           }
         } else {
           setState(() {
@@ -401,7 +408,7 @@ class ItemReportState extends State<ItemReport> {
       });
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -414,7 +421,9 @@ class ItemReportState extends State<ItemReport> {
               isObscure: false,
               controller: _titleController,
               validator: (String? value) {
-                return (value == null || value.isEmpty) ? 'Please enter an item name!' : null;
+                return (value == null || value.isEmpty)
+                    ? 'Please enter an item name!'
+                    : null;
               },
             ),
             InputTextField(
@@ -446,11 +455,7 @@ class ItemReportState extends State<ItemReport> {
               isObscure: false,
               controller: _imgController,
             ),
-            SizedBox(
-              width: 350,
-              height: 250,
-              child: const ReportMap(),
-            ),
+            SizedBox(width: 350, height: 250, child: const ReportMap()),
             BoldElevatedButton(
               text: 'Submit',
               onPressed: () {
@@ -459,19 +464,17 @@ class ItemReportState extends State<ItemReport> {
                 }
               },
               minWidth: 70,
-              minHeight: 60
+              minHeight: 60,
             ),
-            if (_errorMessage.isNotEmpty) Text(
-              _errorMessage,
-              style: const TextStyle( 
-                color: Colors.red, 
-                fontSize: 14, 
-              ), 
-              textAlign: TextAlign.center, 
-            ),
+            if (_errorMessage.isNotEmpty)
+              Text(
+                _errorMessage,
+                style: const TextStyle(color: Colors.red, fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
           ],
         ),
-      )
+      ),
     );
   }
 }
@@ -491,9 +494,7 @@ class _ReportMapState extends State<ReportMap> {
 
   /// Helper function to create a custom Marker (pin)
   /// May change this to be more general and have a isItem bool that will be checked to determine how to treat a pin
-  Marker _buildLocationMarker({
-    required LatLng point,
-  }) {
+  Marker _buildLocationMarker({required LatLng point}) {
     return Marker(
       point: point,
       child: GestureDetector(
@@ -522,24 +523,20 @@ class _ReportMapState extends State<ReportMap> {
 
 //  Notifications Inbox Widgets
 class InboxDisplay extends StatelessWidget {
-  const InboxDisplay({
-    super.key,
-  });
+  const InboxDisplay({super.key});
 
   @override
   Widget build(BuildContext context) {
-   // return ListView.builder(
-     // itemBuilder:
-   // );
-   return Scaffold();
+    // return ListView.builder(
+    // itemBuilder:
+    // );
+    return Scaffold();
   }
 }
 
 //  Hamburger Menu Contents
 class AboutModal extends StatelessWidget {
-  const AboutModal({
-    super.key,
-  });
+  const AboutModal({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -550,9 +547,11 @@ class AboutModal extends StatelessWidget {
           padding: EdgeInsetsGeometry.all(20),
           //  Might want to find a way to change this so that the text itself is hyperlinked instead of
           //  just a plaintext link
-          child: Text('Created for COP 4331\n\nGithub: https://github.com/DenimBeans/LostNFound'),
-        )
-      ]
+          child: Text(
+            'Created for COP 4331\n\nGithub: https://github.com/DenimBeans/LostNFound',
+          ),
+        ),
+      ],
     );
   }
 }
@@ -581,7 +580,9 @@ class SubmittedItems extends StatelessWidget {
 */
 
 //  Account Settings Widget
-class AccountSettings extends StatelessWidget {
+// Replace the AccountSettings class in home.dart with this
+
+class AccountSettings extends StatefulWidget {
   final String firstName;
   final String lastName;
   final String email;
@@ -594,40 +595,188 @@ class AccountSettings extends StatelessWidget {
   });
 
   @override
+  State<AccountSettings> createState() => _AccountSettingsState();
+}
+
+class _AccountSettingsState extends State<AccountSettings> {
+  late TextEditingController _firstNameController;
+  late TextEditingController _lastNameController;
+  late TextEditingController _emailController;
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isDyslexicFont = false;
+  bool _isDarkMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Pre-populate fields with current user data
+    _firstNameController = TextEditingController(text: widget.firstName);
+    _lastNameController = TextEditingController(text: widget.lastName);
+    _emailController = TextEditingController(text: widget.email);
+  }
+
+  @override
+  void dispose() {
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _updateProfile() async {
+    // TODO: Implement API call to update profile
+    // For now, just show a success message
+    if (mounted) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Profile updated!')));
+    }
+  }
+
+  Future<void> _resetPassword() async {
+    if (_passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a new password')),
+      );
+      return;
+    }
+
+    // TODO: Implement API call to reset password
+    // For now, just show a success message
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Password reset email sent!')),
+      );
+      _passwordController.clear();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: ArrowTitleBar(title: 'Account Settings'),
-      body: SizedBox(
-        height: 600,
-        width: 300,
-        child: GridView.count(
-          crossAxisCount: 2,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Change name'),
-            InputTextField(label: 'Rename User', isObscure: false),
-            Text('Change email'),
-            InputTextField(label: 'Change Email', isObscure: false),            
-            Text('Reset password'),
-            InputTextField(label: 'Reset Password', isObscure: false),
-            Text('Dsylexic font'),
-            Switch(value: false, onChanged: (bool newVal) {},),
-            Text('Light/Dark mode'),
-            Switch(value: false, onChanged: (bool newVal) {},),
+            // Section: Profile Information
+            _buildSectionHeader('Profile Information'),
+            const SizedBox(height: 12),
+            InputTextField(
+              label: 'First Name',
+              isObscure: false,
+              controller: _firstNameController,
+            ),
+            const SizedBox(height: 8),
+            InputTextField(
+              label: 'Last Name',
+              isObscure: false,
+              controller: _lastNameController,
+            ),
+            const SizedBox(height: 8),
+            InputTextField(
+              label: 'Email Address',
+              isObscure: false,
+              controller: _emailController,
+            ),
+            const SizedBox(height: 20),
+            Center(
+              child: BoldElevatedButton(
+                text: 'Update Profile',
+                onPressed: _updateProfile,
+                minWidth: 180,
+                minHeight: 45,
+              ),
+            ),
+
+            const SizedBox(height: 32),
+            const Divider(),
+            const SizedBox(height: 20),
+
+            // Section: Security
+            _buildSectionHeader('Security'),
+            const SizedBox(height: 12),
+            InputTextField(
+              label: 'New Password',
+              isObscure: true,
+              controller: _passwordController,
+            ),
+            const SizedBox(height: 20),
+            Center(
+              child: BoldElevatedButton(
+                text: 'Reset Password',
+                onPressed: _resetPassword,
+                minWidth: 180,
+                minHeight: 45,
+              ),
+            ),
+
+            const SizedBox(height: 32),
+            const Divider(),
+            const SizedBox(height: 20),
+
+            // Section: Preferences
+            _buildSectionHeader('Preferences'),
+            const SizedBox(height: 12),
+
+            // Dyslexic Font Toggle
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text(
+                'Dyslexic-Friendly Font',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              subtitle: const Text(
+                'Use OpenDyslexic font for better readability',
+              ),
+              trailing: Switch(
+                value: _isDyslexicFont,
+                onChanged: (bool newValue) {
+                  setState(() {
+                    _isDyslexicFont = newValue;
+                  });
+                  // TODO: Implement font change globally
+                },
+              ),
+            ),
+            const SizedBox(height: 8),
+
+            // Dark Mode Toggle
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              title: const Text(
+                'Dark Mode',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              ),
+              subtitle: const Text('Switch between light and dark theme'),
+              trailing: Switch(
+                value: _isDarkMode,
+                onChanged: (bool newValue) {
+                  setState(() {
+                    _isDarkMode = newValue;
+                  });
+                  // TODO: Implement theme change globally
+                },
+              ),
+            ),
+
+            const SizedBox(height: 40),
           ],
-        )
-      )
-      /*Column(
-          children: [
-            Text('Change name'),
-            Text('Change email'),
-            Text('Dsylexic font'),
-            Text('Light/Dark mode'),
-            InputTextField(label: 'Rename User', isObscure: false),
-            InputTextField(label: 'Change Email', isObscure: false),
-            Switch(value: false, onChanged: (bool newVal) {},),
-            Switch(value: false, onChanged: (bool newVal) {},),
-          ],
-        )*/
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Text(
+      title,
+      style: const TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: Colors.black87,
+      ),
     );
   }
 }

@@ -12,21 +12,17 @@ class Register extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: mainCol,
-      appBar: ArrowTitleBar(title:  'Register'),
+      appBar: ArrowTitleBar(title: 'Register'),
       body: Column(
         //mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          RegisterForm(),
-        ],
+        children: [RegisterForm()],
       ),
     );
   }
 }
 
 class RegisterForm extends StatefulWidget {
-  const RegisterForm({
-    super.key,
-  });
+  const RegisterForm({super.key});
 
   @override
   RegisterFormState createState() {
@@ -36,10 +32,10 @@ class RegisterForm extends StatefulWidget {
 
 class RegisterFormState extends State<RegisterForm> {
   final _registerFormKey = GlobalKey<FormState>();
-  final TextEditingController _fnameController = TextEditingController(); 
-  final TextEditingController _lnameController = TextEditingController(); 
-  final TextEditingController _emailController = TextEditingController(); 
-  final TextEditingController _passwordController = TextEditingController(); 
+  final TextEditingController _fnameController = TextEditingController();
+  final TextEditingController _lnameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   String _errorMessage = '';
   bool _isLoading = false;
 
@@ -61,11 +57,11 @@ class RegisterFormState extends State<RegisterForm> {
         }),
       );
 
-      if(response.statusCode == 201) {
+      if (response.statusCode == 201) {
         final data = jsonDecode(response.body);
 
-        if(data['error'] == null || data['error'].isEmpty) {
-          if(mounted) {
+        if (data['error'] == null || data['error'].isEmpty) {
+          if (mounted) {
             //  After verification, user must return to the start page and login
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Verfication email sent!')),
@@ -78,13 +74,14 @@ class RegisterFormState extends State<RegisterForm> {
         }
       } else {
         setState(() {
-          _errorMessage = 'Registration failed. Please check your email for verification.';
+          _errorMessage =
+              'Registration failed. Please check your email for verification.';
         });
       }
     } catch (e) {
       setState(() {
         _errorMessage = 'Network error. Please check your connection.';
-    });
+      });
     } finally {
       setState(() {
         _isLoading = false;
@@ -99,67 +96,73 @@ class RegisterFormState extends State<RegisterForm> {
       child: Column(
         children: [
           InputTextField(
-            label: 'First Name',    
-            isObscure: false,       
-            controller: _fnameController, 
+            label: 'First Name',
+            isObscure: false,
+            controller: _fnameController,
             validator: (String? value) {
-              return (value == null || value.isEmpty) ? 'Please enter valid first name' : null;
-            }
+              return (value == null || value.isEmpty)
+                  ? 'Please enter valid first name'
+                  : null;
+            },
           ),
           InputTextField(
             label: 'Last Name',
             isObscure: false,
             controller: _lnameController,
             validator: (String? value) {
-              return (value == null || value.isEmpty) ? 'Please enter valid last name' : null;
-            }
+              return (value == null || value.isEmpty)
+                  ? 'Please enter valid last name'
+                  : null;
+            },
           ),
-          EmailField(controller: _emailController,),
+          EmailField(controller: _emailController),
           InputTextField(
             label: 'Password',
             isObscure: true,
             controller: _passwordController,
             validator: (String? value) {
-              return (value == null || value.isEmpty) ? 'Please enter valid password' : null;
-            }
+              return (value == null || value.isEmpty)
+                  ? 'Please enter valid password'
+                  : null;
+            },
           ),
           InputTextField(
             label: 'Re-type Password',
             isObscure: true,
             validator: (String? value) {
-              return (value != _passwordController.text) ? 'Passwords should match' : null;
-            }
+              return (value != _passwordController.text)
+                  ? 'Passwords should match'
+                  : null;
+            },
           ),
           BoldElevatedButton(
-            text: 'Next', 
+            text: 'Next',
             onPressed: () {
               // Validate returns true if the form is valid, or false otherwise.
               if (_registerFormKey.currentState!.validate()) {
                 _isLoading ? null : _register();
               }
-            }, 
-            minWidth: 100, 
+            },
+            minWidth: 100,
             minHeight: 46,
           ),
-          if (_errorMessage.isNotEmpty) Text(
-            _errorMessage,
-            style: const TextStyle( 
-              color: Colors.red, 
-              fontSize: 14, 
-            ), 
-            textAlign: TextAlign.center, 
-          ),
-        ]
+          if (_errorMessage.isNotEmpty)
+            Text(
+              _errorMessage,
+              style: const TextStyle(color: Colors.red, fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+        ],
       ),
     );
   }
 
   @override
-  void dispose() { 
-    _fnameController.dispose(); 
+  void dispose() {
+    _fnameController.dispose();
     _lnameController.dispose();
     _emailController.dispose();
-    _passwordController.dispose(); 
-    super.dispose(); 
+    _passwordController.dispose();
+    super.dispose();
   }
 }

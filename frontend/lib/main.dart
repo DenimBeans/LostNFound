@@ -16,9 +16,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.amber,
-        )
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
       ),
       home: Scaffold(
         resizeToAvoidBottomInset: true,
@@ -30,7 +28,10 @@ class MyApp extends StatelessWidget {
             child: AppBar(
               backgroundColor: mainCol,
               centerTitle: true,
-              title: const Text("KnightFind", style:TextStyle(fontSize: 48, fontWeight: FontWeight.bold)),
+              title: const Text(
+                "KnightFind",
+                style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
+              ),
             ),
           ),
         ),
@@ -38,9 +39,7 @@ class MyApp extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextHeading(),
-            SizedBox(
-              height: 300,
-            ),
+            SizedBox(height: 300),
             JoinButton(),
             Spacer(),
             LoginText(),
@@ -53,9 +52,7 @@ class MyApp extends StatelessWidget {
 
 //  Title Page Widgets
 class TextHeading extends StatelessWidget {
-  const TextHeading({
-    super.key,
-  });
+  const TextHeading({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -66,10 +63,7 @@ class TextHeading extends StatelessWidget {
         children: <InlineSpan>[
           TextSpan(
             text: 'for finding lost items at UCF ',
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.normal,
-            ),
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.normal),
           ),
         ],
       ),
@@ -78,9 +72,7 @@ class TextHeading extends StatelessWidget {
 }
 
 class JoinButton extends StatelessWidget {
-  const JoinButton({
-    super.key,
-  });
+  const JoinButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -88,7 +80,7 @@ class JoinButton extends StatelessWidget {
       text: 'Join Now!',
       onPressed: () {
         Navigator.push(
-          context, 
+          context,
           MaterialPageRoute(builder: (context) => Register()),
         );
       },
@@ -99,22 +91,29 @@ class JoinButton extends StatelessWidget {
 }
 
 class LoginText extends StatelessWidget {
-  const LoginText({
-    super.key,
-  });
+  const LoginText({super.key});
 
   @override
   Widget build(BuildContext context) {
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 35.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         //  crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Already created an account?', style:TextStyle(fontSize: 21, fontWeight: FontWeight.bold)),
+          Text(
+            'Already created an account?',
+            style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+          ),
           TextButton(
-            child: const Text(('Log in'), style:TextStyle(color: Color(0xFF514D08), fontSize: 21, fontWeight: FontWeight.bold)),
+            child: const Text(
+              ('Log in'),
+              style: TextStyle(
+                color: Color(0xFF514D08),
+                fontSize: 21,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             onPressed: () {
               showModalBottomSheet<void>(
                 context: context,
@@ -124,22 +123,22 @@ class LoginText extends StatelessWidget {
                 },
               );
             },
-          )
-        ]
-      )
+          ),
+        ],
+      ),
     );
   }
 }
 
 class LoginModal extends StatelessWidget {
-  const LoginModal({
-    super.key,
-  });
+  const LoginModal({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Padding (
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom,), 
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Container(
         height: 300,
         color: Colors.amber,
@@ -148,20 +147,21 @@ class LoginModal extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              const Text('Login', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              const Text(
+                'Login',
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
               LoginForm(),
             ],
           ),
         ),
-      )
+      ),
     );
   }
 }
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({
-    super.key,
-  });
+  const LoginForm({super.key});
 
   @override
   LoginFormState createState() {
@@ -171,10 +171,10 @@ class LoginForm extends StatefulWidget {
 
 class LoginFormState extends State<LoginForm> {
   final _loginFormKey = GlobalKey<FormState>();
-  final TextEditingController _loginController = TextEditingController(); 
-  final TextEditingController _passwordController = TextEditingController(); 
+  final TextEditingController _loginController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   String _errorMessage = '';
-  bool _isLoading = false; 
+  bool _isLoading = false;
 
   Future<void> _login() async {
     setState(() {
@@ -194,7 +194,7 @@ class LoginFormState extends State<LoginForm> {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        
+
         if (data['error'] == null || data['error'].isEmpty) {
           // Login successful, navigate to second page
           if (mounted) {
@@ -202,26 +202,26 @@ class LoginFormState extends State<LoginForm> {
               context,
               MaterialPageRoute(
                 builder: (context) => AppHome(
-                  firstName: data['firstName'], 
+                  firstName: data['firstName'],
                   lastName: data['lastName'],
                   email: _loginController.text,
                 ),
               ),
             );
           }
-        } else { 
-          setState(() { 
-            _errorMessage = data['error']; 
-          }); 
-        } 
-      } else { 
+        } else {
+          setState(() {
+            _errorMessage = data['error'];
+          });
+        }
+      } else {
         setState(() {
-          _errorMessage = 'Login failed. Please try again.'; 
-        }); 
-      } 
+          _errorMessage = 'Login failed. Please try again.';
+        });
+      }
     } catch (e) {
-      setState(() { 
-        _errorMessage = 'Network error. Please check your connection.'; 
+      setState(() {
+        _errorMessage = 'Network error. Please check your connection.';
       });
     } finally {
       setState(() {
@@ -237,14 +237,16 @@ class LoginFormState extends State<LoginForm> {
       child: Column(
         children: [
           //  Pass email controller to EmailField
-          EmailField(controller: _loginController,),
+          EmailField(controller: _loginController),
           InputTextField(
             label: 'Password',
             controller: _passwordController,
             isObscure: true,
             validator: (String? value) {
-              return (value == null || value.isEmpty) ? 'Please enter valid password' : null;
-            }
+              return (value == null || value.isEmpty)
+                  ? 'Please enter valid password'
+                  : null;
+            },
           ),
           BoldElevatedButton(
             text: 'Next',
@@ -256,24 +258,22 @@ class LoginFormState extends State<LoginForm> {
             minWidth: 70,
             minHeight: 20,
           ),
-          if (_errorMessage.isNotEmpty) Text(
-            _errorMessage,
-            style: const TextStyle( 
-              color: Colors.red, 
-              fontSize: 14, 
-            ), 
-            textAlign: TextAlign.center, 
-          ),
-        ]
-      )
+          if (_errorMessage.isNotEmpty)
+            Text(
+              _errorMessage,
+              style: const TextStyle(color: Colors.red, fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+        ],
+      ),
     );
   }
 
-  @override 
-  void dispose() { 
-    _loginController.dispose(); 
-    _passwordController.dispose(); 
-    super.dispose(); 
+  @override
+  void dispose() {
+    _loginController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }
 
@@ -294,7 +294,7 @@ class ContentPopup extends StatelessWidget {
       title: Text(title),
       onTap: () => showDialog<String>(
         context: context,
-        builder: (BuildContext context) => simpleModal,            
+        builder: (BuildContext context) => simpleModal,
       ),
     );
   }
@@ -303,10 +303,7 @@ class ContentPopup extends StatelessWidget {
 class ArrowTitleBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
 
-  const ArrowTitleBar({
-    super.key, 
-    required this.title
-  });
+  const ArrowTitleBar({super.key, required this.title});
 
   static const Color mainCol = Color(0xFFFFF4D9);
   //  static const double defaultSize = 56.0;
@@ -320,14 +317,15 @@ class ArrowTitleBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: mainCol,
       leading: IconButton(
         onPressed: () {
-          Navigator.pop(
-            context
-          );
+          Navigator.pop(context);
         },
         icon: Icon(Icons.arrow_back),
       ),
       centerTitle: true,
-      title: Text(title, style:TextStyle(fontSize: 36, fontWeight: FontWeight.bold)),
+      title: Text(
+        title,
+        style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+      ),
     );
   }
 }
@@ -351,13 +349,11 @@ class InputTextField extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: TextFormField(
-        decoration: InputDecoration(
-          labelText: label,
-        ),
+        decoration: InputDecoration(labelText: label),
         obscureText: isObscure,
         controller: controller,
         validator: validator,
-      )
+      ),
     );
   }
 }
@@ -365,10 +361,7 @@ class InputTextField extends StatelessWidget {
 class EmailField extends StatelessWidget {
   final TextEditingController? controller;
 
-  const EmailField({
-    super.key,
-    this.controller,
-  });
+  const EmailField({super.key, this.controller});
 
   @override
   Widget build(BuildContext context) {
@@ -377,10 +370,14 @@ class EmailField extends StatelessWidget {
       isObscure: false,
       controller: controller,
       validator: (String? value) {
-        return (value == null || value.isEmpty || 
-        !(RegExp(r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$")).hasMatch(value))
-        ? 'Please enter valid email' : null;
-      }
+        return (value == null ||
+                value.isEmpty ||
+                !(RegExp(
+                  r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$",
+                )).hasMatch(value))
+            ? 'Please enter valid email'
+            : null;
+      },
     );
   }
 }
@@ -403,7 +400,7 @@ class BoldElevatedButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        //  minimumSize: Size(140, 50), 
+        //  minimumSize: Size(140, 50),
         minimumSize: Size(minWidth, minHeight),
         backgroundColor: Colors.green,
         foregroundColor: Colors.white,
