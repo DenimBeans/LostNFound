@@ -54,7 +54,7 @@ function AccountSettings(){
                 console.log(res.error)
             }
             else{
-            handleFirst(res.firstname);
+            handleFirst(res.firstName);
             handleLast(res.lastName);
             handleEmail(res.email);
             handleVerified(res.isVerified);
@@ -85,17 +85,16 @@ function AccountSettings(){
         }
     },[]);
 
-    //Temporarily displaying itemUSERID so that compiler runs. 
-    // Feel free to change once variable is used elsewhere. - Jean
+    
     return(
         <div id = "AccountSettingsMain">
             <input type = "text" id = "id" className = "AccountSet" value = {itemUSERID}  readOnly/>
-            <input type = "text" id = "firstname" className = "AccountSet" value = {userFirst} onChange = {handleFirst} readOnly/>
-            <input type = "text" id = "lastname" className = "AccountSet" value = {userLast} onChange = {handleLast} readOnly/>
-            <input type = "text" id = "Accountemail" className = "AccountSet" value = {userEmail} onChange = {handleEmail} readOnly/>
-            <input type = "text" id = "isVer" className = "AccountSet" value = {userVerified} onChange = {handleVerified} readOnly/>
-            <input type = "text" id = "created" className = "AccountSet" value = {userCreated} onChange = {handleCreated} readOnly/>
-            <input type = "text" id = "updated" className = "AccountSet" value = {userUpdated} onChange = {handleUpdated} readOnly/>
+            <input type = "text" id = "firstname" className = "AccountSet" defaultvalue = {userFirst} readOnly/>
+            <input type = "text" id = "lastname" className = "AccountSet" defaultvalue = {userLast}  readOnly/>
+            <input type = "text" id = "Accountemail" className = "AccountSet" defaultvalue = {userEmail} oreadOnly/>
+            <input type = "text" id = "isVer" className = "AccountSet" defaultvalue = {userVerified}  readOnly/>
+            <input type = "text" id = "created" className = "AccountSet" defaultvalue = {userCreated}  readOnly/>
+            <input type = "text" id = "updated" className = "AccountSet" defaultvalue = {userUpdated}  readOnly/>
 
 
         </div>
