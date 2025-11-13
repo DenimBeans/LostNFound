@@ -12,6 +12,25 @@ border-style:solid;
 border-color:black;
 }
 
+#AboutTitle{
+    margin-top: 5%;
+    font-size: x-large;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    color: white;
+    text-shadow: 1px 1px 2px rgb(175, 173, 173);
+}
+
+.Assigned{
+    margin-top: 5%;
+    font-size: x-large;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    color: white;
+    text-shadow: 1px 1px 2px rgb(175, 173, 173);
+}
 
 .About{
     width: 50%;
@@ -34,4 +53,10 @@ border-color:black;
     outline-color: darkgoldenrod;
     outline-style: solid;
     outline-width: 3px;
+}
+
+#Git{
+    margin-left: 3%;
+    color: white;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
 }

@@ -9,14 +9,19 @@ function About(){
 
     return(
         <div id = "AboutMain">
+            <span id ="AboutTitle">Contibutors</span>
+            <span className = "Assigned">Project Manager and Full Stack</span>
             <input type = "text" id = "jean" className = "About" 
-            value = "Project Manager and Full Stack : Jean Deguzman " readOnly/>
+            value =  "Jean Deguzman" readOnly/>
+            <span className = "Assigned">Database</span>
             <input type = "text" id = "Rian Lowery" className = "About" 
-            value = "Database : Rian Lowery " readOnly/>
+            value = " Rian Lowery " readOnly/>
+            <span className = "Assigned">API</span>
             <input type = "text" id = "Armando Rosarion Nazario" className = "About" 
-            value = "API: Armando Rosarion Nazario " readOnly/>
+            value = "Armando Rosarion Nazario " readOnly/>
             <input type = "text" id = "Bryant Arteaga" className = "About" 
-            value = "API: Bryant Arteaga " readOnly/>
+            value = "Bryant Arteaga " readOnly/>
+            <span className = "Assigned">Frontend</span>
             <input type = "text" id = "Hiroki Yoshida" className = "About" 
             value = "Frontend Web: Hiroki Yoshida " readOnly/>
             <input type = "text" id = "Destiny Rodriguez" className = "About" 
