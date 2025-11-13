@@ -28,7 +28,6 @@ function About(){
             value = "Frontend Mobile: Destiny Rodriguez " readOnly/>
             <input type = "text" id = "Lucas Marrou" className = "About" 
             value = "Frontend General-Debugging : Lucas Marrou " readOnly/>
-            
             <p id="Git"><a href = {Github}>Visit our Github!</a></p>
 
         </div>
