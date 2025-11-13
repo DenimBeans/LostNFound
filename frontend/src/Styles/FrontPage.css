@@ -14,7 +14,7 @@
 #TitleBorder{
     background-color: darkgoldenrod;
     width: 100%;
-    min-height: 10vh;
+    min-height: 8vh;
     display:flex;
     
     margin-bottom: 2%;
@@ -26,7 +26,7 @@
 }
 
 #title{
-    height: 70px;
+    height: 8vh;
     margin-left: 15px;
     display: inline;
 }
@@ -223,7 +223,7 @@ border-color:black;
     font-size: 14pt;
     visibility: hidden;
     width: 190px;
-    height: 80px;
+    height: 8vh;
     background-color: rgba(255, 255, 255, 0);
     border-right: 0px;
     border-top: 0px;
