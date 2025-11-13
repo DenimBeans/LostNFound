@@ -52,18 +52,18 @@ function AccountSettings(){
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             var res = JSON.parse(await response.text());
-            console.log(res)
+            console.log(res.firstName);
 
             if(res.error != ' '){
                 console.log(res.error)
             }
             else{
-            handleFirst(res.user.firstName);
-            handleLast(res.user.lastName);
-            handleEmail(res.user.email);
-            handleVerified(res.user.isVerified);
-            handleCreated(res.user.createdAt);
-            handleUpdated(res.user.updatedAt);
+            handleFirst(res.firstName);
+            handleLast(res.lastName);
+            handleEmail(res.email);
+            handleVerified(res.isVerified);
+            handleCreated(res.createdAt);
+            handleUpdated(res.updatedAt);
             }
 
             
