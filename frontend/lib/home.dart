@@ -27,18 +27,23 @@ class _AppHomeState extends State<AppHome> {
 
   @override
   Widget build(BuildContext context) {
-    //  Should make the scaffold into its own "Home Page" widget
-    //  everything remains the same between the report and search
-    //  page except for:
-    //  The app bar title
-    //  Which icon is shadowed in the bottom navigation
-    //  And the actual content in the body
     return Scaffold(
-      //  This doesn't actually need an arrow
-      //  I'll rewrite the widget later so that the back arrow becomes optional
-      //  + rename it from ArrowTitleBar to CenterTitleBar
-      appBar: ArrowTitleBar(title: 'Search for Lost Items'),
+      backgroundColor: AppColors.mainBackground,
+      appBar: AppBar(
+        backgroundColor: AppColors.mainBackground,
+        centerTitle: true,
+        automaticallyImplyLeading: false, // Removes back arrow
+        title: Text(
+          currentPageIndex == 0
+              ? 'Report a Lost Item'
+              : currentPageIndex == 1
+              ? 'Search for a Lost Item'
+              : 'Inbox',
+          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+      ),
       bottomNavigationBar: NavigationBar(
+        backgroundColor: AppColors.secondaryBackground,
         onDestinationSelected: (int index) {
           setState(() {
             currentPageIndex = index;
@@ -78,50 +83,74 @@ class _AppHomeState extends State<AppHome> {
         InboxDisplay(),
       ][currentPageIndex],
       endDrawer: Drawer(
+        backgroundColor: AppColors.secondaryBackground,
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            ListTile(
-              title: const Text('Tracked Items'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              title: const Text('Your Reports'),
-              onTap: () {
-                // Update the state of the app.
-                // ...
-              },
-            ),
-            ListTile(
-              title: const Text('Account Settings'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AccountSettings(
-                      firstName: widget.firstName,
-                      lastName: widget.lastName,
-                      email: widget.email,
-                    ),
+            const SizedBox(height: 50),
+            _buildDrawerButton(context, 'Tracked Items', () {
+              // TODO: Navigate to tracked items
+            }),
+            _buildDrawerButton(context, 'Your Reports', () {
+              // TODO: Navigate to your items
+            }),
+            _buildDrawerButton(context, 'Account Settings', () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AccountSettings(
+                    firstName: widget.firstName,
+                    lastName: widget.lastName,
+                    email: widget.email,
                   ),
-                );
-              },
-            ),
-            ContentPopup(title: 'About', simpleModal: AboutModal()),
-            Spacer(),
-            BoldElevatedButton(
-              text: 'Log Out',
-              onPressed: () {
-                //  Run log out function
-                Navigator.of(context).popUntil((route) => route.isFirst);
-              },
-              minWidth: 40,
-              minHeight: 30,
+                ),
+              );
+            }),
+            _buildDrawerButton(context, 'About', () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => AboutModal(),
+              );
+            }),
+            const Spacer(),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: BoldElevatedButton(
+                text: 'Log out',
+                onPressed: () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                },
+                minWidth: double.infinity,
+                minHeight: 45,
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDrawerButton(
+    BuildContext context,
+    String title,
+    VoidCallback onTap,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.secondaryButton,
+          foregroundColor: AppColors.primaryText,
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          elevation: 0,
+        ),
+        onPressed: onTap,
+        child: Text(
+          title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
         ),
       ),
     );
@@ -172,7 +201,7 @@ class ItemSearchState extends State<ItemSearch> {
           if (mounted) {
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(const SnackBar(content: Text('')));
+            ).showSnackBar(const SnackBar(content: Text('Search complete!')));
           }
         } else {
           setState(() {
@@ -181,7 +210,7 @@ class ItemSearchState extends State<ItemSearch> {
         }
       } else {
         setState(() {
-          _errorMessage = 'Failed to submit report.';
+          _errorMessage = 'Failed to search.';
         });
       }
     } catch (e) {
@@ -200,14 +229,12 @@ class ItemSearchState extends State<ItemSearch> {
     return SingleChildScrollView(
       child: Column(
         children: [
+          const SizedBox(height: 20),
           InputTextField(label: 'Search Item', isObscure: false),
-          SizedBox(
-            width: 350,
-            height: 250,
-            //  Container widget is placeholder
-            //  As this will be where we output the items, ListView may be better
-            child: const SearchMap(),
-          ),
+          const SizedBox(height: 20),
+          SizedBox(width: 350, height: 250, child: const SearchMap()),
+          const SizedBox(height: 20),
+          // Search results will be populated from API
         ],
       ),
     );
@@ -227,29 +254,26 @@ class _SearchMapState extends State<SearchMap> {
   // A list that will hold our pins (markers)
   late final List<Marker> _markers;
 
-  /// Helper function to create a custom Marker (pin)
-  /// May change this to be more general and have a isItem bool that will be checked to determine how to treat a pin
-  Marker _buildItemMarker({
-    required LatLng point,
-    required String itemName,
+  // Helper function to create a custom Marker (pin)
+  // May change this to be more general and have a isItem bool that will be checked to determine how to treat a pin
+  Marker _buildItemMarker({required LatLng point, required String itemName}) {
     //  Maybe one color for own lost items, another for all others?
     //  Not a requirment
     //  required Color color,
-  }) {
     return Marker(
       point: point,
       width: 95, // Fixed width that accommodates the longest name well
       height: 65, // Fixed height for the pin
       child: GestureDetector(
         onTap: () {
-          // For item search page: this should open a popup that displays the item's in-depth information
+          // Show item details
         },
         // The visual content of the pin is a column with the icon and text
         child: Column(
           children: [
-            Icon(
+            const Icon(
               Icons.location_pin,
-              //  color: color,
+              //color: color,
               size: 40,
             ),
             Container(
@@ -275,12 +299,7 @@ class _SearchMapState extends State<SearchMap> {
   @override
   Widget build(BuildContext context) {
     _markers = [
-      _buildItemMarker(
-        point: LatLng(28.6024274, -81.2000599),
-        itemName: 'Student Union',
-      ),
-      //  This is where the item markers will be added
-      //  Will be filled with data from the appropiate API
+      // Markers will be populated from API
     ];
 
     return MapUCF(pontoCentral: _pontoCentral, markers: _markers);
@@ -416,6 +435,7 @@ class ItemReportState extends State<ItemReport> {
         key: _itemReportKey,
         child: Column(
           children: [
+            const SizedBox(height: 20),
             InputTextField(
               label: '*Item Name',
               isObscure: false,
@@ -436,26 +456,69 @@ class ItemReportState extends State<ItemReport> {
               isObscure: false,
               controller: _locationController,
             ),
-            DropdownMenu(
-              label: Text('Category'),
-              onSelected: (String? category) {
-                setState(() {
-                  _categoryText = category!;
-                });
-              },
-              dropdownMenuEntries: <DropdownMenuEntry<String>>[
-                DropdownMenuEntry(value: 'Electronic', label: 'Electronic'),
-                DropdownMenuEntry(value: 'Apparel', label: 'Apparel'),
-                DropdownMenuEntry(value: 'Container', label: 'Container'),
-                DropdownMenuEntry(value: 'Personal', label: 'Personal'),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 8.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Category',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.primaryText,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: AppColors.inputBackground,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 12.0,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                        borderSide: const BorderSide(
+                          color: AppColors.inputBorder,
+                          width: 1.0,
+                        ),
+                      ),
+                    ),
+                    items: const [
+                      DropdownMenuItem(
+                        value: 'Electronic',
+                        child: Text('Electronic'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Apparel',
+                        child: Text('Apparel'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Container',
+                        child: Text('Container'),
+                      ),
+                      DropdownMenuItem(
+                        value: 'Personal',
+                        child: Text('Personal'),
+                      ),
+                    ],
+                    onChanged: (String? value) {
+                      setState(() {
+                        _categoryText = value ?? '';
+                      });
+                    },
+                  ),
+                ],
+              ),
             ),
-            InputTextField(
-              label: 'Image URL',
-              isObscure: false,
-              controller: _imgController,
-            ),
+            const SizedBox(height: 20),
             SizedBox(width: 350, height: 250, child: const ReportMap()),
+            const SizedBox(height: 20),
             BoldElevatedButton(
               text: 'Submit',
               onPressed: () {
@@ -463,15 +526,19 @@ class ItemReportState extends State<ItemReport> {
                   _isLoading ? null : _report();
                 }
               },
-              minWidth: 70,
-              minHeight: 60,
+              minWidth: 200,
+              minHeight: 50,
             ),
             if (_errorMessage.isNotEmpty)
-              Text(
-                _errorMessage,
-                style: const TextStyle(color: Colors.red, fontSize: 14),
-                textAlign: TextAlign.center,
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Text(
+                  _errorMessage,
+                  style: const TextStyle(color: Colors.red, fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
               ),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -499,11 +566,11 @@ class _ReportMapState extends State<ReportMap> {
       point: point,
       child: GestureDetector(
         onTap: () {
-          // For item report page: this allows the user to move the pin around to signfiy where the item was lost
+          // Allow user to move pin
         },
-        child: Icon(
+        child: const Icon(
           Icons.location_pin,
-          //  color: color,
+          //color: color,
           size: 40,
         ),
       ),
@@ -513,8 +580,7 @@ class _ReportMapState extends State<ReportMap> {
   @override
   Widget build(BuildContext context) {
     _markers = [
-      _buildLocationMarker(point: LatLng(28.6024274, -81.2000599)),
-      //  Only marker marker will be the one user can click and drag (similar to web app)
+      // Pin will be set by user when reporting
     ];
 
     return MapUCF(pontoCentral: _pontoCentral, markers: _markers);
@@ -527,10 +593,12 @@ class InboxDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // return ListView.builder(
-    // itemBuilder:
-    // );
-    return Scaffold();
+    return const Center(
+      child: Text(
+        'No notifications yet',
+        style: TextStyle(fontSize: 18, color: Colors.grey),
+      ),
+    );
   }
 }
 
@@ -543,10 +611,8 @@ class AboutModal extends StatelessWidget {
     return SimpleDialog(
       title: const Text('About'),
       children: <Widget>[
-        Padding(
-          padding: EdgeInsetsGeometry.all(20),
-          //  Might want to find a way to change this so that the text itself is hyperlinked instead of
-          //  just a plaintext link
+        const Padding(
+          padding: EdgeInsets.all(20.0),
           child: Text(
             'Created for COP 4331\n\nGithub: https://github.com/DenimBeans/LostNFound',
           ),
@@ -556,32 +622,7 @@ class AboutModal extends StatelessWidget {
   }
 }
 
-//  Moving these to be scrolled down to on the home pages instead of accessed through the hamburger menu
-/*
-//  User Tracked Items Widget
-class TrackedItems extends StatelessWidget {
-  const TrackedItems({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
-  }
-}
-
-//  User Reported Items Widget
-class SubmittedItems extends StatelessWidget {
-  const SubmittedItems({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
-  }
-}
-*/
-
 //  Account Settings Widget
-// Replace the AccountSettings class in home.dart with this
-
 class AccountSettings extends StatefulWidget {
   final String firstName;
   final String lastName;
@@ -655,6 +696,7 @@ class _AccountSettingsState extends State<AccountSettings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.secondaryBackground,
       appBar: ArrowTitleBar(title: 'Account Settings'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),

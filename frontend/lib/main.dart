@@ -8,25 +8,49 @@ void main() {
   runApp(const MyApp());
 }
 
+// ============================================
+// App Color Palette
+// ============================================
+class AppColors {
+  // Backgrounds
+  static const Color mainBackground = Color(0xFFFFF4D9); // Cream
+  static const Color secondaryBackground = Color(0xFFD9D9D9); // Light gray
+
+  // Buttons
+  static const Color primaryButton = Color(0xFF000000); // Black
+  static const Color secondaryButton = Color(0xFFA9A9A9); // Gray
+  static const Color accentButton = Color(0xFFC0504D); // Red/Burgundy
+  static const Color successButton = Color(0xFFA3D977); // Green/Lime
+
+  // Text
+  static const Color primaryText = Color(0xFF000000); // Black
+  static const Color secondaryText = Color(
+    0xFF514D08,
+  ); // Dark olive (for links)
+
+  // Input Fields
+  static const Color inputBackground = Color(0xFFFFFFFF); // White
+  static const Color inputBorder = Color(0xFF000000); // Black
+}
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-  static const Color mainCol = Color(0xFFFFF4D9);
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.mainBackground),
       ),
       home: Scaffold(
         resizeToAvoidBottomInset: true,
-        backgroundColor: mainCol,
+        backgroundColor: AppColors.mainBackground,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(120.0),
           child: Padding(
             padding: const EdgeInsets.only(top: 35.0),
             child: AppBar(
-              backgroundColor: mainCol,
+              backgroundColor: AppColors.mainBackground,
               centerTitle: true,
               title: const Text(
                 "KnightFind",
@@ -77,7 +101,7 @@ class JoinButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BoldElevatedButton(
-      text: 'Join Now!',
+      text: 'Join Now',
       onPressed: () {
         Navigator.push(
           context,
@@ -85,7 +109,7 @@ class JoinButton extends StatelessWidget {
         );
       },
       minWidth: 130,
-      minHeight: 60,
+      minHeight: 50,
     );
   }
 }
@@ -99,18 +123,17 @@ class LoginText extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 35.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        //  crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Already created an account?',
-            style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
+            'Already have an account?',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
           ),
           TextButton(
             child: const Text(
-              ('Log in'),
+              'Log in',
               style: TextStyle(
-                color: Color(0xFF514D08),
-                fontSize: 21,
+                color: AppColors.secondaryText,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -140,8 +163,8 @@ class LoginModal extends StatelessWidget {
         bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
       child: Container(
-        height: 300,
-        color: Colors.amber,
+        height: 380,
+        color: AppColors.mainBackground,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -149,8 +172,9 @@ class LoginModal extends StatelessWidget {
             children: <Widget>[
               const Text(
                 'Login',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
               ),
+              const SizedBox(height: 20),
               LoginForm(),
             ],
           ),
@@ -236,7 +260,6 @@ class LoginFormState extends State<LoginForm> {
       key: _loginFormKey,
       child: Column(
         children: [
-          //  Pass email controller to EmailField
           EmailField(controller: _loginController),
           InputTextField(
             label: 'Password',
@@ -248,6 +271,7 @@ class LoginFormState extends State<LoginForm> {
                   : null;
             },
           ),
+          const SizedBox(height: 12),
           BoldElevatedButton(
             text: 'Next',
             onPressed: () {
@@ -255,14 +279,17 @@ class LoginFormState extends State<LoginForm> {
                 _isLoading ? null : _login();
               }
             },
-            minWidth: 70,
-            minHeight: 20,
+            minWidth: 120,
+            minHeight: 45,
           ),
           if (_errorMessage.isNotEmpty)
-            Text(
-              _errorMessage,
-              style: const TextStyle(color: Colors.red, fontSize: 14),
-              textAlign: TextAlign.center,
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(
+                _errorMessage,
+                style: const TextStyle(color: Colors.red, fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
             ),
         ],
       ),
@@ -302,11 +329,9 @@ class ContentPopup extends StatelessWidget {
 
 class ArrowTitleBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final Color? backgroundColor;
 
-  const ArrowTitleBar({super.key, required this.title});
-
-  static const Color mainCol = Color(0xFFFFF4D9);
-  //  static const double defaultSize = 56.0;
+  const ArrowTitleBar({super.key, required this.title, this.backgroundColor});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -314,17 +339,21 @@ class ArrowTitleBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: mainCol,
+      backgroundColor: backgroundColor ?? AppColors.secondaryBackground,
       leading: IconButton(
         onPressed: () {
           Navigator.pop(context);
         },
-        icon: Icon(Icons.arrow_back),
+        icon: const Icon(Icons.arrow_back, color: AppColors.primaryText),
       ),
       centerTitle: true,
       title: Text(
         title,
-        style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+        style: const TextStyle(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: AppColors.primaryText,
+        ),
       ),
     );
   }
@@ -347,12 +376,61 @@ class InputTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: TextFormField(
-        decoration: InputDecoration(labelText: label),
-        obscureText: isObscure,
-        controller: controller,
-        validator: validator,
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: AppColors.primaryText,
+            ),
+          ),
+          const SizedBox(height: 6),
+          TextFormField(
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: AppColors.inputBackground,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: const BorderSide(
+                  color: AppColors.inputBorder,
+                  width: 1.0,
+                ),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: const BorderSide(
+                  color: AppColors.inputBorder,
+                  width: 1.0,
+                ),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: const BorderSide(
+                  color: AppColors.primaryText,
+                  width: 2.0,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8.0),
+                borderSide: const BorderSide(
+                  color: AppColors.accentButton,
+                  width: 1.0,
+                ),
+              ),
+            ),
+            obscureText: isObscure,
+            controller: controller,
+            validator: validator,
+          ),
+        ],
       ),
     );
   }
@@ -387,6 +465,8 @@ class BoldElevatedButton extends StatelessWidget {
   final VoidCallback onPressed;
   final double minWidth;
   final double minHeight;
+  final Color? backgroundColor;
+  final Color? textColor;
 
   const BoldElevatedButton({
     super.key,
@@ -394,24 +474,20 @@ class BoldElevatedButton extends StatelessWidget {
     required this.onPressed,
     required this.minWidth,
     required this.minHeight,
+    this.backgroundColor,
+    this.textColor,
   });
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        //  minimumSize: Size(140, 50),
         minimumSize: Size(minWidth, minHeight),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12.0),
-        ),
-        textStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 34,
-          fontWeight: FontWeight.bold,
-        ),
+        backgroundColor: backgroundColor ?? AppColors.primaryButton,
+        foregroundColor: textColor ?? Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        elevation: 0,
+        textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
       onPressed: onPressed,
       child: Text(text),

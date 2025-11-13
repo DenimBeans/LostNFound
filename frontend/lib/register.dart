@@ -6,16 +6,14 @@ import 'home.dart';
 
 class Register extends StatelessWidget {
   const Register({super.key});
-  static const Color mainCol = Color(0xFFFFF4D9);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: mainCol,
+      backgroundColor: AppColors.secondaryBackground,
       appBar: ArrowTitleBar(title: 'Register'),
-      body: Column(
-        //mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [RegisterForm()],
+      body: SingleChildScrollView(
+        child: Column(children: [const SizedBox(height: 20), RegisterForm()]),
       ),
     );
   }
@@ -64,7 +62,7 @@ class RegisterFormState extends State<RegisterForm> {
           if (mounted) {
             //  After verification, user must return to the start page and login
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Verfication email sent!')),
+              const SnackBar(content: Text('Verification email sent!')),
             );
           }
         } else {
@@ -127,7 +125,7 @@ class RegisterFormState extends State<RegisterForm> {
             },
           ),
           InputTextField(
-            label: 'Re-type Password',
+            label: 'Re-enter Password',
             isObscure: true,
             validator: (String? value) {
               return (value != _passwordController.text)
@@ -135,6 +133,7 @@ class RegisterFormState extends State<RegisterForm> {
                   : null;
             },
           ),
+          const SizedBox(height: 20),
           BoldElevatedButton(
             text: 'Next',
             onPressed: () {
@@ -143,15 +142,19 @@ class RegisterFormState extends State<RegisterForm> {
                 _isLoading ? null : _register();
               }
             },
-            minWidth: 100,
-            minHeight: 46,
+            minWidth: 120,
+            minHeight: 45,
           ),
           if (_errorMessage.isNotEmpty)
-            Text(
-              _errorMessage,
-              style: const TextStyle(color: Colors.red, fontSize: 14),
-              textAlign: TextAlign.center,
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Text(
+                _errorMessage,
+                style: const TextStyle(color: Colors.red, fontSize: 14),
+                textAlign: TextAlign.center,
+              ),
             ),
+          const SizedBox(height: 20),
         ],
       ),
     );
