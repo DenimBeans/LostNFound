@@ -51,12 +51,19 @@ function AccountSettings(){
             let txt = await response.text();
             let res = JSON.parse(txt);
 
+            if(res.error != ' '){
+                console.log(res.error)
+            }
+            else{
             handleFirst(res.firstname);
             handleLast(res.lastName);
             handleEmail(res.email);
             handleVerified(res.isVerified);
             handleCreated(res.createdAt);
             handleUpdated(res.updatedAt);
+            }
+
+            
             }
             
         
