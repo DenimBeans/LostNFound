@@ -15,11 +15,11 @@ function AccountSettings(){
     const [userCreated, setUserCreated] = React.useState('');
     const [userUpdated, setUserUpdated] = React.useState('');
 
-    async function ShowUserInfo(){
+    async function ShowUserInfo(id: any){
         
 
         try {
-            const response = await fetch(buildAPIPath(`api/users/${itemUSERID}`),
+            const response = await fetch(buildAPIPath(`api/users/${id}`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
@@ -46,7 +46,7 @@ function AccountSettings(){
         if(Data != null){
             const UserData = JSON.parse(Data);
             setItemUSERIDValue(UserData?.userId);
-            ShowUserInfo();
+            ShowUserInfo(UserData?.userId);
         }
         else{
             window.location.href = '/';
