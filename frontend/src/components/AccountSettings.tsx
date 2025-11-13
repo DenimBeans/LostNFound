@@ -19,31 +19,6 @@ function AccountSettings(){
     const [userUpdated, setUserUpdated] = React.useState('');
 
     async function ShowUserInfo(id: any){
-
-
-   /* function handleFirst(e: any): void {
-        setUserFirst(e.target.value);
-    }*/
-        
-    function handleLast(e: any): void {
-        setUserLast(e);
-    }
-        
-    function handleEmail(e: any): void {
-        setUserEmail(e.target.value);
-    }
-        
-    function handleVerified(e: any): void {
-        setUserVerified(e.target.value);
-    }
-        
-    function handleCreated(e: any): void {
-        setUserCreated(e.target.value);
-    }
-        
-    function handleUpdated(e: any): void {
-        setUserUpdated(e.target.value);
-    }
         
         
 
@@ -56,19 +31,14 @@ function AccountSettings(){
             let res = JSON.parse(txt);
             console.log(res);
             console.log(res.user);
-            console.log(res.user.firstName);
+            console.log(res.user.lastName);
 
-            if(res.error != ' '){
-                console.log(res.error)
-            }
-            else{
             setUserFirst(res.user.firstName);
-            handleLast(res.user.lastName);
-            handleEmail(res.user.email);
-            handleVerified(res.user.isVerified);
-            handleCreated(res.user.createdAt);
-            handleUpdated(res.user.updatedAt);
-            }
+            setUserLast(res.user.lastName);
+            setUserEmail(res.user.email);
+            setUserVerified(res.user.isVerified);
+            setUserCreated(res.user.createdAt);
+            setUserUpdated(res.user.updatedAt);
 
             
             }
