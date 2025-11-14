@@ -214,30 +214,41 @@ class _MapUCFState extends State<MapUCF> {
   }
 }
 
-/*
 //  Item widgets
-class Item extends StatelessWidget {
+class Item {
   final String title;
-  final String description;
-  final String category;
-  final String imageUrl;
-  final String locationText;
   final String reporterName;
-  final int lat;
-  final int long;
+  final String? description;
+  final String? category;
+  final String? imageUrl;
+  final String? locationText;
+  final int? lat;
+  final int? long;
 
-  const Item({
-    super.key
-    required this.Title,
-    required
+  Item({
+    required this.title,
+    required this.reporterName,
+    this.description,
+    this.category,
+    this.imageUrl,
+    this.locationText,
+    this.lat,
+    this.long
   });
   
-  @override
-  Widget build(BuildContext context) {
-
-  };
+  factory Item.fromJson(Map<String, dynamic> json) {
+    return Item(
+      title: json['title'],
+      description: json['description'] ?? 'No item description give.',
+      category: json['category'] ?? '---',
+      imageUrl: json['imageUrl'] ?? '',
+      locationText: json['locationText'] ?? 'No location description given.',
+      reporterName: json['repoterName'],
+      lat: json['lat'] ?? 28.6024274,
+      long: json['long'] ?? -81.2000599
+    );
+  }
 }
-*/
 
 //  Hamburger Menu Contents
 class AboutModal extends StatelessWidget {
