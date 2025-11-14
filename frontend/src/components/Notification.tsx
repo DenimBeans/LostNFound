@@ -9,10 +9,19 @@ function Notification(){
     interface NotifData{
         _id : string;
         title : string;
-        text : string;
-        isRead : boolean;
+        description : string;
         category : string;
         imageUrl : string;
+
+        text : string;
+        isMeetup : boolean;
+        isRead : boolean;
+        location : string;
+        meetTime : Date;
+        senderId : string;
+        itemId : string;
+        
+
     }
 
     const ViewNotIf = useRef<HTMLDivElement>(null);
@@ -22,7 +31,7 @@ function Notification(){
 
     const [itemUSERID, setItemUSERIDValue] = React.useState('');
 
-    //const [viewNotifId, setviewNotifId] = React.useState('');
+    const [viewNotifId, setviewNotifId] = React.useState('');
     //View notification
     const [NotifTitle, setNotifTitle] = React.useState('');
     const [NotifDescription, setNotifDescription] = React.useState('');
@@ -153,8 +162,11 @@ function Notification(){
             if(Notif.isMeetup == false && ViewNotIfButton.current){
                 ViewNotIfButton.current.style.visibility = 'none';
             }
+            else if(Notif.isMeetup == true && ViewNotIfButton.current){
+                ViewNotIfButton.current.style.visibility = 'visible';
+            }
         }
-        setviewNotifId(Notif._id)
+        setviewNotifId(Notif)
         setNotifTitle(Notif.title);
         setNotifDescription(Notif.text);
         setNotifCategory(Notif.category);
@@ -162,15 +174,32 @@ function Notification(){
 
     };
 
-    async function ReturnNotif(id: any,answer : string){
+    async function ReturnNotif(Notif: any,answer : string){
         if (answer == "Accept"){
+            let obj = {
+                userId : itemUSERID, 
+                text : Notif.text,
+                isMeetup : Notif.isMeetup,
+                location : Notif.location,
+                meetTime : Notif.meetTime,
+                senderId : Notif.senderId,
+                itemId : Notif.itemId,
+
+            };
+            let js = JSON.stringify(obj);
             try {
-            const response = await fetch(buildAPIPath(`api/users/${id}/notifications?isRead=true&isMeetup=true`),
-                { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+            const response = await fetch(buildAPIPath(`api/notifications`),
+                { method: 'POST',body: js, headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
             let res = JSON.parse(txt);
-            console.log(res)
+            
+            if(res.error != ''){
+                console.log(res.error)
+            }
+            else{
+
+            }
             
             }
             
@@ -180,13 +209,30 @@ function Notification(){
         }
         }
         else if (answer == "Deny"){
+            let obj = {
+                userId : itemUSERID, 
+                text : Notif.text,
+                isMeetup : Notif.isMeetup,
+                location : Notif.location,
+                meetTime : Notif.meetTime,
+                senderId : Notif.senderId,
+                itemId : Notif.itemId,
+
+            };
+            let js = JSON.stringify(obj);
             try {
-            const response = await fetch(buildAPIPath(`api/users/${id}/notifications?isRead=true&isMeetup=false`),
-                { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+            const response = await fetch(buildAPIPath(`api/notifications`),
+                { method: 'POST',body : js, headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
             let res = JSON.parse(txt);
-            console.log(res)
+            
+            if(res.error != ''){
+                console.log(res.error)
+            }
+            else{
+            
+            }
             }
             
         
@@ -219,9 +265,9 @@ function Notification(){
                 <input type = "text" id = "NotifCat" className = "NotifData" value = {NotifCategory} readOnly/>
                 <input type = "text" id = "NotifImage" className = "NotifData" value = {NotifImageUrl} readOnly/>
                 <div id = "ViewButtonBar" ref = {ViewNotIfButton}>
-                    <button type = "button" id = "NotifAccept" className = "NotifButton" onClick = {() => ReturnNotif(itemUSERID,"Accept")}>Accept</button>
+                    <button type = "button" id = "NotifAccept" className = "NotifButton" onClick = {() => ReturnNotif(viewNotifId,"Accept")}>Accept</button>
                     <button type = "button" id = "NotifContest" className = "NotifButton">Contest</button>
-                    <button type = "button" id = "NotifDeny" className = "NotifButton" onClick = {() => ReturnNotif(itemUSERID,"Deny")}>Deny</button>
+                    <button type = "button" id = "NotifDeny" className = "NotifButton" onClick = {() => ReturnNotif(viewNotifId,"Deny")}>Deny</button>
                 </div>
             </div>
             <div id = "buttonholder">

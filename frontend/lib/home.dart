@@ -40,7 +40,7 @@ class _AppHomeState extends State<AppHome> {
       appBar: AppBar(
         backgroundColor: AppColors.mainBackground,
         centerTitle: true,
-        automaticallyImplyLeading: false, // Removes back arrow
+        automaticallyImplyLeading: false,
         title: Text(
           currentPageIndex == 0
               ? 'Report a Lost Item'
@@ -111,6 +111,7 @@ class _AppHomeState extends State<AppHome> {
                     firstName: widget.firstName,
                     lastName: widget.lastName,
                     email: widget.email,
+                    userId: widget.userId,
                   ),
                 ),
               );
@@ -307,12 +308,14 @@ class AccountSettings extends StatefulWidget {
   final String firstName;
   final String lastName;
   final String email;
+  final String userId;
 
   const AccountSettings({
     super.key,
     required this.firstName,
     required this.lastName,
     required this.email,
+    required this.userId,
   });
 
   @override
@@ -323,9 +326,18 @@ class _AccountSettingsState extends State<AccountSettings> {
   late TextEditingController _firstNameController;
   late TextEditingController _lastNameController;
   late TextEditingController _emailController;
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _currentPasswordController =
+      TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
+
   bool _isDyslexicFont = false;
   bool _isDarkMode = false;
+  bool _isLoadingProfile = false;
+  bool _isLoadingPassword = false;
+  String _profileError = '';
+  String _passwordError = '';
 
   @override
   void initState() {
@@ -341,35 +353,169 @@ class _AccountSettingsState extends State<AccountSettings> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
-    _passwordController.dispose();
+    _currentPasswordController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
   Future<void> _updateProfile() async {
-    // TODO: Implement API call to update profile
-    // For now, just show a success message
-    if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Profile updated!')));
+    setState(() {
+      _isLoadingProfile = true;
+      _profileError = '';
+    });
+
+    try {
+      // Prepare update data
+      final Map<String, dynamic> updateData = {
+        'firstName': _firstNameController.text.trim(),
+        'lastName': _lastNameController.text.trim(),
+        'email': _emailController.text.trim().toLowerCase(),
+      };
+
+      final response = await http.patch(
+        Uri.parse('http://knightfind.xyz:4000/api/users/${widget.userId}'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(updateData),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['error'] == null || data['error'].isEmpty) {
+          if (mounted) {
+            // Check if email was changed (requires verification)
+            final message = data['message'] ?? 'Profile updated successfully';
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(message),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 4),
+              ),
+            );
+
+            // If email changed, show additional info
+            if (_emailController.text.trim().toLowerCase() !=
+                widget.email.toLowerCase()) {
+              Future.delayed(const Duration(seconds: 4), () {
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Please check your new email to verify the change.',
+                      ),
+                      backgroundColor: Colors.orange,
+                      duration: Duration(seconds: 5),
+                    ),
+                  );
+                }
+              });
+            }
+          }
+        } else {
+          setState(() {
+            _profileError = data['error'];
+          });
+        }
+      } else {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _profileError = data['error'] ?? 'Failed to update profile';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _profileError = 'Network error. Please check your connection.';
+      });
+    } finally {
+      setState(() {
+        _isLoadingProfile = false;
+      });
     }
   }
 
   Future<void> _resetPassword() async {
-    if (_passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a new password')),
-      );
+    // Validate inputs
+    if (_currentPasswordController.text.isEmpty) {
+      setState(() {
+        _passwordError = 'Please enter your current password';
+      });
       return;
     }
 
-    // TODO: Implement API call to reset password
-    // For now, just show a success message
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password reset email sent!')),
+    if (_newPasswordController.text.isEmpty) {
+      setState(() {
+        _passwordError = 'Please enter a new password';
+      });
+      return;
+    }
+
+    if (_newPasswordController.text != _confirmPasswordController.text) {
+      setState(() {
+        _passwordError = 'New passwords do not match';
+      });
+      return;
+    }
+
+    if (_currentPasswordController.text == _newPasswordController.text) {
+      setState(() {
+        _passwordError = 'New password must be different from current password';
+      });
+      return;
+    }
+
+    setState(() {
+      _isLoadingPassword = true;
+      _passwordError = '';
+    });
+
+    try {
+      final response = await http.patch(
+        Uri.parse('http://knightfind.xyz:4000/api/users/${widget.userId}'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'currentPassword': _currentPasswordController.text,
+          'newPassword': _newPasswordController.text,
+        }),
       );
-      _passwordController.clear();
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['error'] == null || data['error'].isEmpty) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Password updated successfully!'),
+                backgroundColor: Colors.green,
+              ),
+            );
+
+            // Clear password fields
+            _currentPasswordController.clear();
+            _newPasswordController.clear();
+            _confirmPasswordController.clear();
+          }
+        } else {
+          setState(() {
+            _passwordError = data['error'];
+          });
+        }
+      } else {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _passwordError = data['error'] ?? 'Failed to update password';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _passwordError = 'Network error. Please check your connection.';
+      });
+    } finally {
+      setState(() {
+        _isLoadingPassword = false;
+      });
     }
   }
 
@@ -383,63 +529,107 @@ class _AccountSettingsState extends State<AccountSettings> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Section: Profile Information
+            // ========== PROFILE INFORMATION SECTION ==========
             _buildSectionHeader('Profile Information'),
             const SizedBox(height: 12),
+
             InputTextField(
               label: 'First Name',
               isObscure: false,
               controller: _firstNameController,
             ),
             const SizedBox(height: 8),
+
             InputTextField(
               label: 'Last Name',
               isObscure: false,
               controller: _lastNameController,
             ),
             const SizedBox(height: 8),
+
             InputTextField(
               label: 'Email Address',
               isObscure: false,
               controller: _emailController,
             ),
+
+            if (_profileError.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Text(
+                  _profileError,
+                  style: const TextStyle(color: Colors.red, fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
             const SizedBox(height: 20),
             Center(
-              child: BoldElevatedButton(
-                text: 'Update Profile',
-                onPressed: _updateProfile,
-                minWidth: 180,
-                minHeight: 45,
-              ),
+              child: _isLoadingProfile
+                  ? const CircularProgressIndicator()
+                  : BoldElevatedButton(
+                      text: 'Update Profile',
+                      onPressed: _updateProfile,
+                      minWidth: 180,
+                      minHeight: 45,
+                    ),
             ),
 
             const SizedBox(height: 32),
             const Divider(),
             const SizedBox(height: 20),
 
-            // Section: Security
+            // ========== SECURITY SECTION ==========
             _buildSectionHeader('Security'),
             const SizedBox(height: 12),
+
+            InputTextField(
+              label: 'Current Password',
+              isObscure: true,
+              controller: _currentPasswordController,
+            ),
+            const SizedBox(height: 8),
+
             InputTextField(
               label: 'New Password',
               isObscure: true,
-              controller: _passwordController,
+              controller: _newPasswordController,
             ),
+            const SizedBox(height: 8),
+
+            InputTextField(
+              label: 'Confirm New Password',
+              isObscure: true,
+              controller: _confirmPasswordController,
+            ),
+
+            if (_passwordError.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 12.0),
+                child: Text(
+                  _passwordError,
+                  style: const TextStyle(color: Colors.red, fontSize: 14),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+
             const SizedBox(height: 20),
             Center(
-              child: BoldElevatedButton(
-                text: 'Reset Password',
-                onPressed: _resetPassword,
-                minWidth: 180,
-                minHeight: 45,
-              ),
+              child: _isLoadingPassword
+                  ? const CircularProgressIndicator()
+                  : BoldElevatedButton(
+                      text: 'Update Password',
+                      onPressed: _resetPassword,
+                      minWidth: 180,
+                      minHeight: 45,
+                    ),
             ),
 
             const SizedBox(height: 32),
             const Divider(),
             const SizedBox(height: 20),
 
-            // Section: Preferences
+            // ========== PREFERENCES SECTION ==========
             _buildSectionHeader('Preferences'),
             const SizedBox(height: 12),
 
@@ -460,6 +650,15 @@ class _AccountSettingsState extends State<AccountSettings> {
                     _isDyslexicFont = newValue;
                   });
                   // TODO: Implement font change globally
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        newValue
+                            ? 'Dyslexic font enabled (feature coming soon)'
+                            : 'Dyslexic font disabled',
+                      ),
+                    ),
+                  );
                 },
               ),
             ),
@@ -480,6 +679,15 @@ class _AccountSettingsState extends State<AccountSettings> {
                     _isDarkMode = newValue;
                   });
                   // TODO: Implement theme change globally
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        newValue
+                            ? 'Dark mode enabled (feature coming soon)'
+                            : 'Dark mode disabled',
+                      ),
+                    ),
+                  );
                 },
               ),
             ),
