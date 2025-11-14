@@ -78,7 +78,7 @@ function AccountSettings(){
         let js = JSON.stringify(obj);
 
          try {
-            const response = await fetch(buildAPIPath(`api/items/${itemUSERID}`),
+            const response = await fetch(buildAPIPath(`api/users/${itemUSERID}`),
                 { method: 'PATCH', body: js, headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
@@ -170,9 +170,9 @@ function AccountSettings(){
     return(
         <div id = "AccountSettingsMain">
             <div id = "EditUser" ref = {EditUser}>
-                <input type = "text" className = "edituser" placeholder = "firstname" value = {userFirst} onChange = {handleOldFirst}/>
-                <input type = "text" className = "edituser" placeholder = "lastname" value = {userLast} onChange = {handleOldLast}/>
-                <input type = "text" className = "edituser" placeholder = "email" value = {userEmail} onChange = {handleOldEmail}/>
+                <input type = "text" className = "edituser" placeholder = {userFirst} onChange = {handleOldFirst}/>
+                <input type = "text" className = "edituser" placeholder = {userLast} onChange = {handleOldLast}/>
+                <input type = "text" className = "edituser" placeholder = {userEmail} onChange = {handleOldEmail}/>
                 <input type = "text" className = "edituser" placeholder = "Old password"  onChange = {handleOldPass}/>
                 <input type = "text" className = "edituser" placeholder = "New Password" onChange = {handleNewPass}/>
                 <button type = "button" id = "edituser" onClick = {EditUserInfo}>Submit new info</button>
