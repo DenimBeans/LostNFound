@@ -138,9 +138,9 @@ function AccountSettings(){
             setUserFirst(res.user.firstName);
             setUserLast(res.user.lastName);
             setUserEmail(res.user.email);
-            setUserVerified(res.user.isVerified);
+            /*setUserVerified(res.user.isVerified);
             setUserCreated(res.user.createdAt);
-            setUserUpdated(res.user.updatedAt);
+            setUserUpdated(res.user.updatedAt);*/
 
             
             }
