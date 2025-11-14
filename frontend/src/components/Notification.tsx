@@ -20,7 +20,7 @@ function Notification(){
 
     const [itemUSERID, setItemUSERIDValue] = React.useState('');
 
-
+    const [viewNotifId, setviewNotifId] = React.useState('');
     //View notification
     const [NotifTitle, setNotifTitle] = React.useState('');
     const [NotifDescription, setNotifDescription] = React.useState('');
@@ -147,6 +147,7 @@ function Notification(){
         if (ViewNotif.current){
             ViewNotif.current.style.visibility = 'visible';
         }
+        setviewNotifId(Notification.notificationId)
         setNotifTitle(Notification.title);
         setNotifDescription(Notification.description);
         setNotifCategory(Notification.category);
@@ -154,14 +155,15 @@ function Notification(){
 
     }
 
-    async function ReturnNotif(answer : string){
+    async function ReturnNotif(viewNotifId,answer : string){
         if (answer == "Accept"){
             try {
-            const response = await fetch(buildAPIPath(`api/users/${id}/notifications?isRead=true&isMeetup=true`),
+            const response = await fetch(buildAPIPath(`api/users/${viewNotifId}/notifications?isRead=true&isMeetup=true`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
             let res = JSON.parse(txt);
+            console.log(res)
             
             }
             
@@ -172,12 +174,12 @@ function Notification(){
         }
         else if (answer == "Deny"){
             try {
-            const response = await fetch(buildAPIPath(`api/users/${id}/notifications?isRead=true&isMeetup=false`),
+            const response = await fetch(buildAPIPath(`api/users/${viewNotifId}/notifications?isRead=true&isMeetup=false`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
             let res = JSON.parse(txt);
-            
+            console.log(res)
             }
             
         
