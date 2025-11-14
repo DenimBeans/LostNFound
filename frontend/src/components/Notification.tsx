@@ -80,13 +80,13 @@ function Notification(){
                 console.log(res.error)
             }
             else{
-                setNotifContainer(NotifContainer.filter((NotifContainer) => NotifContainer.notificationId != NotifId))
+                setNotifContainer(NotifContainer.filter((NotifContainer) => NotifContainer.notificationId != NotId))
             }
 
             
         }
         catch (error: any) {
-            setMessage(error.toString());
+            console.log(error.toString());
         }
     }
 
@@ -128,7 +128,7 @@ function Notification(){
             
         }
         catch (error: any) {
-            setMessage(error.toString());
+            console.log(error.toString());
         }
     };
 
