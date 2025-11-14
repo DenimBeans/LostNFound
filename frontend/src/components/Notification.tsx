@@ -29,7 +29,7 @@ function Notification(){
 
     async function AllNotif(id: any){
         try {
-            const response = await fetch(buildAPIPath(`api/users/${id}/notifications`),
+            const response = await fetch(buildAPIPath(`api/users/${id}/notifications?isRead=false`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
