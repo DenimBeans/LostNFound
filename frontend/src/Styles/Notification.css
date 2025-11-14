@@ -52,3 +52,34 @@ overflow-y: auto;
     margin-top: 30px;
     height: 45px;
 }
+
+.NotifButton{
+    margin-top: 20px;
+    height: 45px;
+    width: 20%;
+    margin-left: 40%;
+    margin-bottom: 30px;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    background: linear-gradient(-45deg, darkgoldenrod 40%,  rgb(216, 159, 14) 50%,  darkgoldenrod 60%); 
+    background-size: 300%;
+    background-position-x: 100%;
+
+    
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color: rgb(170, 125, 11);
+    filter: drop-shadow(2px 2px 15px rgba(170, 125, 11, 0.541));
+    box-shadow: 0 8px rgb(134, 99, 9);
+}
+
+#ViewButtonBar{
+    display: flex;
+    clear: both;
+    margin-top: 30px;
+    height: 45px;
+    visibility: hidden;
+}
