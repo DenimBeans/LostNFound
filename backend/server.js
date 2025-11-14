@@ -826,8 +826,17 @@ app.post('/api/items', async (req, res) => {
     } = req.body;
 
     // Validate required fields
-    if (!title || !description || !userId) {
-      error = 'Title, description, and userId required';
+    // Separated userId check so frontend error does not mention userID to users - Jean
+    if(!userId)
+    {
+      error = 'userId required';
+      var ret = { error: error };
+      return res.status(400).json(ret);
+    }
+
+    //Changed error message to look better on frontend - Jean
+    else if (!title || !description) {
+      error = 'Item Name and Description required';
       var ret = { error: error };
       return res.status(400).json(ret);
     }
