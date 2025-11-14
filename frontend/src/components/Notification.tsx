@@ -27,29 +27,29 @@ function Notification(){
     const [NotifCategory, setNotifCategory] = React.useState('');
     const [NotifImageUrl, setNotifImageUrl] = React.useState('');
 
-    async function AllNotif(id: any){
+    /*async function AllNotif(id: any){
         try {
-            const response = await fetch(buildAPIPath(`api/users/:6903d4f7e30f35fe63803500/notifications`),
+            const response = await fetch(buildAPIPath(`api/users/${id}/notifications`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
             let res = JSON.parse(txt);
             setNotifContainer(res.results);
-            console.log(id);
+            
             }
             
         
         catch (error: any) {
             console.log("Frontend Error");
         }
-    };
+    };*/
 
     useEffect(() => {
         const Data = sessionStorage.getItem('user_data');
         if(Data != null){
             const UserData = JSON.parse(Data);
             setItemUSERIDValue(UserData?.userId);
-            AllNotif(UserData?.userId);
+            //AllNotif(UserData?.userId);
         }
         else{
             window.location.href = '/';
@@ -65,6 +65,7 @@ function Notification(){
 
             let txt = await response.text();
             let res = JSON.parse(txt);
+           
 
             if (res.error != '') {
                 console.log(res.error)
