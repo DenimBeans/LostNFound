@@ -155,10 +155,10 @@ function Notification(){
 
     }
 
-    async function ReturnNotif(viewNotifId,answer : string){
+    async function ReturnNotif(id,answer : string){
         if (answer == "Accept"){
             try {
-            const response = await fetch(buildAPIPath(`api/users/${viewNotifId}/notifications?isRead=true&isMeetup=true`),
+            const response = await fetch(buildAPIPath(`api/users/${id}/notifications?isRead=true&isMeetup=true`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
@@ -174,7 +174,7 @@ function Notification(){
         }
         else if (answer == "Deny"){
             try {
-            const response = await fetch(buildAPIPath(`api/users/${viewNotifId}/notifications?isRead=true&isMeetup=false`),
+            const response = await fetch(buildAPIPath(`api/users/${id}/notifications?isRead=true&isMeetup=false`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
@@ -212,9 +212,9 @@ function Notification(){
                 <input type = "text" id = "NotifDesc" className = "NotifData" value = {NotifDescription} readOnly/>
                 <input type = "text" id = "NotifCat" className = "NotifData" value = {NotifCategory} readOnly/>
                 <input type = "text" id = "NotifImage" className = "NotifData" value = {NotifImageUrl} readOnly/>
-                <input type = "button" id = "NotifAccept" className = "NotifButton" onClick = {() => ReturnNotif("Accept")}>Accept</input>
+                <input type = "button" id = "NotifAccept" className = "NotifButton" onClick = {() => ReturnNotif(viewNotifId,"Accept")}>Accept</input>
                 <input type = "button" id = "NotifContest" className = "NotifContest">Contest</input>
-                <input type = "button" id = "NotifDeny" className = "NotifDeny" onClick = {() => ReturnNotif("Deny")}>Deny</input>
+                <input type = "button" id = "NotifDeny" className = "NotifDeny" onClick = {() => ReturnNotif(viewNotifId,"Deny")}>Deny</input>
 
             </div>
             <div id = "buttonholder">
