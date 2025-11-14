@@ -31,8 +31,9 @@ function handleSetLastName(e: any): void{
 //}
 
 function handleSetRegisterEmail(e: any): void{
-    setRegisterEmail(e.target.value);
-    setIsValid(emailRegEx.test(RegisterEmail));
+  const newEmail = e.target.value;
+  setRegisterEmail(newEmail);
+  setIsValid(emailRegEx.test(newEmail));
 }
 
 function handleSetRegisterPassword(e:any): void{

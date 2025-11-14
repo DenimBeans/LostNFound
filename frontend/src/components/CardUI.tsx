@@ -509,8 +509,8 @@ function ChangeView({center, zoom }: any) {
                 <label id = "viewLabel" htmlFor = "Desc">Description</label>                
                 <textarea 
                     id="viewDesc" 
-                    value = {VitemDesc}>
-                    readOnly
+                    value = {VitemDesc}
+                    readOnly>
                 </textarea>
 
                 <label id = "viewLabel" htmlFor = "CategoryView">Category</label>
