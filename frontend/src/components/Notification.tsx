@@ -22,7 +22,7 @@ function Notification(){
 
     const [itemUSERID, setItemUSERIDValue] = React.useState('');
 
-    const [viewNotifId, setviewNotifId] = React.useState('');
+    //const [viewNotifId, setviewNotifId] = React.useState('');
     //View notification
     const [NotifTitle, setNotifTitle] = React.useState('');
     const [NotifDescription, setNotifDescription] = React.useState('');
@@ -216,9 +216,9 @@ function Notification(){
                 <input type = "text" id = "NotifDesc" className = "NotifData" value = {NotifDescription} readOnly/>
                 <input type = "text" id = "NotifCat" className = "NotifData" value = {NotifCategory} readOnly/>
                 <input type = "text" id = "NotifImage" className = "NotifData" value = {NotifImageUrl} readOnly/>
-                <button type = "button" id = "NotifAccept" className = "NotifButton" onClick = {() => ReturnNotif(viewNotifId,"Accept")}>Accept</button>
+                <button type = "button" id = "NotifAccept" className = "NotifButton" onClick = {() => ReturnNotif(itemUSERID,"Accept")}>Accept</button>
                 <button type = "button" id = "NotifContest" className = "NotifContest">Contest</button>
-                <button type = "button" id = "NotifDeny" className = "NotifDeny" onClick = {() => ReturnNotif(viewNotifId,"Deny")}>Deny</button>
+                <button type = "button" id = "NotifDeny" className = "NotifDeny" onClick = {() => ReturnNotif(itemUSERID,"Deny")}>Deny</button>
 
             </div>
             <div id = "buttonholder">
