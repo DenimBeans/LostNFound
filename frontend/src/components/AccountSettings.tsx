@@ -17,9 +17,9 @@ function AccountSettings(){
     const [userFirst, setUserFirst] = React.useState('');
     const [userLast, setUserLast] = React.useState('');
     const [userEmail, setUserEmail] = React.useState('');
-    const [userVerified, setUserVerified] = React.useState('');
-    const [userCreated, setUserCreated] = React.useState('');
-    const [userUpdated, setUserUpdated] = React.useState('');
+    //const [userVerified, setUserVerified] = React.useState('');
+    //const [userCreated, setUserCreated] = React.useState('');
+    //const [userUpdated, setUserUpdated] = React.useState('');
 
     //deleteinfo
     //const [deletePass, setdeletepass] = React.useState('');
@@ -182,13 +182,11 @@ function AccountSettings(){
                 
                 <button type = "button" id = "deleteuser" onClick = {DeleteUserInfo}>Delete User!</button>
             </div>
-            <input type = "text" id = "id" className = "AccountSet" value = {itemUSERID}  readOnly/>
+
             <input type = "text" id = "firstname" className = "AccountSet" value = {userFirst} readOnly/>
             <input type = "text" id = "lastname" className = "AccountSet" value = {userLast}  readOnly/>
             <input type = "text" id = "Accountemail" className = "AccountSet" value = {userEmail} readOnly/>
-            <input type = "text" id = "isVer" className = "AccountSet" value = {userVerified}  readOnly/>
-            <input type = "text" id = "created" className = "AccountSet" value = {userCreated}  readOnly/>
-            <input type = "text" id = "updated" className = "AccountSet" value = {userUpdated}  readOnly/>
+            
             
             <div id = "buttonbar">
                 <button type = "button" id = "edituser" onClick = {showEdit}>Edit User</button>
