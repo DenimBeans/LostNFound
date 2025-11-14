@@ -169,7 +169,7 @@ function AccountSettings(){
     
     return(
         <div id = "AccountSettingsMain">
-            <div id = "EditUser">
+            <div id = "EditUser" ref = {EditUser}>
                 <input type = "text" className = "edituser" placeholder = "firstname" value = {userFirst} onChange = {handleOldFirst}/>
                 <input type = "text" className = "edituser" placeholder = "lastname" value = {userLast} onChange = {handleOldLast}/>
                 <input type = "text" className = "edituser" placeholder = "email" value = {userEmail} onChange = {handleOldEmail}/>
@@ -177,7 +177,7 @@ function AccountSettings(){
                 <input type = "text" className = "edituser" placeholder = "New Password" onChange = {handleNewPass}/>
                 <button type = "button" id = "edituser" onClick = {EditUserInfo}>Submit new info</button>
             </div>
-            <div id = "DeleteUser">
+            <div id = "DeleteUser" ref = {DeleteUser}>
                 <span id = "Warning">Are you absolutly sure you want to delete your account?</span>
                 
                 <button type = "button" id = "deleteuser" onClick = {DeleteUserInfo}>Delete User!</button>
