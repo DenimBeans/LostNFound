@@ -194,7 +194,7 @@ function Notification(){
     return(
         <div id = "NotificationMain">
             <p>{itemUSERID}</p>
-            <div id = "LostItemPage">
+            <div id = "NotifPage">
                 {NotifContainer.map(NotifContainer => (
                     <div key = {NotifContainer.notificationId} className = "NotifContainers">
                         <input type = "text" id = "NotificationTitle" className = "NotTitle"  readOnly/>
