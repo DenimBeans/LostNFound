@@ -213,11 +213,10 @@ function CardUI() {
         }
     };
 
-    async function searchItem(e: any): Promise<void> {
-        e.preventDefault();
+    async function searchItem(id: any){
 
         try {
-            const response = await fetch(buildAPIPath(`api/users/${itemUSERID}/items`),
+            const response = await fetch(buildAPIPath(`api/users/${id}/items`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
@@ -302,7 +301,13 @@ function CardUI() {
         if(Data != null){
             const UserData = JSON.parse(Data);
             setItemUSERIDValue(UserData?.userId);
-            searchItem(true);
+            
+            searchItem(UserData?.userId);
+
+                /*
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+            setItemContainer(res.results);*/
         }
         else{
             window.location.href = '/';
@@ -382,7 +387,7 @@ function CardUI() {
                     <option value = "Personal">Personal</option>
                 </select>
                 <input type = "text" id = "Searchtab" placeholder = "Item Name..." onChange = {handleSearchItemChange}/>
-                <button type = "button" id = "SearchItem" onClick = {searchItemSpecific}>Search</button>
+                <button type = "button" id = "SearchItem" className ="button" onClick = {searchItemSpecific}>Search</button>
             </div>
 
             <div id = "AddItemPopup" ref = {AddPopupRef}>

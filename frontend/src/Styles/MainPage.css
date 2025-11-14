@@ -1,9 +1,8 @@
 #MainUIDiv{
 width: 80%;
 margin-left: 10%;
-height: 70vh;
+height: 75vh;
 background-color: rgb(101, 101, 101);
-display:flex;
 flex-direction: column;
 
 border-width: 3px;
@@ -14,9 +13,10 @@ border-color:black;
 
 #LostItemPage{
 height: 50vh;
+width: 50%;
 background-color: rgb(101, 101, 101);
-display:flex;
 flex-direction: column;
+float: left;
 
 border-bottom: 5px solid rgb(50, 50, 50);
 border-top-left-radius: 20px;
@@ -53,13 +53,63 @@ overflow-x: auto;
 #ContainerTitle
 {
     border-right: 0px;
+    width: 25%;
+
 }
 
 #ContainerStatus
 {
     text-align: center;
-    width: 60px;
+    width: 25%;
     border-left: 0px;
+}
+
+#ContainerData
+{
+    width: 20%;
+}
+
+#ContainerEdit, #ContainerDelete
+{
+    width: 13%;
+}
+
+
+
+#statusFilter, #categoryFilter
+{
+    width: 80%;
+    margin-left: 10%;
+}
+
+#SearchBar
+{
+    float: right;
+    height: 50vh;
+    width: 50%;
+    position: relative;
+    display: column;
+    justify-content: center;
+    border-bottom: 5px solid rgb(50, 50, 50);
+}
+
+#Searchtab
+{
+    margin-top: 15px;
+    justify-content: center;
+    border-radius: 20px;
+    width: 80%;
+    margin-left: 10%;
+    height: 4vh;
+    border-color:rgb(41, 42, 46);
+    border-style: solid;
+    text-align: center;
+}
+
+#Searchitem
+{
+    justify-content: center;
+    margin-left: 0%;
 }
 
 #AddItemPopup,#EditItemPopup,#ViewItemPopup{
@@ -87,10 +137,13 @@ overflow-y: auto;
 
 
 
-#ButtonHolster{
-display: flex;
-flex-direction: row;
-
+#ButtonHolster
+{ 
+    display: flex;
+    clear: both;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    height: 45px;
 }
 
 #itemTitle, #Desc, #locationText, #ImageUp{
@@ -268,6 +321,7 @@ flex-direction: row;
     height: 45px;
     width: 20%;
     margin-left: 40%;
+    margin-bottom: 30px;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
     font-weight: bold;
     font-size: 16px;
@@ -304,7 +358,7 @@ flex-direction: row;
 
 #reportButton
 {
-    margin-bottom: 30px;
+    justify-content: center;
 }
 
 #addItemButton
