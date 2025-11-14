@@ -7,14 +7,15 @@ import '../Styles/Notification.css';
 function Notification(){
 
     interface NotifData{
-        notificationId : string;
+        _id : string;
         title : string;
-        description : string;
+        text : string;
+        isMeetup : boolean;
         category : string;
         imageUrl : string;
     }
 
-     const ViewNotif = useRef<HTMLDivElement>(null);
+     const ViewNotIf = useRef<HTMLDivElement>(null);
 
 
     const [NotifContainer,setNotifContainer] = useState<NotifData[]>([]);
@@ -58,10 +59,10 @@ function Notification(){
     },[]);
 
 
-    async function Read(Notif: any){
+    async function Read(NotId: any){
 
          try {
-            const response = await fetch(buildAPIPath(`api/notifications/${Notif.notificationId}/read`),
+            const response = await fetch(buildAPIPath(`api/notifications/${NotId}/read`),
                 { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
@@ -147,12 +148,12 @@ function Notification(){
 
     async function View(Notif : any){
 
-        if (ViewNotif.current){
-            ViewNotif.current.style.visibility = 'visible';
+        if (ViewNotIf.current){
+            ViewNotIf.current.style.visibility = 'visible';
         }
         setviewNotifId(Notif.notificationId)
         setNotifTitle(Notif.title);
-        setNotifDescription(Notif.description);
+        setNotifDescription(Notif.text);
         setNotifCategory(Notif.category);
         setNotifImageUrl(Notif.imageUrl);
 
@@ -199,17 +200,17 @@ function Notification(){
             <p>{itemUSERID}</p>
             <div id = "NotifPage">
                 {NotifContainer.map(NotifContainer => (
-                    <div key = {NotifContainer.notificationId} className = "NotifContainers">
-                        <input type = "text" id = "NotificationTitle" className = "NotTitle"  readOnly/>
-                        <input type = "text" id = "NotificationMeetup" className = "NotTitle"  readOnly/>
+                    <div key = {NotifContainer._id} className = "NotifContainers">
+                        <input type = "text" id = "NotificationTitle" className = "NotTitle" value = {NotifContainer.text} readOnly/>
+                        <input type = "text" id = "NotificationMeetup" className = "NotTitle" value = {NotifContainer.isMeetup} readOnly/>
                         <button type = "button" id = "NotificationData" onClick = {() => View(NotifContainer)}>View Report</button>
-                        <button type = "button" id = "NotificationData" onClick = {() => Read(NotifContainer)}>Read</button>
-                        <button type = "button" id = "NotificationData" onClick = {() => Delete(NotifContainer.notificationId)}>Delete</button>
+                        <button type = "button" id = "NotificationData" onClick = {() => Read(NotifContainer._id)}>Read</button>
+                        <button type = "button" id = "NotificationData" onClick = {() => Delete(NotifContainer._id)}>Delete</button>
                     </div>
                 ))}
             
             </div>
-            <div id = "ViewNotif" ref = {ViewNotif}>
+            <div id = "ViewNotIf" ref = {ViewNotIf}>
 
                 <input type = "text" id = "NotifTitle" className = "NotifData" value = {NotifTitle} readOnly/>
                 <input type = "text" id = "NotifDesc" className = "NotifData" value = {NotifDescription} readOnly/>
