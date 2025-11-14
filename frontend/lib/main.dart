@@ -229,6 +229,7 @@ class LoginFormState extends State<LoginForm> {
                   firstName: data['firstName'],
                   lastName: data['lastName'],
                   email: _loginController.text,
+                  userId: data['userId']
                 ),
               ),
             );

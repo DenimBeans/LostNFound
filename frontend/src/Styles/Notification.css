@@ -1,0 +1,54 @@
+#NotificationMain{
+width: 80%;
+margin-left: 10%;
+height: 75vh;
+background-color: rgb(101, 101, 101);
+flex-direction: column;
+
+border-width: 3px;
+border-radius: 20px;
+border-style:solid;
+border-color:black;
+}
+
+#NotifPage{
+height: 50vh;
+width: 50%;
+background-color: rgb(101, 101, 101);
+flex-direction: column;
+float: left;
+overflow-y: auto;
+overflow-x: auto;
+border-bottom: 5px solid rgb(50, 50, 50);
+}
+
+#ViewNotIf{
+width: 80%;
+background-color: rgb(101, 101, 101);
+height: 90vh;
+
+flex-direction: column;
+z-index: 3;
+display: flex;
+visibility: hidden;
+
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+
+border-width: 3px;
+border-radius: 20px;
+border-style:solid;
+border-color:black;
+
+overflow-y: auto;
+}
+
+#buttonholder
+{ 
+    display: flex;
+    clear: both;
+    margin-top: 30px;
+    height: 45px;
+}

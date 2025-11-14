@@ -24,3 +24,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+/frontend/.dart_tool
+frontend/.flutter-plugins-dependencies
+/frontend/build

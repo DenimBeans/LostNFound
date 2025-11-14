@@ -33,46 +33,19 @@ class ItemSearchState extends State<ItemSearch> {
   String _errorMessage = '';
   bool _isLoading = false;
 
-  Future<void> _search() async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
+  Future<List<Item>> get itemsFuture => searchItems();
 
-    try {
-      final response = await http.post(
-        Uri.parse('http://174.138.65.216:4000/api/items'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({}),
-      );
+  Future<List<Item>> searchItems() async {
+    final response = await http.get(
+      Uri.parse('http://174.138.65.216:4000/api/items'),
+      headers: {'Content-Type': 'application/json'},
+    );
 
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-
-        if (data['error'] == null || data['error'].isEmpty) {
-          if (mounted) {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text('Search complete!')));
-          }
-        } else {
-          setState(() {
-            _errorMessage = data['error'];
-          });
-        }
-      } else {
-        setState(() {
-          _errorMessage = 'Failed to search.';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _errorMessage = 'Network error. Please check your connection.';
-      });
-    } finally {
-      setState(() {
-        _isLoading = false;
-      });
+    if (response.statusCode == 201) {
+      final data = jsonDecode(response.body);
+      return data.map((e) =>Item.fromJson(e)).toList();
+    } else {
+      throw Exception('Failted to load lost items');
     }
   }
 
@@ -81,20 +54,64 @@ class ItemSearchState extends State<ItemSearch> {
     return SingleChildScrollView(
       child: Column(
         children: [
+          FutureBuilder<List<Item>>(
+            future: itemsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // until data is fetched, show loader
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasData) {
+                // once data is fetched, display it on screen (call buildPosts())
+                final items = snapshot.data!;
+                return tempBuildList(items);
+              } else {
+                // if no data, show simple Text
+                return const Text("No data available");
+              }
+            }
+          ),
+          
           const SizedBox(height: 20),
           InputTextField(label: 'Search Item', isObscure: false),
           const SizedBox(height: 20),
-          SizedBox(width: 350, height: 250, child: const SearchMap()),
+          //SizedBox(width: 350, height: 250, child: const SearchMap()),
           const SizedBox(height: 20),
           // Search results will be populated from API
         ],
       ),
     );
   }
+  // function to display fetched data on screen
+  Widget tempBuildList(List<Item> items) {
+    // ListView Builder to show data in a list
+    return ListView.builder(
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return Container(
+          color: Colors.grey.shade300,
+          margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+          padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+          height: 100,
+          width: double.maxFinite,
+          child: Row(
+            children: [
+              Expanded(flex: 1, child: Text(item.title!)),
+              SizedBox(width: 10),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
 
 class SearchMap extends StatefulWidget {
-  const SearchMap({super.key});
+  const SearchMap({
+    super.key,
+    required this.items
+  });
+  final List<Item> items;
 
   @override
   State<SearchMap> createState() => _SearchMapState();

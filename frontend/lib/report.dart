@@ -14,12 +14,14 @@ class ItemReport extends StatefulWidget {
   final String firstName;
   final String lastName;
   final String email;
+  final String userId;
 
   const ItemReport({
     super.key,
     required this.firstName,
     required this.lastName,
     required this.email,
+    required this.userId
   });
 
   @override
@@ -32,9 +34,9 @@ class ItemReportState extends State<ItemReport> {
   final _itemReportKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descripController = TextEditingController();
+  final TextEditingController _imgURLController = TextEditingController();
   String _categoryText = '';
   final TextEditingController _imgController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
   LatLng _itemPosition = LatLng(28.6024274, -81.2000599);  //  Initial value UCF center
   String _errorMessage = '';
   bool _isLoading = false;
@@ -54,16 +56,17 @@ class ItemReportState extends State<ItemReport> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://174.138.65.216:4000/api/items'),
+        Uri.parse('http://knightfind.xyz:4000/api/items'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'title': _titleController.text,
           'description': _descripController.text,
           'category': _categoryText,
-          'imageUrl': _imgController.text,
-          'locationText': _locationController.text,
-          'reporterName': widget.firstName,
-          'reporterEmail': widget.email,
+          'imageUrl': _imgURLController.text,
+          //'locationText': _locationController.text,
+          'userId' : widget.userId,
+          //'reporterName': widget.firstName,
+          //'reporterEmail': widget.email,
           'lat': _itemPosition.latitude,
           'lng': _itemPosition.longitude
         }),
@@ -124,9 +127,9 @@ class ItemReportState extends State<ItemReport> {
               controller: _descripController,
             ),
             InputTextField(
-              label: 'Building / Floor / Classroom Number',
+              label: 'Image URL',
               isObscure: false,
-              controller: _locationController,
+              controller: _imgURLController,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(
