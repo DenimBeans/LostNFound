@@ -215,9 +215,9 @@ function Notification(){
                 <input type = "text" id = "NotifDesc" className = "NotifData" value = {NotifDescription} readOnly/>
                 <input type = "text" id = "NotifCat" className = "NotifData" value = {NotifCategory} readOnly/>
                 <input type = "text" id = "NotifImage" className = "NotifData" value = {NotifImageUrl} readOnly/>
-                <input type = "button" id = "NotifAccept" className = "NotifButton" onClick = {() => ReturnNotif(viewNotifId,"Accept")}>Accept</input>
-                <input type = "button" id = "NotifContest" className = "NotifContest">Contest</input>
-                <input type = "button" id = "NotifDeny" className = "NotifDeny" onClick = {() => ReturnNotif(viewNotifId,"Deny")}>Deny</input>
+                <button type = "button" id = "NotifAccept" className = "NotifButton" onClick = {() => ReturnNotif(viewNotifId,"Accept")}>Accept</button>
+                <button type = "button" id = "NotifContest" className = "NotifContest">Contest</button>
+                <button type = "button" id = "NotifDeny" className = "NotifDeny" onClick = {() => ReturnNotif(viewNotifId,"Deny")}>Deny</button>
 
             </div>
             <div id = "buttonholder">
