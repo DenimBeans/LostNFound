@@ -39,17 +39,17 @@ class ItemSearchState extends State<ItemSearch> {
     final queryParams = {
       //  Using UCF's coordinates for now
       //  Eventually will need to be replaced with user coords
-      'queryLat':  28.6024274,
-      'queryLong': -81.2000599,
-      'queryRad': 5
+      'lat':  '28.6024274',
+      'lng': '-81.2000599',
+      'radius': '5'
     };
 
     final response = await http.get(
-      Uri.http('http://174.138.65.216:4000', '/api/items', queryParams),
+      Uri.http('174.138.65.216:4000', '/api/items/nearby', queryParams),
       headers: {'Content-Type': 'application/json'},
     );
 
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       return data.map((e) =>Item.fromJson(e)).toList();
     } else {
