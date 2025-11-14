@@ -1,22 +1,31 @@
-//Uncomment as needed. - Jean
-
 import React, { useState} from 'react';
 import { buildAPIPath } from './Path';
 import {useEffect} from 'react';
-//import {useRef} from 'react';
+import {useRef} from 'react';
 
 function Notification(){
 
     interface NotifData{
-        _id : string;
+        notificationId : string;
         title : string;
-        
+        description : string;
+        category : string;
+        imageUrl : string;
     }
+
+     const ViewNotif = useRef<HTMLDivElement>(null);
 
 
     const [NotifContainer,setNotifContainer] = useState<NotifData[]>([]);
 
     const [itemUSERID, setItemUSERIDValue] = React.useState('');
+
+
+    //View notification
+    const [NotifTitle, setNotifTitle] = React.useState('');
+    const [NotifDescription, setNotifDescription] = React.useState('');
+    const [NotifCategory, setNotifCategory] = React.useState('');
+    const [NotifImageUrl, setNotifImageUrl] = React.useState('');
 
     async function AllNotif(id: any){
         try {
@@ -47,24 +56,132 @@ function Notification(){
     },[]);
 
 
+    async function Read(Notif: any){
 
-//Paragraph tag with userID added to appease compiler.
-//Remove once itemUSERID is used elsewhere - Jean
+         try {
+            const response = await fetch(buildAPIPath(`api/notifications/${Notif.notificationId}/read`),
+                { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
+
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if (res.error != '') {
+                console.log(res.error)
+            }
+            else {
+                
+            }
+        }
+        catch (error: any) {
+            console.log(error.toString());
+        }
+    };
+
+    async function Delete(NotId: any){
+         try {
+            const response = await fetch(buildAPIPath(`api/notifications/${NotId}`),
+                { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
+            
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if(res.error != ''){
+                console.log(res.error)
+            }
+            else{
+                setNotifContainer(NotifContainer.filter((NotifContainer) => NotifContainer.notificationId != NotId))
+            }
+
+            
+        }
+        catch (error: any) {
+            console.log(error.toString());
+        }
+    }
+
+
+    async function ReadAll(){
+        try {
+            const response = await fetch(buildAPIPath(`api/users/${itemUSERID}/notifications/read-all`),
+                { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
+
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if (res.error != '') {
+                console.log(res.error)
+            }
+            else {
+                
+            }
+        }
+        catch (error: any) {
+            console.log(error.toString());
+        }
+    };
+
+    async function DeleteAll(){
+        try {
+            const response = await fetch(buildAPIPath(`api/users/${itemUSERID}/notifications`),
+                { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
+            
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if(res.error != ''){
+                console.log(res.error)
+            }
+            else{
+                setNotifContainer([])
+            }
+
+            
+        }
+        catch (error: any) {
+            console.log(error.toString());
+        }
+    };
+
+    async function View(Notification : any){
+
+        if (ViewNotif.current){
+            ViewNotif.current.style.visibility = 'visible';
+        }
+        setNotifTitle(Notification.title);
+        setNotifDescription(Notification.description);
+        setNotifCategory(Notification.category);
+        setNotifImageUrl(Notification.imageUrl);
+
+    }
+
     return(
         <div id = "NotificationMain">
             <p>{itemUSERID}</p>
             <div id = "LostItemPage">
                 {NotifContainer.map(NotifContainer => (
-                    <div key = {NotifContainer._id} className = "NotifContainers">
+                    <div key = {NotifContainer.notificationId} className = "NotifContainers">
                         <input type = "text" id = "NotificationTitle" className = "NotTitle"  readOnly/>
-                        <button type = "button" id = "NotificationData" >View Report</button>
-                        <button type = "button" id = "NotificationDelete" >Delete</button>
+                        <input type = "text" id = "NotificationMeetup" className = "NotTitle"  readOnly/>
+                        <button type = "button" id = "NotificationData" onClick = {() => View(NotifContainer)}>View Report</button>
+                        <button type = "button" id = "NotificationData" onClick = {() => Read(NotifContainer)}>Read</button>
+                        <button type = "button" id = "NotificationData" onClick = {() => Delete(NotifContainer.notificationId)}>Delete</button>
                     </div>
                 ))}
-                
+            
+            </div>
+            <div id = "ViewNotif" ref = {ViewNotif}>
+                <input type = "text" id = "NotifTitle" className = "NotifData" value = {NotifTitle} readOnly/>
+                <input type = "text" id = "NotifDesc" className = "NotifData" value = {NotifDescription} readOnly/>
+                <input type = "text" id = "NotifCat" className = "NotifData" value = {NotifCategory} readOnly/>
+                <input type = "text" id = "NotifImage" className = "NotifData" value = {NotifImageUrl} readOnly/>
+                <input type = "button" id = "NotifAccept" className = "NotifButton">Accept</input>
+                <input type = "button" id = "NotifContest" className = "NotifContest">Contest</input>
+                <input type = "button" id = "NotifDeny" className = "NotifDeny">Deny</input>
+
             </div>
             <div id = "buttonholder">
-                <button type = "button" id = "deleteAllNotif">Delete</button>
+                <button type = "button" className = "bottombutton" onClick = {ReadAll}>Read-ALL</button>
+                <button type = "button" className = "bottombutton" onClick = {DeleteAll}>Delete-ALL</button>
             </div>
         </div>
     );
