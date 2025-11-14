@@ -154,6 +154,41 @@ function Notification(){
 
     }
 
+    async function ReturnNotif(answer : string){
+        if (answer == "Accept"){
+            try {
+            const response = await fetch(buildAPIPath(`api/users/${id}/notifications?isRead=true&isMeetup=true`),
+                { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+            
+            }
+            
+        
+        catch (error: any) {
+            console.log("Frontend Error");
+        }
+        }
+        else if (answer == "Deny"){
+            try {
+            const response = await fetch(buildAPIPath(`api/users/${id}/notifications?isRead=true&isMeetup=false`),
+                { method: 'GET', headers: { 'Content-Type': 'application/json' } });
+
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+            
+            }
+            
+        
+        catch (error: any) {
+            console.log("Frontend Error");
+        }
+        }
+        
+
+    }
+
     return(
         <div id = "NotificationMain">
             <p>{itemUSERID}</p>
@@ -170,13 +205,14 @@ function Notification(){
             
             </div>
             <div id = "ViewNotif" ref = {ViewNotif}>
+
                 <input type = "text" id = "NotifTitle" className = "NotifData" value = {NotifTitle} readOnly/>
                 <input type = "text" id = "NotifDesc" className = "NotifData" value = {NotifDescription} readOnly/>
                 <input type = "text" id = "NotifCat" className = "NotifData" value = {NotifCategory} readOnly/>
                 <input type = "text" id = "NotifImage" className = "NotifData" value = {NotifImageUrl} readOnly/>
-                <input type = "button" id = "NotifAccept" className = "NotifButton">Accept</input>
+                <input type = "button" id = "NotifAccept" className = "NotifButton" onClick = {() => ReturnNotif("Accept")}>Accept</input>
                 <input type = "button" id = "NotifContest" className = "NotifContest">Contest</input>
-                <input type = "button" id = "NotifDeny" className = "NotifDeny">Deny</input>
+                <input type = "button" id = "NotifDeny" className = "NotifDeny" onClick = {() => ReturnNotif("Deny")}>Deny</input>
 
             </div>
             <div id = "buttonholder">
