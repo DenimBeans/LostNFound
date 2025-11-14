@@ -145,16 +145,16 @@ function Notification(){
         }
     };
 
-    async function View(Notification : any){
+    async function View(Notif : any){
 
         if (ViewNotif.current){
             ViewNotif.current.style.visibility = 'visible';
         }
-        setviewNotifId(Notification.notificationId)
-        setNotifTitle(Notification.title);
-        setNotifDescription(Notification.description);
-        setNotifCategory(Notification.category);
-        setNotifImageUrl(Notification.imageUrl);
+        setviewNotifId(Notif.notificationId)
+        setNotifTitle(Notif.title);
+        setNotifDescription(Notif.description);
+        setNotifCategory(Notif.category);
+        setNotifImageUrl(Notif.imageUrl);
 
     };
 
