@@ -6,7 +6,7 @@ import '../Styles/MainPage.css';
 import '../Styles/FrontPage.css';
 
 //Map imports - Jean
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import {LatLng, Icon} from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import markerIconPng from "../assets/marker-icon.png";
@@ -15,6 +15,8 @@ function CardUI() {
     const AddPopupRef = useRef<HTMLDivElement>(null);
     const EditPopupRef = useRef<HTMLDivElement>(null);
     const ViewPopupRef = useRef<HTMLDivElement>(null);
+
+    const imageViewRef = useRef<HTMLDivElement>(null);
 
     interface ContainerData{
         _id : string;
@@ -33,6 +35,9 @@ function CardUI() {
 
     const [CurEditItem,setCurEditItem] = React.useState('');
 
+    const ucfCoords:LatLng = new LatLng(28.6024, -81.2001);
+    const [position, setPosition] = useState(ucfCoords);
+
     //SearchBar
     const [status,setstatus] = React.useState('');
     const [Category,setCategory] = React.useState('');
@@ -43,6 +48,7 @@ function CardUI() {
     const [VitemDesc, setItemDescValueV] = React.useState('');
     const [VitemCat, setItemCatValueV] = React.useState('');
     const [VitemImage, setItemImageValueV] = React.useState('');
+    const [viewPosition, setItemPositionValueV] = React.useState(ucfCoords);
 
 
     //Edit
@@ -61,9 +67,6 @@ function CardUI() {
     const [itemLocation, setLocationValue] = React.useState('');
     const [itemUSERID, setItemUSERIDValue] = React.useState('');
 
-    const ucfCoords:LatLng = new LatLng(28.6024, -81.2001);
-    const [position, setPosition] = useState(ucfCoords);
-
      async function AddItemPage(e : any): Promise<void>{
          e.preventDefault();
 
@@ -74,14 +77,25 @@ function CardUI() {
 
 
     async function ItemPage(Item: any): Promise<void>{
+
+        console.log(Item.location.coordinates[0], Item.location.coordinates[1]);
+
         if (ViewPopupRef.current){
-            
             setItemNameValueV(Item.title);
+            setItemPositionValueV(new LatLng(Item.location.coordinates[1], Item.location.coordinates[0]));
             setItemDescValueV(Item.description);
             setItemCatValueV(Item.category);
             setItemImageValueV(Item.imageUrl);
             
             ViewPopupRef.current.style.visibility = 'visible';
+
+            if (imageViewRef.current)
+            {
+                if(Item.imageUrl == "")
+                imageViewRef.current.style.display = 'none';
+                else
+                    imageViewRef.current.style.display = 'flex';
+            }
         }
     }
 
@@ -126,6 +140,7 @@ function CardUI() {
         setItemImageValue('');
         setLocationValue('');
         setRepMessage('');
+        searchItem(itemUSERID);
     }
 
 
@@ -213,11 +228,10 @@ function CardUI() {
         }
     };
 
-    async function searchItem(e: any): Promise<void> {
-        e.preventDefault();
+    async function searchItem(id: any){
 
         try {
-            const response = await fetch(buildAPIPath(`api/users/${itemUSERID}/items`),
+            const response = await fetch(buildAPIPath(`api/users/${id}/items`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
@@ -273,10 +287,6 @@ function CardUI() {
         setItemImageValue(e.target.value);
     }
 
-    function handleLocationTextChange(e: any): void {
-        setLocationValue(e.target.value);
-    }
-
     //Edit
     function EdithandleItemTextChange(e: any): void {
         setItemNameValueE(e.target.value);
@@ -302,7 +312,13 @@ function CardUI() {
         if(Data != null){
             const UserData = JSON.parse(Data);
             setItemUSERIDValue(UserData?.userId);
-            searchItem(true);
+            
+            searchItem(UserData?.userId);
+
+                /*
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+            setItemContainer(res.results);*/
         }
         else{
             window.location.href = '/';
@@ -350,6 +366,14 @@ function CardUI() {
         )
     }
 
+function ChangeView({center, zoom }: any) {
+    const map = useMap();
+    useEffect(() => {
+        map.setView(center, zoom);
+    }, [center, zoom, map]);
+  return null;
+}
+
     return (
         <div id="MainUIDiv">
 
@@ -360,9 +384,9 @@ function CardUI() {
                     <div key = {ItemContainer._id} className = "ItemContainers">
                         <input type = "text" id = "ContainerTitle" className = "containerInput" value = {ItemContainer.title} readOnly/>
                         <input type = "text" id = "ContainerStatus" className = "containerInput" value = {ItemContainer.status} readOnly/>
-                        <button type = "button" id = "ContainerData" onClick = {() => ItemPage(ItemContainer)}>View Report</button>
-                        <button type = "button" id = "ContainerEdit" onClick = {() => EditPage(ItemContainer)}>Edit</button>
-                        <button type = "button" id = "ContainerDelete" onClick = {() => DeleteItem(ItemContainer._id)}>Delete</button>
+                        <button type = "button" id = "ContainerData" className = "containerBtn" onClick = {() => {ItemPage(ItemContainer)}}>View Report</button>
+                        <button type = "button" id = "ContainerEdit" className = "containerBtn" onClick = {() => EditPage(ItemContainer)}>Edit</button>
+                        <button type = "button" id = "ContainerDelete" className = "containerBtn" onClick = {() => DeleteItem(ItemContainer._id)}>Delete</button>
                     </div>
                 ))}
                 
@@ -370,19 +394,20 @@ function CardUI() {
 
             <div id = "SearchBar">
                 <select id = 'statusFilter' className = "filter" onChange = {handleStatusChange}>
-                    <option className = "default" value = " ">Filter By Status...</option>
+                    <option className = "default" value = "">Filter By Status...</option>
                     <option value = "lost">Lost</option>
                     <option value = "found">Found</option>
                 </select>
                 <select id = 'categoryFilter' className = "filter" onChange = {handleCategoryChange}>
-                    <option className = "default" value = " ">Filter By Category...</option>
+                    <option className = "default" value = "">Filter By Category...</option>
                     <option value = "Electronic">Electronic</option>
                     <option value = "Apparal">Apparal</option>
                     <option value = "Container">Container</option>
                     <option value = "Personal">Personal</option>
+                    <option value = "Other">Other</option>
                 </select>
                 <input type = "text" id = "Searchtab" placeholder = "Item Name..." onChange = {handleSearchItemChange}/>
-                <button type = "button" id = "SearchItem" onClick = {searchItemSpecific}>Search</button>
+                <button type = "button" id = "SearchItem" className ="button" onClick = {searchItemSpecific}>Search</button>
             </div>
 
             <div id = "AddItemPopup" ref = {AddPopupRef}>
@@ -410,11 +435,8 @@ function CardUI() {
                     onChange={handleDescTextChange}>
                 </textarea>
 
-                <input type="text" id = "locationText" value= {itemLocation} placeholder = "Building Name/Classroom Number/Floor" 
-                    onChange = {handleLocationTextChange}></input>
-
                 <select id = 'category' className = "filter" value = {itemCat} onChange = {handleItemCatChange}>
-                    <option value = " ">Select Option</option>
+                    <option value = "">Select Option...</option>
                     <option value = "Electronic">Electronic</option>
                     <option value = "Apparal">Apparal</option>
                     <option value = "Container">Container</option>
@@ -475,9 +497,13 @@ function CardUI() {
 
             <div id = "ViewItemPopup" ref = {ViewPopupRef}>
                 <button type = "button" id="ViewReportView" onClick={() => ViewexitReport()}>X</button>
-                <h2 id = 'reportHeader'>Lost Item Report</h2>
+                <h2 id = 'reportHeader'>Item Report: {VitemTitle}</h2>
 
                 <span id="itemAddResult">{repMessage}</span>
+
+                <div id = "imgContainer" ref = {imageViewRef}>
+                    <img id = "reportImg" src = {VitemImage}/>
+                </div>
 
                 <MapContainer id = "map" center = {ucfCoords} zoom={17} scrollWheelZoom={false} placeholder>
                     <TileLayer
@@ -485,32 +511,32 @@ function CardUI() {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
 
-                    <DraggableMarker/>
+                    <Marker position = {viewPosition}/>
+                    <ChangeView center = {viewPosition}/>
                 </MapContainer>
 
-                <input type="text" id="itemTitle" value= {VitemTitle} placeholder="Item Name" readOnly/>
 
+
+                <label id = "viewLabel" htmlFor = "Desc">Description</label>                
                 <textarea 
-                    id="Desc" 
-                    value = {VitemDesc}
-                    placeholder="Item Description">
+                    id="viewDesc" 
+                    value = {VitemDesc}>
                     readOnly
                 </textarea>
 
+                <label id = "viewLabel" htmlFor = "CategoryView">Category</label>
                 <input type = "text" id = "CategoryView" className = "filter" value = {VitemCat} readOnly/>
-                    
-                <input type="text" id = "ImageUp" value = {VitemImage} placeholder = "Image URL" readOnly/>
                 
             </div>
+
+            <br />
+                <span id="itemAddResult">{message}</span>
+            <br />
 
            <div id = "ButtonHolster">
                 <input type="button" id="addItemButton" className="button"
                     onClick={AddItemPage} value = "Make a Report"/>
            </div>
-
-            <br />
-                <span id="itemAddResult">{message}</span>
-            <br />
             
         </div>
 
