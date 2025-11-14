@@ -35,6 +35,7 @@ function Notification(){
             let txt = await response.text();
             let res = JSON.parse(txt);
             setNotifContainer(res.results);
+            console.log(id);
             }
             
         
