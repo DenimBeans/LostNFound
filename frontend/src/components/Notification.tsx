@@ -52,10 +52,10 @@ function Notification(){
 //Remove once itemUSERID is used elsewhere - Jean
     return(
         <div id = "NotificationMain">
-            <p value = {itemUSERID}></p>
+            <p>{itemUSERID}</p>
             <div id = "LostItemPage">
                 {NotifContainer.map(NotifContainer => (
-                    <div key = {NotifContainer.itemId} className = "NotifContainers">
+                    <div key = {NotifContainer} className = "NotifContainers">
                         <input type = "text" id = "NotificationTitle" className = "NotTitle"  readOnly/>
                         <button type = "button" id = "NotificationData" >View Report</button>
                         <button type = "button" id = "NotificationDelete" >Delete</button>
