@@ -15,12 +15,14 @@ class AppHome extends StatefulWidget {
   final String firstName;
   final String lastName;
   final String email;
+  final String userId;
 
   const AppHome({
     super.key,
     required this.firstName,
     required this.lastName,
     required this.email,
+    required this.userId
   });
 
   @override
@@ -79,6 +81,7 @@ class _AppHomeState extends State<AppHome> {
           firstName: widget.firstName,
           lastName: widget.lastName,
           email: widget.email,
+          userId: widget.userId
         ),
         ItemSearch(
           firstName: widget.firstName,
