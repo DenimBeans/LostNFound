@@ -52,7 +52,7 @@ class MyApp extends StatelessWidget {
             padding: const EdgeInsets.only(top: 35.0),
             child: Image.asset(
               'flutter-assets/knightfindlogo.png',
-              fit: BoxFit.contain
+              fit: BoxFit.contain,
             ),
           ),
         ),
@@ -217,7 +217,7 @@ class LoginFormState extends State<LoginForm> {
         final data = jsonDecode(response.body);
 
         if (data['error'] == null || data['error'].isEmpty) {
-          // Login successful, navigate to second page
+          // Login successful, navigate to home page
           if (mounted) {
             Navigator.pushReplacement(
               context,
@@ -226,7 +226,7 @@ class LoginFormState extends State<LoginForm> {
                   firstName: data['firstName'],
                   lastName: data['lastName'],
                   email: _loginController.text,
-                  userId: data['userId']
+                  userId: data['userId'],
                 ),
               ),
             );
