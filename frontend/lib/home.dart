@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:io';
@@ -22,7 +23,7 @@ class AppHome extends StatefulWidget {
     required this.firstName,
     required this.lastName,
     required this.email,
-    required this.userId
+    required this.userId,
   });
 
   @override
@@ -81,7 +82,7 @@ class _AppHomeState extends State<AppHome> {
           firstName: widget.firstName,
           lastName: widget.lastName,
           email: widget.email,
-          userId: widget.userId
+          userId: widget.userId,
         ),
         ItemSearch(
           firstName: widget.firstName,
@@ -171,7 +172,7 @@ class MapUCF extends StatefulWidget {
     super.key,
     required this.pontoCentral,
     this.markers,
-    this.dragMarker
+    this.dragMarker,
   });
 
   final LatLng pontoCentral;
@@ -208,10 +209,10 @@ class _MapUCFState extends State<MapUCF> {
           userAgentPackageName: 'com.example.flutter_map_example',
         ),
         // Marker Layer (optionally draggable)
-        if(widget.dragMarker != null)
+        if (widget.dragMarker != null)
           DragMarkers(markers: widget.dragMarker ?? [])
         else
-          MarkerLayer(markers: widget.markers ?? [])
+          MarkerLayer(markers: widget.markers ?? []),
       ],
     );
   }
@@ -236,9 +237,9 @@ class Item {
     this.imageUrl,
     this.locationText,
     this.lat,
-    this.long
+    this.long,
   });
-  
+
   factory Item.fromJson(Map<String, dynamic> json) {
     return Item(
       title: json['title'],
@@ -248,7 +249,7 @@ class Item {
       locationText: json['locationText'] ?? 'No location description given.',
       reporterName: json['repoterName'],
       lat: json['lat'] ?? 28.6024274,
-      long: json['long'] ?? -81.2000599
+      long: json['long'] ?? -81.2000599,
     );
   }
 }
@@ -257,15 +258,43 @@ class Item {
 class AboutModal extends StatelessWidget {
   const AboutModal({super.key});
 
+  Future<void> _launchURL() async {
+    final Uri url = Uri.parse('https://github.com/DenimBeans/LostNFound');
+    await launchUrl(url);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SimpleDialog(
       title: const Text('About'),
       children: <Widget>[
-        const Padding(
-          padding: EdgeInsets.all(20.0),
-          child: Text(
-            'Created for COP 4331\n\nGithub: https://github.com/DenimBeans/LostNFound',
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Created for COP 4331',
+                style: TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'GitHub:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 4),
+              GestureDetector(
+                onTap: _launchURL,
+                child: const Text(
+                  'https://github.com/DenimBeans/LostNFound',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ],
