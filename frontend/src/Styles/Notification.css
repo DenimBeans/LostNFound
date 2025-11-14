@@ -81,5 +81,5 @@ overflow-y: auto;
     clear: both;
     margin-top: 30px;
     height: 45px;
-    visibility: hidden;
+    visibility: visible;
 }
