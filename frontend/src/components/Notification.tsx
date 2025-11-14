@@ -155,7 +155,7 @@ function Notification(){
 
     }
 
-    async function ReturnNotif(id,answer : string){
+    async function ReturnNotif(id: any,answer : string){
         if (answer == "Accept"){
             try {
             const response = await fetch(buildAPIPath(`api/users/${id}/notifications?isRead=true&isMeetup=true`),
