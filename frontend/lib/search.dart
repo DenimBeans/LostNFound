@@ -36,8 +36,16 @@ class ItemSearchState extends State<ItemSearch> {
   Future<List<Item>> get itemsFuture => searchItems();
 
   Future<List<Item>> searchItems() async {
+    final queryParams = {
+      //  Using UCF's coordinates for now
+      //  Eventually will need to be replaced with user coords
+      'queryLat':  28.6024274,
+      'queryLong': -81.2000599,
+      'queryRad': 5
+    };
+
     final response = await http.get(
-      Uri.parse('http://174.138.65.216:4000/api/items'),
+      Uri.http('http://174.138.65.216:4000', '/api/items', queryParams),
       headers: {'Content-Type': 'application/json'},
     );
 
@@ -45,7 +53,7 @@ class ItemSearchState extends State<ItemSearch> {
       final data = jsonDecode(response.body);
       return data.map((e) =>Item.fromJson(e)).toList();
     } else {
-      throw Exception('Failted to load lost items');
+      throw Exception('Failted to load nearby lost items');
     }
   }
 
