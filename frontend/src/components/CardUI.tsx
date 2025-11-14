@@ -25,7 +25,6 @@ function CardUI() {
         category : string;
         status : string;
         imageUrl: string;
-        locationText: string;
     }
 
     const [message, setMessage] = useState('');
@@ -56,7 +55,6 @@ function CardUI() {
     const [EitemDesc, setItemDescValueE] = React.useState('');
     const [EitemCat, setItemCatValueE] = React.useState('');
     const [EitemImage, setItemImageValueE] = React.useState('');
-    const [EitemLocation, setLocationValueE] = React.useState('');
 
 
     //Add
@@ -106,7 +104,7 @@ function CardUI() {
             setItemDescValueE(Item.description);
             setItemCatValueE(Item.category);
             setItemImageValueE(Item.imageUrl);
-            setLocationValueE(Item.locationText);
+            setPosition(new LatLng(Item.location.coordinates[1], Item.location.coordinates[0]));
             EditPopupRef.current.style.visibility = 'visible';
         }
     }
@@ -140,6 +138,7 @@ function CardUI() {
         setItemImageValue('');
         setLocationValue('');
         setRepMessage('');
+        setPosition(ucfCoords);
         searchItem(itemUSERID);
     }
 
@@ -148,8 +147,8 @@ function CardUI() {
 
         
         
-        let obj = { title: itemTitle,description: itemDesc,category: itemCat,imageUrl: itemImage,lat: position.lat,
-            lng: position.lng, locationText: itemLocation,userId: itemUSERID };
+        let obj = { title: EitemTitle,description: EitemDesc,category: EitemCat,imageUrl: EitemImage, 
+            location: {type: "Point", coordinates: [position.lng, position.lat]}, userId: itemUSERID };
         let js = JSON.stringify(obj);
 
          try {
@@ -163,11 +162,7 @@ function CardUI() {
                 setRepMessage(res.error)
             }
             else {
-                if (EditPopupRef.current){
-                    EditPopupRef.current.style.display = 'none';
-                }
-
-                resetFields();
+                exitReportEdit();
             }
         }
         catch (error: any) {
@@ -301,10 +296,6 @@ function CardUI() {
         setItemImageValueE(e.target.value);
     }
 
-    function EdithandleLocationTextChange(e: any): void {
-        setLocationValueE(e.target.value);
-    }
-
 
     //Grab userid
     useEffect(() => {
@@ -358,7 +349,7 @@ function CardUI() {
                 <Popup minWidth={90}>
                     <span onClick={toggleDraggable}>
                     {draggable
-                        ? `Marker is draggable!`
+                        ? `Marker is draggable! ${position}`
                         : 'Click here to make marker draggable.'}
                     </span>
                 </Popup>
@@ -401,7 +392,7 @@ function ChangeView({center, zoom }: any) {
                 <select id = 'categoryFilter' className = "filter" onChange = {handleCategoryChange}>
                     <option className = "default" value = "">Filter By Category...</option>
                     <option value = "Electronic">Electronic</option>
-                    <option value = "Apparal">Apparal</option>
+                    <option value = "Apparel">Apparel</option>
                     <option value = "Container">Container</option>
                     <option value = "Personal">Personal</option>
                     <option value = "Other">Other</option>
@@ -438,7 +429,7 @@ function ChangeView({center, zoom }: any) {
                 <select id = 'category' className = "filter" value = {itemCat} onChange = {handleItemCatChange}>
                     <option value = "">Select Option...</option>
                     <option value = "Electronic">Electronic</option>
-                    <option value = "Apparal">Apparal</option>
+                    <option value = "Apparel">Apparel</option>
                     <option value = "Container">Container</option>
                     <option value = "Personal">Personal</option>
                 </select>
@@ -464,6 +455,7 @@ function ChangeView({center, zoom }: any) {
                     />
 
                     <DraggableMarker/>
+                    <ChangeView center = {position} zoom = {17}/>
                 </MapContainer>
 
                 <input type="text" id="itemTitle" value= {EitemTitle} placeholder="Item Name"
@@ -476,13 +468,10 @@ function ChangeView({center, zoom }: any) {
                     onChange={EdithandleDescTextChange}>
                 </textarea>
 
-                <input type="text" id = "locationText" value = {EitemLocation} placeholder = "Building Name/Classroom Number/Floor" 
-                    onChange = {EdithandleLocationTextChange}></input>
-
                 <select id = 'category' className = "filter" value = {EitemCat} onChange = {EdithandleItemCatChange}>
                     <option value = " ">Select Option</option>
                     <option value = "Electronic">Electronic</option>
-                    <option value = "Apparal">Apparal</option>
+                    <option value = "Apparel">Apparel</option>
                     <option value = "Container">Container</option>
                     <option value = "Personal">Personal</option>
                 </select>

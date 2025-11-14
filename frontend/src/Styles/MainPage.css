@@ -17,9 +17,9 @@ width: 50%;
 background-color: rgb(101, 101, 101);
 flex-direction: column;
 float: left;
-border-bottom: 5px solid rgb(50, 50, 50);
 overflow-y: auto;
 overflow-x: auto;
+border-bottom: 5px solid rgb(50, 50, 50);
 }
 
 #homeHeader
@@ -32,9 +32,10 @@ overflow-x: auto;
 {
     margin-top: 2px;
     margin-bottom: 2px;
+    margin-left: 5px;
     display:flex;
     height: 50px;
-    width: 100%;
+    width: 99%;
     justify-content: center;
     flex-shrink: 0;
 }
@@ -49,14 +50,14 @@ overflow-x: auto;
 #ContainerTitle
 {
     border-right: 0px;
-    width: 25%;
+    width: 24%;
 
 }
 
 #ContainerStatus
 {
     text-align: center;
-    width: 25%;
+    width: 24%;
     border-left: 0px;
 }
 
