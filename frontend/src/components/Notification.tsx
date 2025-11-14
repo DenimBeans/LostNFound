@@ -29,7 +29,7 @@ function Notification(){
 
     async function AllNotif(id: any){
         try {
-            const response = await fetch(buildAPIPath(`api/users/${id}/notifications?isRead=false`),
+            const response = await fetch(buildAPIPath(`api/users/:6903d4f7e30f35fe63803500/notifications`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
@@ -41,7 +41,7 @@ function Notification(){
         catch (error: any) {
             console.log("Frontend Error");
         }
-    }
+    };
 
     useEffect(() => {
         const Data = sessionStorage.getItem('user_data');
@@ -97,7 +97,7 @@ function Notification(){
         catch (error: any) {
             console.log(error.toString());
         }
-    }
+    };
 
 
     async function ReadAll(){
@@ -153,7 +153,7 @@ function Notification(){
         setNotifCategory(Notification.category);
         setNotifImageUrl(Notification.imageUrl);
 
-    }
+    };
 
     async function ReturnNotif(id: any,answer : string){
         if (answer == "Accept"){
@@ -189,7 +189,7 @@ function Notification(){
         }
         
 
-    }
+    };
 
     return(
         <div id = "NotificationMain">
