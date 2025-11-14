@@ -50,7 +50,7 @@ function Notification(){
         if(Data != null){
             const UserData = JSON.parse(Data);
             setItemUSERIDValue(UserData?.userId);
-            //AllNotif(UserData?.userId);
+            AllNotif(UserData?.userId);
         }
         else{
             window.location.href = '/';
