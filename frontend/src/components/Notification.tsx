@@ -8,7 +8,7 @@ import {useEffect} from 'react';
 function Notification(){
 
     interface NotifData{
-        _id : string;
+        notificationId : string;
         title : string;
         
     }
@@ -47,24 +47,109 @@ function Notification(){
     },[]);
 
 
+    async function Read(Notif: any){
 
-//Paragraph tag with userID added to appease compiler.
-//Remove once itemUSERID is used elsewhere - Jean
+         try {
+            const response = await fetch(buildAPIPath(`api/notifications/${Notif.notificationId}/read`),
+                { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
+
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if (res.error != '') {
+                console.log(res.error)
+            }
+            else {
+                
+            }
+        }
+        catch (error: any) {
+            console.log(error.toString());
+        }
+    };
+
+    async function Delete(NotId: any){
+         try {
+            const response = await fetch(buildAPIPath(`api/notifications/${NotId}`),
+                { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
+            
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if(res.error != ''){
+                console.log(res.error)
+            }
+            else{
+                setNotifContainer(NotifContainer.filter((NotifContainer) => NotifContainer.notificationId != NotifId))
+            }
+
+            
+        }
+        catch (error: any) {
+            setMessage(error.toString());
+        }
+    }
+
+    async function ReadAll(){
+        try {
+            const response = await fetch(buildAPIPath(`api/users/${itemUSERID}/notifications/read-all`),
+                { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
+
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if (res.error != '') {
+                console.log(res.error)
+            }
+            else {
+                
+            }
+        }
+        catch (error: any) {
+            console.log(error.toString());
+        }
+    };
+
+    async function DeleteAll(){
+        try {
+            const response = await fetch(buildAPIPath(`api/users/${itemUSERID}/notifications`),
+                { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
+            
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if(res.error != ''){
+                console.log(res.error)
+            }
+            else{
+                setNotifContainer([])
+            }
+
+            
+        }
+        catch (error: any) {
+            setMessage(error.toString());
+        }
+    };
+
     return(
         <div id = "NotificationMain">
             <p>{itemUSERID}</p>
             <div id = "LostItemPage">
                 {NotifContainer.map(NotifContainer => (
-                    <div key = {NotifContainer._id} className = "NotifContainers">
+                    <div key = {NotifContainer.notificationId} className = "NotifContainers">
                         <input type = "text" id = "NotificationTitle" className = "NotTitle"  readOnly/>
+                        <input type = "text" id = "NotificationMeetup" className = "NotTitle"  readOnly/>
                         <button type = "button" id = "NotificationData" >View Report</button>
-                        <button type = "button" id = "NotificationDelete" >Delete</button>
+                        <button type = "button" id = "NotificationData" onClick = {() => Read(NotifContainer)}>Read</button>
+                        <button type = "button" id = "NotificationData" onClick = {() => Delete(NotifContainer.notificationId)}>Delete</button>
                     </div>
                 ))}
                 
             </div>
             <div id = "buttonholder">
-                <button type = "button" id = "deleteAllNotif">Delete</button>
+                <button type = "button" className = "bottombutton" onClick = {ReadAll}>Read-ALL</button>
+                <button type = "button" className = "bottombutton" onClick = {DeleteAll}>Delete-ALL</button>
             </div>
         </div>
     );
