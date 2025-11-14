@@ -22,7 +22,7 @@ function AccountSettings(){
     const [userUpdated, setUserUpdated] = React.useState('');
 
     //deleteinfo
-    const [deletePass, setdeletepass] = React.useState('');
+    //const [deletePass, setdeletepass] = React.useState('');
 
     //Change user info
     const [oldFirst, setoldFirst] = React.useState('');
@@ -32,9 +32,9 @@ function AccountSettings(){
     const[newPass, setnewPass] = React.useState('');
     //Handles
 
-    function handleDeletePass(e: any): void{
+    /*function handleDeletePass(e: any): void{
         setdeletepass(e.target.value);
-    }
+    }*/
 
     function handleOldFirst(e: any): void{
         setoldFirst(e.target.value);
@@ -85,7 +85,7 @@ function AccountSettings(){
             let res = JSON.parse(txt);
 
             if (res.error != '') {
-                setRepMessage(res.error)
+                console.log(res.error)
             }
             else {
                 if (EditUser.current){
@@ -110,16 +110,16 @@ function AccountSettings(){
             let res = JSON.parse(txt);
 
             if(res.error != ''){
-                setMessage(res.error)
+                console.log(res.error)
             }
             else{
-                
+                window.location.href = '/';
             }
 
             
         }
         catch (error: any) {
-            setMessage(error.toString());
+            console.log(error)
         }
     };
 
@@ -165,6 +165,7 @@ function AccountSettings(){
         }
     },[]);
 
+    //<input type = "password" id = "deletepass" className = "AccountSet" placeholder = "Confirm Password" onChange = {handleDeletePass}/>
     
     return(
         <div id = "AccountSettingsMain">
@@ -178,7 +179,7 @@ function AccountSettings(){
             </div>
             <div id = "DeleteUser">
                 <span id = "Warning">Are you absolutly sure you want to delete your account?</span>
-                <input type = "password" id = "deletepass" className = "AccountSet" placeholder = "Confirm Password" onChange = {handleDeletePass}/>
+                
                 <button type = "button" id = "deleteuser" onClick = {DeleteUserInfo}>Delete User!</button>
             </div>
             <input type = "text" id = "id" className = "AccountSet" value = {itemUSERID}  readOnly/>
