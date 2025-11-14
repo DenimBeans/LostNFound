@@ -34,3 +34,50 @@ border-color:black;
     outline-style: solid;
     outline-width: 3px;
 }
+
+#EditUser{
+    
+width: 80%;
+background-color: rgb(101, 101, 101);
+height: 90vh;
+
+flex-direction: column;
+z-index: 3;
+display: flex;
+visibility: hidden;
+
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+
+border-width: 3px;
+border-radius: 20px;
+border-style:solid;
+border-color:black;
+
+overflow-y: auto;
+}
+#DeleteUser{
+
+width: 80%;
+background-color: rgb(101, 101, 101);
+height: 90vh;
+
+flex-direction: column;
+z-index: 3;
+display: flex;
+visibility: hidden;
+
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+
+border-width: 3px;
+border-radius: 20px;
+border-style:solid;
+border-color:black;
+
+overflow-y: auto;
+}

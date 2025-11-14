@@ -3,13 +3,16 @@
 import React/*, { useState}*/ from 'react';
 import { buildAPIPath } from './Path';
 import {useEffect} from 'react';
-//import {useRef} from 'react';
+import {useRef} from 'react';
 
 import '../Styles/AccountSettings.css';
 
 
 function AccountSettings(){
+    const EditUser = useRef<HTMLDivElement>(null);
+    const DeleteUser = useRef<HTMLDivElement>(null);
 
+    //get user info
     const [itemUSERID, setItemUSERIDValue] = React.useState('');
     const [userFirst, setUserFirst] = React.useState('');
     const [userLast, setUserLast] = React.useState('');
@@ -17,6 +20,108 @@ function AccountSettings(){
     const [userVerified, setUserVerified] = React.useState('');
     const [userCreated, setUserCreated] = React.useState('');
     const [userUpdated, setUserUpdated] = React.useState('');
+
+    //deleteinfo
+    const [deletePass, setdeletepass] = React.useState('');
+
+    //Change user info
+    const [oldFirst, setoldFirst] = React.useState('');
+    const [oldLast, setoldLast] = React.useState('');
+    const [oldEmail, setoldEmail] = React.useState('');
+    const[oldPass, setoldPass] = React.useState('');
+    const[newPass, setnewPass] = React.useState('');
+    //Handles
+
+    function handleDeletePass(e: any): void{
+        setdeletepass(e.target.value);
+    }
+
+    function handleOldFirst(e: any): void{
+        setoldFirst(e.target.value);
+    }
+
+    function handleOldLast(e: any): void{
+        setoldLast(e.target.value);
+    }
+
+    function handleOldEmail(e: any): void{
+        setoldEmail(e.target.value);
+    }
+
+    function handleOldPass(e: any): void{
+        setoldPass(e.target.value);
+    }
+
+    function handleNewPass(e: any): void{
+        setnewPass(e.target.value);
+    }
+
+    function showEdit(){
+        if(EditUser.current){
+            EditUser.current.style.visibility = 'visible';
+        }
+    }
+
+    function showDelete(){
+        if(DeleteUser.current){
+            DeleteUser.current.style.visibility = 'visible';
+        }
+    }
+
+    async function EditUserInfo(){
+         let obj = { 
+            firstName: oldFirst, 
+            lastName: oldLast, 
+            email: oldEmail,
+            currentPassword: oldPass,
+            newPassword: newPass};
+        let js = JSON.stringify(obj);
+
+         try {
+            const response = await fetch(buildAPIPath(`api/items/${itemUSERID}`),
+                { method: 'PATCH', body: js, headers: { 'Content-Type': 'application/json' } });
+
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if (res.error != '') {
+                setRepMessage(res.error)
+            }
+            else {
+                if (EditUser.current){
+                    EditUser.current.style.display = 'none';
+                }
+
+                
+            }
+        }
+        catch (error: any) {
+            console.log(error)
+        }
+    };
+
+    async function DeleteUserInfo(){
+
+        try {
+            const response = await fetch(buildAPIPath(`api/users/${itemUSERID}`),
+                { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
+            
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+
+            if(res.error != ''){
+                setMessage(res.error)
+            }
+            else{
+                
+            }
+
+            
+        }
+        catch (error: any) {
+            setMessage(error.toString());
+        }
+    };
 
     async function ShowUserInfo(id: any){
         
@@ -29,10 +134,7 @@ function AccountSettings(){
             
             let txt = await response.text();
             let res = JSON.parse(txt);
-            console.log(res);
-            console.log(res.user);
-            console.log(res.user.lastName);
-
+            
             setUserFirst(res.user.firstName);
             setUserLast(res.user.lastName);
             setUserEmail(res.user.email);
@@ -66,6 +168,19 @@ function AccountSettings(){
     
     return(
         <div id = "AccountSettingsMain">
+            <div id = "EditUser">
+                <input type = "text" className = "edituser" placeholder = "firstname" value = {userFirst} onChange = {handleOldFirst}/>
+                <input type = "text" className = "edituser" placeholder = "lastname" value = {userLast} onChange = {handleOldLast}/>
+                <input type = "text" className = "edituser" placeholder = "email" value = {userEmail} onChange = {handleOldEmail}/>
+                <input type = "text" className = "edituser" placeholder = "Old password"  onChange = {handleOldPass}/>
+                <input type = "text" className = "edituser" placeholder = "New Password" onChange = {handleNewPass}/>
+                <button type = "button" id = "edituser" onClick = {EditUserInfo}>Submit new info</button>
+            </div>
+            <div id = "DeleteUser">
+                <span id = "Warning">Are you absolutly sure you want to delete your account?</span>
+                <input type = "password" id = "deletepass" className = "AccountSet" placeholder = "Confirm Password" onChange = {handleDeletePass}/>
+                <button type = "button" id = "deleteuser" onClick = {DeleteUserInfo}>Delete User!</button>
+            </div>
             <input type = "text" id = "id" className = "AccountSet" value = {itemUSERID}  readOnly/>
             <input type = "text" id = "firstname" className = "AccountSet" value = {userFirst} readOnly/>
             <input type = "text" id = "lastname" className = "AccountSet" value = {userLast}  readOnly/>
@@ -73,7 +188,11 @@ function AccountSettings(){
             <input type = "text" id = "isVer" className = "AccountSet" value = {userVerified}  readOnly/>
             <input type = "text" id = "created" className = "AccountSet" value = {userCreated}  readOnly/>
             <input type = "text" id = "updated" className = "AccountSet" value = {userUpdated}  readOnly/>
-
+            
+            <div id = "buttonbar">
+                <button type = "button" id = "edituser" onClick = {showEdit}>Edit User</button>
+                <button type = "button" id = "deleteuser" onClick = {showDelete}>Delete User</button>
+            </div>
 
         </div>
     );
