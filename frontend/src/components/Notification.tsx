@@ -2,6 +2,7 @@ import React, { useState} from 'react';
 import { buildAPIPath } from './Path';
 import {useEffect} from 'react';
 import {useRef} from 'react';
+import '../Styles/Notification.css';
 
 function Notification(){
 
@@ -27,7 +28,7 @@ function Notification(){
     const [NotifCategory, setNotifCategory] = React.useState('');
     const [NotifImageUrl, setNotifImageUrl] = React.useState('');
 
-    /*async function AllNotif(id: any){
+    async function AllNotif(id: any){
         try {
             const response = await fetch(buildAPIPath(`api/users/${id}/notifications`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
@@ -42,7 +43,7 @@ function Notification(){
         catch (error: any) {
             console.log("Frontend Error");
         }
-    };*/
+    };
 
     useEffect(() => {
         const Data = sessionStorage.getItem('user_data');
