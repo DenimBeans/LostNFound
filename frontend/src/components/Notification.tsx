@@ -1,7 +1,7 @@
 //Uncomment as needed. - Jean
 
-import React/*, { useState}*/ from 'react';
-//import { buildAPIPath } from './Path';
+import React, { useState} from 'react';
+import { buildAPIPath } from './Path';
 import {useEffect} from 'react';
 //import {useRef} from 'react';
 
@@ -52,7 +52,7 @@ function Notification(){
 //Remove once itemUSERID is used elsewhere - Jean
     return(
         <div id = "NotificationMain">
-
+            <p value = {itemUSERID}></p>
             <div id = "LostItemPage">
                 {NotifContainer.map(NotifContainer => (
                     <div key = {NotifContainer.itemId} className = "NotifContainers">
