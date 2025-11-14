@@ -55,7 +55,7 @@ function Notification(){
             <p>{itemUSERID}</p>
             <div id = "LostItemPage">
                 {NotifContainer.map(NotifContainer => (
-                    <div key = {NotifContainer.count} className = "NotifContainers">
+                    <div key = {NotifContainer._id} className = "NotifContainers">
                         <input type = "text" id = "NotificationTitle" className = "NotTitle"  readOnly/>
                         <button type = "button" id = "NotificationData" >View Report</button>
                         <button type = "button" id = "NotificationDelete" >Delete</button>
