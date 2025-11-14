@@ -15,6 +15,7 @@ class AppColors {
   // Backgrounds
   static const Color mainBackground = Color(0xFFFFF4D9); // Cream
   static const Color secondaryBackground = Color(0xFFD9D9D9); // Light gray
+  static const Color indexBackground = Color(0xFFB8860B); // Dark Goldenrod
 
   // Buttons
   static const Color primaryButton = Color(0xFF000000); // Black
@@ -44,18 +45,14 @@ class MyApp extends StatelessWidget {
       ),
       home: Scaffold(
         resizeToAvoidBottomInset: true,
-        backgroundColor: AppColors.mainBackground,
+        backgroundColor: AppColors.indexBackground,
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(120.0),
           child: Padding(
             padding: const EdgeInsets.only(top: 35.0),
-            child: AppBar(
-              backgroundColor: AppColors.mainBackground,
-              centerTitle: true,
-              title: const Text(
-                "KnightFind",
-                style: TextStyle(fontSize: 48, fontWeight: FontWeight.bold),
-              ),
+            child: Image.asset(
+              'flutter-assets/knightfindlogo.png',
+              fit: BoxFit.contain
             ),
           ),
         ),
