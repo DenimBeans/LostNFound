@@ -13,7 +13,7 @@ function Notification(){
         imageUrl : string;
     }
 
-     ViewNotif = useRef<HTMLDivElement>(null);
+     const ViewNotif = useRef<HTMLDivElement>(null);
 
 
     const [NotifContainer,setNotifContainer] = useState<NotifData[]>([]);
@@ -142,7 +142,7 @@ function Notification(){
         }
     };
 
-    async function View(Notification){
+    async function View(Notification : any){
 
         if (ViewNotif.current){
             ViewNotif.current.style.visibility = 'visible';
