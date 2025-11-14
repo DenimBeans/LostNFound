@@ -240,7 +240,7 @@ class LoginFormState extends State<LoginForm> {
         }
       } else {
         setState(() {
-          _errorMessage = 'Login failed. Please try again.';
+          _errorMessage = 'Incorrect username or password.';
         });
       }
     } catch (e) {
