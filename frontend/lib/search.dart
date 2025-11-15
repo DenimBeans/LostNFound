@@ -71,7 +71,7 @@ class ItemSearchState extends State<ItemSearch> {
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData) {
-                  // once data is fetched, display it on screen (call buildPosts())
+                  // once data is fetched, pass it to the map
                   final items = snapshot.data!;
                   return SizedBox(
                     width: 350,

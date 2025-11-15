@@ -88,23 +88,18 @@ class InboxDisplay extends StatelessWidget {
                   return const CircularProgressIndicator();
                 } else if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
-                } else if (snapshot.hasData) {
-                  // once data is fetched, display it on screen (call buildPosts())
-                  final notifs = snapshot.data!;
-                  return buildNotifsList(notifs: notifs);
                 } else {
-                  // if no data, show simple Text
-                  return const Text("No data available");
+                  // once data is fetched, display it on screen (call buildNotifsList())
+                  final notifs = snapshot.data!;
+                  if (notifs.isEmpty) {
+                    return const Text("No data available");
+                  } else {
+                    return buildNotifsList(notifs: notifs);
+                  }
                 }
-              },
-            ),
+              }
+            )
           ),
-          const SizedBox(height: 20),
-          InputTextField(label: 'Search Item', isObscure: false),
-          const SizedBox(height: 20),
-          //SizedBox(width: 350, height: 250, child: const SearchMap()),
-          const SizedBox(height: 20),
-          // Search results will be populated from API
         ],
       ),
     );
