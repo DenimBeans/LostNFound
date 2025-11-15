@@ -82,7 +82,7 @@ function PageTitle() {
 
   return (
     <div id = "TitleBorder">
-      <img src = {Logo} id = "title"/>
+      <img alt = "KnightFind logo" src = {Logo} id = "title"/>
       <input type = "button" id = "main" className = "headerBtn" value = "Home"
         ref = {HomeRef} onClick = {Home}/>
       <input type = "button" id = "notifs" className = "headerBtn" value = "Notifications"
