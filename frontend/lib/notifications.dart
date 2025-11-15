@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert';
 import 'main.dart';
 import 'home.dart';
@@ -26,7 +25,7 @@ class Notification {
   final bool isRead;
   final bool isMeetup;
   final String location;
-  final DateTime meetTime;
+  final DateTime? meetTime;
   final Sender? senderId;
   final Item? itemId;
 
@@ -36,21 +35,22 @@ class Notification {
     required this.isRead,
     required this.isMeetup,
     required this.location,
-    required this.meetTime,
+    this.meetTime,
     this.senderId,
     this.itemId,
   });
   
-  factory Notification.fromJson(json) {
+  factory Notification.fromJson(Map<String, dynamic> json) {
+    DateTime notMeeting = DateTime(2025);
     return Notification(
       userId: json['userId'],
       notifText: json['text'],
       isRead: json['isRead'],
       isMeetup: json['isMeetup'],
       location: json['location'],
-      meetTime: json['meetTime'],
-      senderId: json['senderId'],
-      itemId: json['itemId']
+      meetTime: json['meetTime'] ?? notMeeting,
+      senderId: json['senderId'] ?? '',
+      itemId: json['itemId'] ?? ''
     );
   }
 }
@@ -68,14 +68,14 @@ class InboxDisplay extends StatelessWidget {
 
   Future<List<Notification>> getNotifs() async {
     final response = await http.get(
-      Uri.parse('http://knightfind.xyz:4000/api/users/${userId}/notifications'),
+      Uri.parse('http://knightfind.xyz:4000/api/users/$userId/notifications'),
       headers: {'Content-Type': 'application/json'},
     );
   
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final results = data['results'] as List;
-      return data((e) => Notification.fromJson(e)).toList();
+      return results.map((e) => Notification.fromJson(e)).toList();
     } else {
       throw Exception('Failed to load user notifications');
     }
@@ -100,7 +100,8 @@ class InboxDisplay extends StatelessWidget {
                   return Text('Error: ${snapshot.error}');
                 } else if (snapshot.hasData) {
                   // once data is fetched, display it on screen (call buildPosts())
-                  return SizedBox(width: 350, height: 250);
+                  final notifs = snapshot.data!;
+                  return buildNotifsList(notifs: notifs);
                 } else {
                   // if no data, show simple Text
                   return const Text("No data available");
@@ -119,32 +120,8 @@ class InboxDisplay extends StatelessWidget {
     );
   }
 
-  /*@override
-  Widget build(BuildContext context) {
-    return Center(
-      child: FutureBuilder<List<Notification>>(
-        future: notifsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            // until data is fetched, show loader
-            return const CircularProgressIndicator();
-          } else if (snapshot.hasData) {
-            // once data is fetched, display it on screen (call buildPosts())
-            final notifs = snapshot.data!;
-            return tempBuildList(notifs);
-          } else {
-            // if no data, show simple Text
-            return const Text(
-              'No notifications yet',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
-            );
-          }
-        }
-      ),
-    );
-  }*/
-    // function to display fetched data on screen
-  Widget tempBuildList(List<Notification> notifs) {
+  // function to display fetched data on screen
+  Widget buildNotifsList({required List<Notification> notifs}) {
     // ListView Builder to show data in a list
     return ListView.builder(
       itemCount: notifs.length,

@@ -56,7 +56,7 @@ class YourReportsState extends State<YourReports> {
         queryParams,
       );
 
-      print('🔍 Fetching items from: $uri'); // Debug log
+      debugPrint('🔍 Fetching items from: $uri'); // Debug log
 
       final response = await http
           .get(uri, headers: {'Content-Type': 'application/json'})
@@ -67,13 +67,13 @@ class YourReportsState extends State<YourReports> {
             },
           );
 
-      print('📡 Response status: ${response.statusCode}'); // Debug log
-      print('📦 Response body: ${response.body}'); // Debug log
+      debugPrint('📡 Response status: ${response.statusCode}'); // Debug log
+      debugPrint('📦 Response body: ${response.body}'); // Debug log
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final results = data['results'] as List;
-        print('✅ Found ${results.length} items'); // Debug log
+        debugPrint('✅ Found ${results.length} items'); // Debug log
         return results.map((e) => Item.fromJson(e)).toList();
       } else {
         throw Exception(
@@ -81,7 +81,7 @@ class YourReportsState extends State<YourReports> {
         );
       }
     } catch (e) {
-      print('❌ Error: $e'); // Debug log
+      debugPrint('❌ Error: $e'); // Debug log
       setState(() {
         _errorMessage = 'Error loading items: ${e.toString()}';
       });
@@ -421,7 +421,7 @@ class YourReportsState extends State<YourReports> {
     }
 
     if (_selectedFilter != 'all' && _selectedCategory != 'all') {
-      return 'No $_selectedFilter ${_selectedCategory} items';
+      return 'No $_selectedFilter $_selectedCategory items';
     }
 
     if (_selectedFilter != 'all') {

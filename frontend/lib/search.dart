@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
 import 'package:latlong2/latlong.dart';
 import 'dart:convert';
 import 'main.dart';
@@ -113,7 +111,7 @@ class ItemSearchState extends State<ItemSearch> {
           width: double.maxFinite,
           child: Row(
             children: [
-              Expanded(flex: 1, child: Text(item.title!)),
+              Expanded(flex: 1, child: Text(item.title)),
               SizedBox(width: 10),
             ],
           ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'main.dart';
-import 'home.dart';
 
 class Register extends StatelessWidget {
   const Register({super.key});

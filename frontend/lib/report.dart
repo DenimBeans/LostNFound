@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'dart:io';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
 import 'package:latlong2/latlong.dart';
 import 'dart:convert';
@@ -229,7 +227,7 @@ class ItemReportState extends State<ItemReport> {
 }
 
 class ReportMap extends StatefulWidget {
-  ReportMap({super.key, required this.positionedItem});
+  const ReportMap({super.key, required this.positionedItem});
   final ValueChanged<LatLng> positionedItem;
 
   @override

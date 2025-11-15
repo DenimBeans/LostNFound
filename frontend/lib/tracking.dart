@@ -618,7 +618,7 @@ class TrackedItemsState extends State<TrackedItems> {
 }
 
 class MeetupModal extends StatelessWidget {
-  MeetupModal({super.key});
+  const MeetupModal({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -640,8 +640,8 @@ class MeetupModal extends StatelessWidget {
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 4),
-              DatePickerExample(),
-              TimePickerOptions(),
+              DatePicker(),
+              TimePicker(),
             ]
           ),
         ),
@@ -649,14 +649,16 @@ class MeetupModal extends StatelessWidget {
     );
   }
 }
-class DatePickerExample extends StatefulWidget {
-  const DatePickerExample({super.key});
+class DatePicker extends StatefulWidget {
+  const DatePicker({
+    super.key,
+  });
 
   @override
-  State<DatePickerExample> createState() => _DatePickerExampleState();
+  State<DatePicker> createState() => __DatePickerState();
 }
 
-class _DatePickerExampleState extends State<DatePickerExample> {
+class __DatePickerState extends State<DatePicker> {
   DateTime? selectedDate;
 
   Future<void> _selectDate() async {
@@ -689,16 +691,16 @@ class _DatePickerExampleState extends State<DatePickerExample> {
   }
 }
 
-class TimePickerOptions extends StatefulWidget {
-  const TimePickerOptions({
+class TimePicker extends StatefulWidget {
+  const TimePicker({
     super.key,
   });
 
   @override
-  State<TimePickerOptions> createState() => _TimePickerOptionsState();
+  State<TimePicker> createState() => _TimePickerState();
 }
 
-class _TimePickerOptionsState extends State<TimePickerOptions> {
+class _TimePickerState extends State<TimePicker> {
   TimeOfDay? selectedTime;
   TimePickerEntryMode entryMode = TimePickerEntryMode.dial;
   Orientation? orientation;
@@ -752,5 +754,22 @@ class _TimePickerOptionsState extends State<TimePickerOptions> {
         ),
       ],
     );
+  }
+}
+
+class LocationPicker extends StatefulWidget {
+  const LocationPicker({
+    super.key,
+  });
+
+  @override
+  State<LocationPicker> createState() => _LocationPickerState();
+}
+
+class _LocationPickerState extends State<LocationPicker> {
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
   }
 }
