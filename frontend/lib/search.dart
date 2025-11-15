@@ -61,6 +61,7 @@ class ItemSearchState extends State<ItemSearch> {
         children: [          
           SizedBox(
             height: 250, 
+            //  To display items in ListView
             child: FutureBuilder<List<Item>>(
               future: itemsFuture,
               builder: (context, snapshot) {
@@ -72,7 +73,7 @@ class ItemSearchState extends State<ItemSearch> {
                 } else if (snapshot.hasData) {
                   // once data is fetched, display it on screen (call buildPosts())
                   final items = snapshot.data!;
-                  return tempBuildList(items);
+                  return SizedBox(width: 350, height: 250, child: SearchMap(items: items));
                 } else {
                   // if no data, show simple Text
                   return const Text("No data available");
@@ -134,12 +135,12 @@ class _SearchMapState extends State<SearchMap> {
 
   // Helper function to create a custom Marker (pin)
   // May change this to be more general and have a isItem bool that will be checked to determine how to treat a pin
-  Marker _buildItemMarker({required LatLng point, required String itemName}) {
+  Marker _buildItemMarker({required Item item}) {
     //  Maybe one color for own lost items, another for all others?
     //  Not a requirment
     //  required Color color,
     return Marker(
-      point: point,
+      point: LatLng(item.lat, item.lng),
       width: 95, // Fixed width that accommodates the longest name well
       height: 65, // Fixed height for the pin
       child: GestureDetector(
@@ -161,7 +162,7 @@ class _SearchMapState extends State<SearchMap> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Text(
-                itemName,
+                item.title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
@@ -178,6 +179,8 @@ class _SearchMapState extends State<SearchMap> {
   Widget build(BuildContext context) {
     _markers = [
       // Markers will be populated from API
+      for(var i = 0; i < widget.items.length; i++)
+        _buildItemMarker(item: widget.items[i]),
     ];
 
     return MapUCF(pontoCentral: _pontoCentral, markers: _markers, dragMarker: null,);

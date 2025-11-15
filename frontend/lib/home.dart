@@ -268,9 +268,9 @@ class Item {
       status: json['status'],
       lat: json['location']['coordinates'][1],
       lng: json['location']['coordinates'][0],
-      reporterFName: firstName ?? '',//json['userId']['firstName'],
-      reporterLName: lastName ?? '',//json['userId']['lastName'],
-      reporterEmail: email ?? '',//json['userId' ]['email'], 
+      reporterFName: firstName ?? '',
+      reporterLName: lastName ?? '',
+      reporterEmail: email ?? '',
       imageUrl: json['imageUrl'] ?? ''
     );
   }
