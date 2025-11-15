@@ -236,10 +236,31 @@ class LoginFormState extends State<LoginForm> {
             _errorMessage = data['error'];
           });
         }
-      } else {
+      } else if (response.statusCode == 403) {
+        // Email not verified
+        final data = jsonDecode(response.body);
         setState(() {
-          _errorMessage = 'Incorrect username or password.';
+          _errorMessage =
+              data['error'] ?? 'Please verify your email before logging in';
         });
+      } else if (response.statusCode == 401) {
+        // Invalid credentials
+        final data = jsonDecode(response.body);
+        setState(() {
+          _errorMessage = data['error'] ?? 'Incorrect email or password';
+        });
+      } else {
+        // Other errors
+        try {
+          final data = jsonDecode(response.body);
+          setState(() {
+            _errorMessage = data['error'] ?? 'Login failed. Please try again.';
+          });
+        } catch (e) {
+          setState(() {
+            _errorMessage = 'Login failed. Please try again.';
+          });
+        }
       }
     } catch (e) {
       setState(() {

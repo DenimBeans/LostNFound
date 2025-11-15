@@ -25,18 +25,30 @@ function Notification(){
     }
 
     const ViewNotIf = useRef<HTMLDivElement>(null);
-    const ViewNotIfButton = useRef<HTMLDivElement>(null); 
+    const ViewNotIfButton = useRef<HTMLDivElement>(null);
+    const Contest = useRef<HTMLDivElement>(null);
 
     const [NotifContainer,setNotifContainer] = useState<NotifData[]>([]);
 
     const [itemUSERID, setItemUSERIDValue] = React.useState('');
 
     const [viewNotifId, setviewNotifId] = React.useState('');
+    //contest
+    const [contestLocation, setContestLocation] = React.useState('');
+    const [contestTime, setContestTime] = React.useState('');
     //View notification
     const [NotifTitle, setNotifTitle] = React.useState('');
     const [NotifDescription, setNotifDescription] = React.useState('');
     const [NotifCategory, setNotifCategory] = React.useState('');
     const [NotifImageUrl, setNotifImageUrl] = React.useState('');
+
+    function handleContestLocation(e:any){
+        setContestLocation(e.target.value);
+    }
+
+    function handleContestDate(e:any){
+        setContestTime(e.target.value);
+    }
 
     async function AllNotif(id: any){
         try {
@@ -167,22 +179,30 @@ function Notification(){
             }
         }
         setviewNotifId(Notif)
-        setNotifTitle(Notif.title);
-        setNotifDescription(Notif.text);
-        setNotifCategory(Notif.category);
-        setNotifImageUrl(Notif.imageUrl);
+        setNotifTitle(Notif.itemId.title);
+        setNotifDescription(Notif.itemId.text);
+        setNotifCategory(Notif.itemId.category);
+        setNotifImageUrl(Notif.itemId.imageUrl);
 
+    };
+
+    async function StartContest(Notif: any){
+        if(Contest.current){
+            Contest.current.style.visibility = 'visible';
+        }
+        setContestLocation(Notif.location);
+        setContestTime(Notif.meetTime);
     };
 
     async function ReturnNotif(Notif: any,answer : string){
         if (answer == "Accept"){
             let obj = {
-                userId : itemUSERID, 
+                userId : Notif.senderId._id, 
                 text : Notif.text,
                 isMeetup : Notif.isMeetup,
                 location : Notif.location,
                 meetTime : Notif.meetTime,
-                senderId : Notif.senderId,
+                senderId : itemUSERID,
                 itemId : Notif.itemId,
 
             };
@@ -198,7 +218,40 @@ function Notification(){
                 console.log(res.error)
             }
             else{
+                window.location.reload(false);
+            }
+            
+            }
+            
+        
+        catch (error: any) {
+            console.log("Frontend Error");
+        }
+        }
+        else if (answer == "Contest"){
+            let obj = {
+                userId : Notif.senderId._id, 
+                text : Notif.text,
+                isMeetup : Notif.isMeetup,
+                location : contestLocation,
+                meetTime : contestTime,
+                senderId : itemUSERID,
+                itemId : Notif.itemId,
 
+            };
+            let js = JSON.stringify(obj);
+            try {
+            const response = await fetch(buildAPIPath(`api/notifications`),
+                { method: 'POST',body: js, headers: { 'Content-Type': 'application/json' } });
+
+            let txt = await response.text();
+            let res = JSON.parse(txt);
+            
+            if(res.error != ''){
+                console.log(res.error)
+            }
+            else{
+                window.location.reload(false);
             }
             
             }
@@ -210,12 +263,12 @@ function Notification(){
         }
         else if (answer == "Deny"){
             let obj = {
-                userId : itemUSERID, 
+                userId : Notif.senderId._id, 
                 text : Notif.text,
                 isMeetup : Notif.isMeetup,
                 location : Notif.location,
                 meetTime : Notif.meetTime,
-                senderId : Notif.senderId,
+                senderId : itemUSERID,
                 itemId : Notif.itemId,
 
             };
@@ -231,7 +284,7 @@ function Notification(){
                 console.log(res.error)
             }
             else{
-            
+                window.location.reload(false);
             }
             }
             
@@ -266,9 +319,14 @@ function Notification(){
                 <input type = "text" id = "NotifImage" className = "NotifData" value = {NotifImageUrl} readOnly/>
                 <div id = "ViewButtonBar" ref = {ViewNotIfButton}>
                     <button type = "button" id = "NotifAccept" className = "NotifButton" onClick = {() => ReturnNotif(viewNotifId,"Accept")}>Accept</button>
-                    <button type = "button" id = "NotifContest" className = "NotifButton">Contest</button>
+                    <button type = "button" id = "NotifContest" className = "NotifButton" onClick = {() => StartContest(viewNotifId)}>Contest</button>
                     <button type = "button" id = "NotifDeny" className = "NotifButton" onClick = {() => ReturnNotif(viewNotifId,"Deny")}>Deny</button>
                 </div>
+            </div>
+            <div id = "Contest" ref = {Contest}>
+                <input type = "text" id = "ContestLocation" className = "Contest" onChange = {handleContestLocation}/>
+                <input type = "date" id = "ContestTime" className = "Contest" onChange = {handleContestDate}/>
+                <button type = "button" id = "SubmitContest" onClick = {() => ReturnNotif(viewNotifId,"Contest")}>Submit new contest</button>
             </div>
             <div id = "buttonholder">
                 <button type = "button" className = "bottombutton" onClick = {ReadAll}>Read-ALL</button>

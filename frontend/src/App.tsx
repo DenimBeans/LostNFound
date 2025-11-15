@@ -9,6 +9,7 @@ import EmailVerificationPage from './pages/EmailVerificationPage';
 import NotificationPage from './pages/NotificationPage';
 import AccountSettingsPage from './pages/AccountSettingsPage';
 import AboutPage from './pages/AboutPage';
+import EmailReVerPage from './pages/EmailReVerPage';
 
 
 //Removed Login Page to make changes work with Rian's Database/API functions - Jean
@@ -26,6 +27,7 @@ function App() {
         <Route path="/Notification" element={<NotificationPage />} />
         <Route path="/AccountSettings" element={<AccountSettingsPage />} />
         <Route path="/About" element={<AboutPage />} />
+        <Route path="/api/auth/verify/:token" element = {<EmailReVerPage />} />
       </Routes>
     </BrowserRouter>
   );
