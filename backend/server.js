@@ -1430,7 +1430,7 @@ app.post('/api/notifications', async (req, res) => {
     // Populate for response
     const populatedNotification = await Notification.findById(notification._id)
       .populate('senderId', 'firstName lastName')
-      .populate('itemId', 'title category')
+      .populate('itemId', 'title description category imageUrl')
       .populate('userId', 'firstName lastName email');
 
     var ret = {
