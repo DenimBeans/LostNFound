@@ -1,3 +1,9 @@
+import { useState } from 'react';
+import { buildAPIPath } from './Path';
+import {useParams} from 'react-router-dom';
+import {useEffect} from 'react';
+import '../Styles/FrontPage.css';
+
 function EmailReVer(){
 const { token } = useParams();
 const [message, setMessage] = useState('');
