@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
@@ -222,35 +224,54 @@ class _MapUCFState extends State<MapUCF> {
 //  Item widgets
 class Item {
   final String title;
-  final String reporterName;
   final String? description;
   final String? category;
+  final String status;
+  final double lat;
+  final double lng;
+  final String reporterFName;
+  final String reporterLName;
+  final String reporterEmail;
   final String? imageUrl;
-  final String? locationText;
-  final int? lat;
-  final int? long;
 
   Item({
     required this.title,
-    required this.reporterName,
     this.description,
     this.category,
+    required this.status,
+    required this.lat,
+    required this.lng,
+    required this.reporterFName,
+    required this.reporterLName,
+    required this.reporterEmail,
     this.imageUrl,
-    this.locationText,
-    this.lat,
-    this.long,
   });
 
   factory Item.fromJson(Map<String, dynamic> json) {
+    //  Extract data from userId as Map
+    String? firstName;
+    String? lastName;
+    String? email;
+
+    if (json['userId'] is Map) {
+      final user = json['userId'] as Map<String, dynamic>;
+      firstName = user['firstName'];
+      lastName = user['lastName'];
+      email = user['email'];
+    }
+
+    //  Return complete item
     return Item(
       title: json['title'],
       description: json['description'] ?? 'No item description give.',
       category: json['category'] ?? '---',
-      imageUrl: json['imageUrl'] ?? '',
-      locationText: json['locationText'] ?? 'No location description given.',
-      reporterName: json['repoterName'],
-      lat: json['lat'] ?? 28.6024274,
-      long: json['long'] ?? -81.2000599,
+      status: json['status'],
+      lat: json['location']['coordinates'][1],
+      lng: json['location']['coordinates'][0],
+      reporterFName: firstName ?? '',//json['userId']['firstName'],
+      reporterLName: lastName ?? '',//json['userId']['lastName'],
+      reporterEmail: email ?? '',//json['userId' ]['email'], 
+      imageUrl: json['imageUrl'] ?? ''
     );
   }
 }

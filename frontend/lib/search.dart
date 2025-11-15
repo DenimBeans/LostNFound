@@ -29,10 +29,6 @@ class ItemSearch extends StatefulWidget {
 }
 
 class ItemSearchState extends State<ItemSearch> {
-  final _itemSearchKey = GlobalKey<FormState>();
-  String _errorMessage = '';
-  bool _isLoading = false;
-
   Future<List<Item>> get itemsFuture => searchItems();
 
   Future<List<Item>> searchItems() async {
@@ -51,7 +47,8 @@ class ItemSearchState extends State<ItemSearch> {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return data.map((e) =>Item.fromJson(e)).toList();
+      final results = data['results'] as List;
+      return results.map((e) =>Item.fromJson(e)).toList();
     } else {
       throw Exception('Failted to load nearby lost items');
     }
@@ -61,24 +58,28 @@ class ItemSearchState extends State<ItemSearch> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
-        children: [
-          FutureBuilder<List<Item>>(
-            future: itemsFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                // until data is fetched, show loader
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasData) {
-                // once data is fetched, display it on screen (call buildPosts())
-                final items = snapshot.data!;
-                return tempBuildList(items);
-              } else {
-                // if no data, show simple Text
-                return const Text("No data available");
+        children: [          
+          SizedBox(
+            height: 250, 
+            child: FutureBuilder<List<Item>>(
+              future: itemsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // until data is fetched, show loader
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (snapshot.hasData) {
+                  // once data is fetched, display it on screen (call buildPosts())
+                  final items = snapshot.data!;
+                  return tempBuildList(items);
+                } else {
+                  // if no data, show simple Text
+                  return const Text("No data available");
+                }
               }
-            }
+            ),
           ),
-          
           const SizedBox(height: 20),
           InputTextField(label: 'Search Item', isObscure: false),
           const SizedBox(height: 20),
