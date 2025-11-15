@@ -35,20 +35,20 @@ class ItemSearchState extends State<ItemSearch> {
     final queryParams = {
       //  Using UCF's coordinates for now
       //  Eventually will need to be replaced with user coords
-      'lat':  '28.6024274',
+      'lat': '28.6024274',
       'lng': '-81.2000599',
-      'radius': '5'
+      'radius': '5',
     };
 
     final response = await http.get(
-      Uri.http('174.138.65.216:4000', '/api/items/nearby', queryParams),
+      Uri.http('knightfind.xyz:4000', '/api/items/nearby', queryParams),
       headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final results = data['results'] as List;
-      return results.map((e) =>Item.fromJson(e)).toList();
+      return results.map((e) => Item.fromJson(e)).toList();
     } else {
       throw Exception('Failted to load nearby lost items');
     }
@@ -58,9 +58,9 @@ class ItemSearchState extends State<ItemSearch> {
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
-        children: [          
+        children: [
           SizedBox(
-            height: 250, 
+            height: 250,
             //  To display items in ListView
             child: FutureBuilder<List<Item>>(
               future: itemsFuture,
@@ -73,12 +73,16 @@ class ItemSearchState extends State<ItemSearch> {
                 } else if (snapshot.hasData) {
                   // once data is fetched, display it on screen (call buildPosts())
                   final items = snapshot.data!;
-                  return SizedBox(width: 350, height: 250, child: SearchMap(items: items));
+                  return SizedBox(
+                    width: 350,
+                    height: 250,
+                    child: SearchMap(items: items),
+                  );
                 } else {
                   // if no data, show simple Text
                   return const Text("No data available");
                 }
-              }
+              },
             ),
           ),
           const SizedBox(height: 20),
@@ -91,6 +95,7 @@ class ItemSearchState extends State<ItemSearch> {
       ),
     );
   }
+
   // function to display fetched data on screen
   Widget tempBuildList(List<Item> items) {
     // ListView Builder to show data in a list
@@ -117,10 +122,7 @@ class ItemSearchState extends State<ItemSearch> {
 }
 
 class SearchMap extends StatefulWidget {
-  const SearchMap({
-    super.key,
-    required this.items
-  });
+  const SearchMap({super.key, required this.items});
   final List<Item> items;
 
   @override
@@ -179,10 +181,14 @@ class _SearchMapState extends State<SearchMap> {
   Widget build(BuildContext context) {
     _markers = [
       // Markers will be populated from API
-      for(var i = 0; i < widget.items.length; i++)
+      for (var i = 0; i < widget.items.length; i++)
         _buildItemMarker(item: widget.items[i]),
     ];
 
-    return MapUCF(pontoCentral: _pontoCentral, markers: _markers, dragMarker: null,);
+    return MapUCF(
+      pontoCentral: _pontoCentral,
+      markers: _markers,
+      dragMarker: null,
+    );
   }
 }

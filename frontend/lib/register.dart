@@ -45,7 +45,7 @@ class RegisterFormState extends State<RegisterForm> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://174.138.65.216:4000/api/auth/register'),
+        Uri.parse('http://knightfind.xyz:4000/api/auth/register'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'firstName': _fnameController.text,

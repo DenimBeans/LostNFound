@@ -27,7 +27,7 @@ class Notification {
     this.senderId,
     this.itemId,
   });
-  
+
   factory Notification.fromJson(Map<String, dynamic> json) {
     return Notification(
       userId: json['userId'],
@@ -37,19 +37,15 @@ class Notification {
       location: json['location'],
       meetTime: json['meetTime'],
       senderId: json['senderId'],
-      itemId: json['itemId']
+      itemId: json['itemId'],
     );
   }
 }
 
 class InboxDisplay extends StatelessWidget {
-
   final String userId;
 
-  const InboxDisplay({
-    super.key,
-    required this.userId,
-  });
+  const InboxDisplay({super.key, required this.userId});
 
   Future<List<Notification>> get notifsFuture => getNotifs();
 
@@ -58,10 +54,10 @@ class InboxDisplay extends StatelessWidget {
       Uri.parse('http://knightfind.xyz:4000/api/users/${userId}/notifications'),
       headers: {'Content-Type': 'application/json'},
     );
-  
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return data.map((e) =>Notification.fromJson(e)).toList();
+      return data.map((e) => Notification.fromJson(e)).toList();
     } else {
       throw Exception('Failed to load user notifications');
     }
@@ -87,11 +83,12 @@ class InboxDisplay extends StatelessWidget {
               style: TextStyle(fontSize: 18, color: Colors.grey),
             );
           }
-        }
+        },
       ),
     );
   }
-    // function to display fetched data on screen
+
+  // function to display fetched data on screen
   Widget tempBuildList(List<Notification> notifs) {
     // ListView Builder to show data in a list
     return ListView.builder(
