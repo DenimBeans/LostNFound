@@ -128,3 +128,26 @@ overflow-y: auto;
   box-shadow: 0 4px rgb(134, 99, 9);
   transform: translateY(4px);
 }
+
+.edituser{
+    width: 50%;
+    margin-left: 25%;
+    margin-top: 15px;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 10px;
+    border-style:solid;
+    border-color:rgb(41, 42, 46);
+}
+
+.edituser:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+}
