@@ -5,6 +5,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'main.dart';
 import 'home.dart';
+import 'edit_item_page.dart';
 
 class YourReports extends StatefulWidget {
   final String userId;
@@ -45,16 +46,26 @@ class YourReportsState extends State<YourReports> {
   Future<List<Item>> getUserItems() async {
     try {
       // Build query parameters
-      var queryParams = <String, String>{};
+      var queryParams = <String, String>{
+        'userId': widget.userId, // Filter by current user's items
+      };
+
+      // Add status filter if not 'all'
       if (_selectedFilter != 'all') {
         queryParams['status'] = _selectedFilter;
       }
 
-      final uri = Uri.http(
-        'knightfind.xyz:4000',
-        '/api/users/${widget.userId}/items',
-        queryParams,
-      );
+      // Add category filter if not 'all'
+      if (_selectedCategory != 'all') {
+        queryParams['category'] = _selectedCategory;
+      }
+
+      // Add search query if not empty
+      if (_searchQuery.isNotEmpty) {
+        queryParams['search'] = _searchQuery;
+      }
+
+      final uri = Uri.http('knightfind.xyz:4000', '/api/items', queryParams);
 
       debugPrint('🔍 Fetching items from: $uri'); // Debug log
 
@@ -360,13 +371,25 @@ class YourReportsState extends State<YourReports> {
                           child: BoldElevatedButton(
                             text: 'Edit',
                             onPressed: () {
-                              Navigator.pop(context);
-                              // TODO: Navigate to edit page
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Edit feature coming soon'),
+                              Navigator.pop(
+                                context,
+                              ); // Close the bottom sheet first
+
+                              // Navigate to edit page and wait for result
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditItemPage(item: item),
                                 ),
-                              );
+                              ).then((result) {
+                                // If edit was successful, refresh the list
+                                if (result == true) {
+                                  setState(() {
+                                    _itemsFuture = getUserItems();
+                                  });
+                                }
+                              });
                             },
                             minWidth: double.infinity,
                             minHeight: 45,
@@ -460,6 +483,8 @@ class YourReportsState extends State<YourReports> {
                           _searchController.clear();
                           setState(() {
                             _searchQuery = '';
+                            _itemsFuture =
+                                getUserItems(); // Refresh when cleared
                           });
                         },
                       )
@@ -478,6 +503,7 @@ class YourReportsState extends State<YourReports> {
               onChanged: (value) {
                 setState(() {
                   _searchQuery = value;
+                  _itemsFuture = getUserItems(); // Refresh on search
                 });
               },
             ),
@@ -532,13 +558,13 @@ class YourReportsState extends State<YourReports> {
                     children: [
                       _buildFilterChip('All', 'all', false),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Electronic', 'electronic', false),
+                      _buildFilterChip('Electronic', 'Electronic', false),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Apparel', 'apparel', false),
+                      _buildFilterChip('Apparel', 'Apparel', false),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Container', 'container', false),
+                      _buildFilterChip('Container', 'Container', false),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Personal', 'personal', false),
+                      _buildFilterChip('Personal', 'Personal', false),
                     ],
                   ),
                 ),
@@ -657,11 +683,10 @@ class YourReportsState extends State<YourReports> {
         setState(() {
           if (isStatusFilter) {
             _selectedFilter = value;
-            _itemsFuture = getUserItems(); // Only refresh for status changes
           } else {
             _selectedCategory = value;
-            // No need to refresh - filtering happens in build
           }
+          _itemsFuture = getUserItems(); // Refresh for any filter change
         });
       },
       child: Container(

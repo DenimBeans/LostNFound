@@ -5,17 +5,12 @@ import 'dart:convert';
 import 'main.dart';
 import 'home.dart';
 
-class Sender
-{
+class Sender {
   final String id;
   final String firstName;
   final String lastName;
 
-  Sender({
-    required this.id,
-    required this.firstName,
-    required this.lastName
-  });
+  Sender({required this.id, required this.firstName, required this.lastName});
 }
 
 //  Notifications Inbox Widgets
@@ -56,13 +51,9 @@ class Notification {
 }
 
 class InboxDisplay extends StatelessWidget {
-
   final String userId;
 
-  const InboxDisplay({
-    super.key,
-    required this.userId,
-  });
+  const InboxDisplay({super.key, required this.userId});
 
   Future<List<Notification>> get notifsFuture => getNotifs();
 
@@ -71,7 +62,7 @@ class InboxDisplay extends StatelessWidget {
       Uri.parse('http://knightfind.xyz:4000/api/users/$userId/notifications'),
       headers: {'Content-Type': 'application/json'},
     );
-  
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       final results = data['results'] as List;
@@ -81,14 +72,13 @@ class InboxDisplay extends StatelessWidget {
     }
   }
 
-  
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
-        children: [          
+        children: [
           SizedBox(
-            height: 250, 
+            height: 250,
             //  To display notifications in ListView
             child: FutureBuilder<List<Notification>>(
               future: notifsFuture,
@@ -106,7 +96,7 @@ class InboxDisplay extends StatelessWidget {
                   // if no data, show simple Text
                   return const Text("No data available");
                 }
-              }
+              },
             ),
           ),
           const SizedBox(height: 20),
