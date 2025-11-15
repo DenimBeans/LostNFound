@@ -180,7 +180,7 @@ function Notification() {
         }
         setviewNotifId(Notif)
         setNotifTitle(Notif.itemId.title);
-        setNotifDescription(Notif.itemId.text);
+        setNotifDescription(Notif.itemId.description);
         setNotifCategory(Notif.itemId.category);
         setNotifImageUrl(Notif.itemId.imageUrl);
 
