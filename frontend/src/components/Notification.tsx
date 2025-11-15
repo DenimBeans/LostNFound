@@ -197,7 +197,7 @@ function Notification(){
     async function ReturnNotif(Notif: any,answer : string){
         if (answer == "Accept"){
             let obj = {
-                userId : Notif.senderid, 
+                userId : itemUSERID, 
                 text : Notif.text,
                 isMeetup : Notif.isMeetup,
                 location : Notif.location,
@@ -230,7 +230,7 @@ function Notification(){
         }
         else if (answer == "Contest"){
             let obj = {
-                userId : Notif.senderid, 
+                userId : itemUSERID, 
                 text : Notif.text,
                 isMeetup : Notif.isMeetup,
                 location : contestLocation,
@@ -263,7 +263,7 @@ function Notification(){
         }
         else if (answer == "Deny"){
             let obj = {
-                userId : Notif.ssenderId, 
+                userId : itemUSERID, 
                 text : Notif.text,
                 isMeetup : Notif.isMeetup,
                 location : Notif.location,
