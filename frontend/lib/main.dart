@@ -205,7 +205,7 @@ class LoginFormState extends State<LoginForm> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://174.138.65.216:4000/api/auth/login'),
+        Uri.parse('http://knightfind.xyz:4000/api/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'email': _loginController.text,

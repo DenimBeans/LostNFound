@@ -21,7 +21,7 @@ class ItemReport extends StatefulWidget {
     required this.firstName,
     required this.lastName,
     required this.email,
-    required this.userId
+    required this.userId,
   });
 
   @override
@@ -37,7 +37,10 @@ class ItemReportState extends State<ItemReport> {
   final TextEditingController _imgURLController = TextEditingController();
   String _categoryText = '';
   final TextEditingController _imgController = TextEditingController();
-  LatLng _itemPosition = LatLng(28.6024274, -81.2000599);  //  Initial value UCF center
+  LatLng _itemPosition = LatLng(
+    28.6024274,
+    -81.2000599,
+  ); //  Initial value UCF center
   String _errorMessage = '';
   bool _isLoading = false;
 
@@ -64,11 +67,11 @@ class ItemReportState extends State<ItemReport> {
           'category': _categoryText,
           'imageUrl': _imgURLController.text,
           //'locationText': _locationController.text,
-          'userId' : widget.userId,
+          'userId': widget.userId,
           //'reporterName': widget.firstName,
           //'reporterEmail': widget.email,
           'lat': _itemPosition.latitude,
-          'lng': _itemPosition.longitude
+          'lng': _itemPosition.longitude,
         }),
       );
 
@@ -88,15 +91,15 @@ class ItemReportState extends State<ItemReport> {
         }
       } else {
         setState(() {
-          _errorMessage = 'Failed to submit report. Error code ${response.statusCode.toString()}';
+          _errorMessage =
+              'Failed to submit report. Error code ${response.statusCode.toString()}';
         });
       }
     } catch (e) {
       setState(() {
         _errorMessage = 'Network error. Please check your connection.';
       });
-    }
-    finally {
+    } finally {
       setState(() {
         _isLoading = false;
       });
@@ -195,7 +198,7 @@ class ItemReportState extends State<ItemReport> {
             SizedBox(
               width: 350,
               height: 250,
-              child: ReportMap(positionedItem: _updateMarkerPosition)
+              child: ReportMap(positionedItem: _updateMarkerPosition),
             ),
             const SizedBox(height: 20),
             BoldElevatedButton(
@@ -226,10 +229,7 @@ class ItemReportState extends State<ItemReport> {
 }
 
 class ReportMap extends StatefulWidget {
-  ReportMap({
-    super.key,
-    required this.positionedItem
-  });
+  ReportMap({super.key, required this.positionedItem});
   final ValueChanged<LatLng> positionedItem;
 
   @override
@@ -261,16 +261,19 @@ class _ReportMapState extends State<ReportMap> {
           ],
         );
       },
-      onDragEnd: (details, point) => widget.positionedItem(point), //debugPrint("End point $point"),
+      onDragEnd: (details, point) =>
+          widget.positionedItem(point), //debugPrint("End point $point"),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final dragMarkers = [
-      _buildLocationMarker(point: _pontoCentral)
-    ];
+    final dragMarkers = [_buildLocationMarker(point: _pontoCentral)];
 
-    return MapUCF(pontoCentral: _pontoCentral, markers: null, dragMarker: dragMarkers,);
+    return MapUCF(
+      pontoCentral: _pontoCentral,
+      markers: null,
+      dragMarker: dragMarkers,
+    );
   }
 }
