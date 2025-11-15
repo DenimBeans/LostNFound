@@ -1,26 +1,26 @@
-import React, { useState} from 'react';
+import React, { useState } from 'react';
 import { buildAPIPath } from './Path';
-import {useEffect} from 'react';
-import {useRef} from 'react';
+import { useEffect } from 'react';
+import { useRef } from 'react';
 import '../Styles/Notification.css';
 
-function Notification(){
+function Notification() {
 
-    interface NotifData{
-        _id : string;
-        title : string;
-        description : string;
-        category : string;
-        imageUrl : string;
+    interface NotifData {
+        _id: string;
+        title: string;
+        description: string;
+        category: string;
+        imageUrl: string;
 
-        text : string;
-        isMeetup : boolean;
-        isRead : boolean;
-        location : string;
-        meetTime : Date;
-        senderId : string;
-        itemId : string;
-        
+        text: string;
+        isMeetup: boolean;
+        isRead: boolean;
+        location: string;
+        meetTime: Date;
+        senderId: string;
+        itemId: string;
+
 
     }
 
@@ -28,7 +28,7 @@ function Notification(){
     const ViewNotIfButton = useRef<HTMLDivElement>(null);
     const Contest = useRef<HTMLDivElement>(null);
 
-    const [NotifContainer,setNotifContainer] = useState<NotifData[]>([]);
+    const [NotifContainer, setNotifContainer] = useState<NotifData[]>([]);
 
     const [itemUSERID, setItemUSERIDValue] = React.useState('');
 
@@ -42,15 +42,15 @@ function Notification(){
     const [NotifCategory, setNotifCategory] = React.useState('');
     const [NotifImageUrl, setNotifImageUrl] = React.useState('');
 
-    function handleContestLocation(e:any){
+    function handleContestLocation(e: any) {
         setContestLocation(e.target.value);
     }
 
-    function handleContestDate(e:any){
+    function handleContestDate(e: any) {
         setContestTime(e.target.value);
     }
 
-    async function AllNotif(id: any){
+    async function AllNotif(id: any) {
         try {
             const response = await fetch(buildAPIPath(`api/users/${id}/notifications`),
                 { method: 'GET', headers: { 'Content-Type': 'application/json' } });
@@ -58,10 +58,10 @@ function Notification(){
             let txt = await response.text();
             let res = JSON.parse(txt);
             setNotifContainer(res.results);
-            
-            }
-            
-        
+
+        }
+
+
         catch (error: any) {
             console.log("Frontend Error");
         }
@@ -69,32 +69,32 @@ function Notification(){
 
     useEffect(() => {
         const Data = sessionStorage.getItem('user_data');
-        if(Data != null){
+        if (Data != null) {
             const UserData = JSON.parse(Data);
             setItemUSERIDValue(UserData?.userId);
             AllNotif(UserData?.userId);
         }
-        else{
+        else {
             window.location.href = '/';
         }
-    },[]);
+    }, []);
 
 
-    async function Read(NotId: any){
+    async function Read(NotId: any) {
 
-         try {
+        try {
             const response = await fetch(buildAPIPath(`api/notifications/${NotId}/read`),
                 { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
 
             let txt = await response.text();
             let res = JSON.parse(txt);
-           
+
 
             if (res.error != '') {
                 console.log(res.error)
             }
             else {
-                
+
             }
         }
         catch (error: any) {
@@ -102,22 +102,22 @@ function Notification(){
         }
     };
 
-    async function Delete(NotId: any){
-         try {
+    async function Delete(NotId: any) {
+        try {
             const response = await fetch(buildAPIPath(`api/notifications/${NotId}`),
                 { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
-            
+
             let txt = await response.text();
             let res = JSON.parse(txt);
 
-            if(res.error != ''){
+            if (res.error != '') {
                 console.log(res.error)
             }
-            else{
+            else {
                 setNotifContainer(NotifContainer.filter((NotifContainer) => NotifContainer._id != NotId))
             }
 
-            
+
         }
         catch (error: any) {
             console.log(error.toString());
@@ -125,7 +125,7 @@ function Notification(){
     };
 
 
-    async function ReadAll(){
+    async function ReadAll() {
         try {
             const response = await fetch(buildAPIPath(`api/users/${itemUSERID}/notifications/read-all`),
                 { method: 'PATCH', headers: { 'Content-Type': 'application/json' } });
@@ -137,7 +137,7 @@ function Notification(){
                 console.log(res.error)
             }
             else {
-                
+
             }
         }
         catch (error: any) {
@@ -145,36 +145,36 @@ function Notification(){
         }
     };
 
-    async function DeleteAll(){
+    async function DeleteAll() {
         try {
             const response = await fetch(buildAPIPath(`api/users/${itemUSERID}/notifications`),
                 { method: 'DELETE', headers: { 'Content-Type': 'application/json' } });
-            
+
             let txt = await response.text();
             let res = JSON.parse(txt);
 
-            if(res.error != ''){
+            if (res.error != '') {
                 console.log(res.error)
             }
-            else{
+            else {
                 setNotifContainer([])
             }
 
-            
+
         }
         catch (error: any) {
             console.log(error.toString());
         }
     };
 
-    async function View(Notif : any){
+    async function View(Notif: any) {
 
-        if (ViewNotIf.current){
+        if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
-            if(Notif.isMeetup == false && ViewNotIfButton.current){
+            if (Notif.isMeetup == false && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'none';
             }
-            else if(Notif.isMeetup == true && ViewNotIfButton.current){
+            else if (Notif.isMeetup == true && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'visible';
             }
         }
@@ -186,151 +186,151 @@ function Notification(){
 
     };
 
-    async function StartContest(Notif: any){
-        if(Contest.current){
+    async function StartContest(Notif: any) {
+        if (Contest.current) {
             Contest.current.style.visibility = 'visible';
         }
         setContestLocation(Notif.location);
         setContestTime(Notif.meetTime);
     };
 
-    async function ReturnNotif(Notif: any,answer : string){
-        if (answer == "Accept"){
+    async function ReturnNotif(Notif: any, answer: string) {
+        if (answer == "Accept") {
             let obj = {
-                userId : Notif.senderId._id, 
-                text : Notif.text,
-                isMeetup : Notif.isMeetup,
-                location : Notif.location,
-                meetTime : Notif.meetTime,
-                senderId : itemUSERID,
-                itemId : Notif.itemId,
+                userId: Notif.senderId._id,
+                text: Notif.text,
+                isMeetup: Notif.isMeetup,
+                location: Notif.location,
+                meetTime: Notif.meetTime,
+                senderId: itemUSERID,
+                itemId: Notif.itemId,
 
             };
             let js = JSON.stringify(obj);
             try {
-            const response = await fetch(buildAPIPath(`api/notifications`),
-                { method: 'POST',body: js, headers: { 'Content-Type': 'application/json' } });
+                const response = await fetch(buildAPIPath(`api/notifications`),
+                    { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
-            let txt = await response.text();
-            let res = JSON.parse(txt);
-            
-            if(res.error != ''){
-                console.log(res.error)
+                let txt = await response.text();
+                let res = JSON.parse(txt);
+
+                if (res.error != '') {
+                    console.log(res.error)
+                }
+                else {
+                    window.location.reload();
+                }
+
             }
-            else{
-                window.location.reload();
+
+
+            catch (error: any) {
+                console.log("Frontend Error");
             }
-            
-            }
-            
-        
-        catch (error: any) {
-            console.log("Frontend Error");
         }
-        }
-        else if (answer == "Contest"){
+        else if (answer == "Contest") {
             let obj = {
-                userId : Notif.senderId._id, 
-                text : Notif.text,
-                isMeetup : Notif.isMeetup,
-                location : contestLocation,
-                meetTime : contestTime,
-                senderId : itemUSERID,
-                itemId : Notif.itemId,
+                userId: Notif.senderId._id,
+                text: Notif.text,
+                isMeetup: Notif.isMeetup,
+                location: contestLocation,
+                meetTime: contestTime,
+                senderId: itemUSERID,
+                itemId: Notif.itemId,
 
             };
             let js = JSON.stringify(obj);
             try {
-            const response = await fetch(buildAPIPath(`api/notifications`),
-                { method: 'POST',body: js, headers: { 'Content-Type': 'application/json' } });
+                const response = await fetch(buildAPIPath(`api/notifications`),
+                    { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
-            let txt = await response.text();
-            let res = JSON.parse(txt);
-            
-            if(res.error != ''){
-                console.log(res.error)
+                let txt = await response.text();
+                let res = JSON.parse(txt);
+
+                if (res.error != '') {
+                    console.log(res.error)
+                }
+                else {
+                    window.location.reload();
+                }
+
             }
-            else{
-                window.location.reload();
+
+
+            catch (error: any) {
+                console.log("Frontend Error");
             }
-            
-            }
-            
-        
-        catch (error: any) {
-            console.log("Frontend Error");
         }
-        }
-        else if (answer == "Deny"){
+        else if (answer == "Deny") {
             let obj = {
-                userId : Notif.senderId._id, 
-                text : Notif.text,
-                isMeetup : Notif.isMeetup,
-                location : Notif.location,
-                meetTime : Notif.meetTime,
-                senderId : itemUSERID,
-                itemId : Notif.itemId,
+                userId: Notif.senderId._id,
+                text: Notif.text,
+                isMeetup: Notif.isMeetup,
+                location: Notif.location,
+                meetTime: Notif.meetTime,
+                senderId: itemUSERID,
+                itemId: Notif.itemId,
 
             };
             let js = JSON.stringify(obj);
             try {
-            const response = await fetch(buildAPIPath(`api/notifications`),
-                { method: 'POST',body : js, headers: { 'Content-Type': 'application/json' } });
+                const response = await fetch(buildAPIPath(`api/notifications`),
+                    { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
 
-            let txt = await response.text();
-            let res = JSON.parse(txt);
-            
-            if(res.error != ''){
-                console.log(res.error)
+                let txt = await response.text();
+                let res = JSON.parse(txt);
+
+                if (res.error != '') {
+                    console.log(res.error)
+                }
+                else {
+                    window.location.reload();
+                }
             }
-            else{
-                window.location.reload();
+
+
+            catch (error: any) {
+                console.log("Frontend Error");
             }
-            }
-            
-        
-        catch (error: any) {
-            console.log("Frontend Error");
         }
-        }
-        
+
 
     };
 
-    return(
-        <div id = "NotificationMain">
-            <div id = "NotifPage">
+    return (
+        <div id="NotificationMain">
+            <div id="NotifPage">
                 {NotifContainer.map(NotifContainer => (
-                    <div key = {NotifContainer._id} className = "NotifContainers">
-                        <input type = "text" id = "NotificationTitle" className = "NotTitle" value = {NotifContainer.text} readOnly/>
-                        <input type = "text" id = "NotificationMeetup" className = "NotTitle" value = {NotifContainer.isRead} readOnly/>
-                        <button type = "button" id = "NotificationView" onClick = {() => View(NotifContainer)}>View Report</button>
-                        <button type = "button" id = "NotificationRead" onClick = {() => Read(NotifContainer._id)}>Read</button>
-                        <button type = "button" id = "NotificationDelete" onClick = {() => Delete(NotifContainer._id)}>Delete</button>
+                    <div key={NotifContainer._id} className="NotifContainers">
+                        <input type="text" id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly />
+                        <input type="text" id="NotificationMeetup" className="NotTitle" value={NotifContainer.isRead} readOnly />
+                        <button type="button" id="NotificationView" onClick={() => View(NotifContainer)}>View Report</button>
+                        <button type="button" id="NotificationRead" onClick={() => Read(NotifContainer._id)}>Read</button>
+                        <button type="button" id="NotificationDelete" onClick={() => Delete(NotifContainer._id)}>Delete</button>
                     </div>
                 ))}
-            
-            </div>
-            <div id = "ViewNotIf" ref = {ViewNotIf}>
 
-                <input type = "text" id = "NotifTitle" className = "NotifData" value = {NotifTitle} readOnly/>
-                <input type = "text" id = "NotifDesc" className = "NotifData" value = {NotifDescription} readOnly/>
-                <input type = "text" id = "NotifCat" className = "NotifData" value = {NotifCategory} readOnly/>
-                <input type = "text" id = "NotifImage" className = "NotifData" value = {NotifImageUrl} readOnly/>
-                <div id = "ViewButtonBar" ref = {ViewNotIfButton}>
-                    <button type = "button" id = "NotifAccept" className = "NotifButton" onClick = {() => ReturnNotif(viewNotifId,"Accept")}>Accept</button>
-                    <button type = "button" id = "NotifContest" className = "NotifButton" onClick = {() => StartContest(viewNotifId)}>Contest</button>
-                    <button type = "button" id = "NotifDeny" className = "NotifButton" onClick = {() => ReturnNotif(viewNotifId,"Deny")}>Deny</button>
+            </div>
+            <div id="ViewNotIf" ref={ViewNotIf}>
+
+                <input type="text" id="NotifTitle" className="NotifData" value={NotifTitle} readOnly />
+                <input type="text" id="NotifDesc" className="NotifData" value={NotifDescription} readOnly />
+                <input type="text" id="NotifCat" className="NotifData" value={NotifCategory} readOnly />
+                <input type="text" id="NotifImage" className="NotifData" value={NotifImageUrl} readOnly />
+                <div id="ViewButtonBar" ref={ViewNotIfButton}>
+                    <button type="button" id="NotifAccept" className="NotifButton" onClick={() => ReturnNotif(viewNotifId, "Accept")}>Accept</button>
+                    <button type="button" id="NotifContest" className="NotifButton" onClick={() => StartContest(viewNotifId)}>Contest</button>
+                    <button type="button" id="NotifDeny" className="NotifButton" onClick={() => ReturnNotif(viewNotifId, "Deny")}>Deny</button>
                 </div>
             </div>
-            <div id = "Contest" ref = {Contest}>
-                <input type = "text" id = "ContestLocation" className = "Contest" onChange = {handleContestLocation}/>
-                <input type = "date" id = "ContestTime" className = "Contest" onChange = {handleContestDate}/>
-                <button type = "button" id = "SubmitContest" onClick = {() => ReturnNotif(viewNotifId,"Contest")}>Submit new contest</button>
+            <div id="Contest" ref={Contest}>
+                <input type="text" id="ContestLocation" className="Contest" onChange={handleContestLocation} />
+                <input type="date" id="ContestTime" className="Contest" onChange={handleContestDate} />
+                <button type="button" id="SubmitContest" onClick={() => ReturnNotif(viewNotifId, "Contest")}>Submit new contest</button>
             </div>
-            <div id = "buttonholder">
-                <button type = "button" className = "bottombutton" onClick = {ReadAll}>Read-ALL</button>
-                <button type = "button" className = "bottombutton" onClick = {DeleteAll}>Delete-ALL</button>
+            <div id="buttonholder">
+                <button type="button" className="bottombutton" onClick={ReadAll}>Read-ALL</button>
+                <button type="button" className="bottombutton" onClick={DeleteAll}>Delete-ALL</button>
             </div>
         </div>
     );
