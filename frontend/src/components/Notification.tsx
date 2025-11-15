@@ -218,7 +218,7 @@ function Notification(){
                 console.log(res.error)
             }
             else{
-
+                window.location.reload(false);
             }
             
             }
@@ -251,7 +251,7 @@ function Notification(){
                 console.log(res.error)
             }
             else{
-                window.location.reload;
+                window.location.reload(false);
             }
             
             }
@@ -284,7 +284,7 @@ function Notification(){
                 console.log(res.error)
             }
             else{
-            
+                window.location.reload(false);
             }
             }
             
