@@ -6,6 +6,19 @@ import 'dart:convert';
 import 'main.dart';
 import 'home.dart';
 
+class Sender
+{
+  final String id;
+  final String firstName;
+  final String lastName;
+
+  Sender({
+    required this.id,
+    required this.firstName,
+    required this.lastName
+  });
+}
+
 //  Notifications Inbox Widgets
 class Notification {
   final String userId;
@@ -14,8 +27,8 @@ class Notification {
   final bool isMeetup;
   final String location;
   final DateTime meetTime;
-  final String? senderId;
-  final int? itemId;
+  final Sender? senderId;
+  final Item? itemId;
 
   Notification({
     required this.userId,
@@ -28,7 +41,7 @@ class Notification {
     this.itemId,
   });
   
-  factory Notification.fromJson(Map<String, dynamic> json) {
+  factory Notification.fromJson(json) {
     return Notification(
       userId: json['userId'],
       notifText: json['text'],
@@ -61,13 +74,52 @@ class InboxDisplay extends StatelessWidget {
   
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return data.map((e) =>Notification.fromJson(e)).toList();
+      final results = data['results'] as List;
+      return data((e) => Notification.fromJson(e)).toList();
     } else {
       throw Exception('Failed to load user notifications');
     }
   }
 
+  
   @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: Column(
+        children: [          
+          SizedBox(
+            height: 250, 
+            //  To display notifications in ListView
+            child: FutureBuilder<List<Notification>>(
+              future: notifsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  // until data is fetched, show loader
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                } else if (snapshot.hasData) {
+                  // once data is fetched, display it on screen (call buildPosts())
+                  return SizedBox(width: 350, height: 250);
+                } else {
+                  // if no data, show simple Text
+                  return const Text("No data available");
+                }
+              }
+            ),
+          ),
+          const SizedBox(height: 20),
+          InputTextField(label: 'Search Item', isObscure: false),
+          const SizedBox(height: 20),
+          //SizedBox(width: 350, height: 250, child: const SearchMap()),
+          const SizedBox(height: 20),
+          // Search results will be populated from API
+        ],
+      ),
+    );
+  }
+
+  /*@override
   Widget build(BuildContext context) {
     return Center(
       child: FutureBuilder<List<Notification>>(
@@ -90,7 +142,7 @@ class InboxDisplay extends StatelessWidget {
         }
       ),
     );
-  }
+  }*/
     // function to display fetched data on screen
   Widget tempBuildList(List<Notification> notifs) {
     // ListView Builder to show data in a list

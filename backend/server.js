@@ -1487,7 +1487,7 @@ app.get('/api/users/:userId/notifications', async (req, res) => {
     // Query notifications
     const notifications = await Notification.find(filter)
       .populate('senderId', 'firstName lastName')
-      .populate('itemId', 'title category imageUrl')
+      .populate('itemId', 'title description category imageUrl')
       .sort({ createdAt: -1 });
 
     // Get unread count

@@ -500,7 +500,12 @@ function ChangeView({center, zoom }: any) {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
 
-                    <Marker position = {viewPosition}/>
+                    <Marker position = {viewPosition}
+                    icon = {new Icon ((
+                    {
+                         iconUrl: markerIconPng, 
+                        iconSize: [25, 41], 
+                    }))}/>
                     <ChangeView center = {viewPosition}/>
                 </MapContainer>
 
