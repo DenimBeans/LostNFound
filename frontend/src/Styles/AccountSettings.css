@@ -36,7 +36,7 @@ border-color:black;
 }
 
 #EditUser{
-    
+
 width: 80%;
 background-color: rgb(101, 101, 101);
 height: 90vh;
@@ -80,4 +80,51 @@ border-style:solid;
 border-color:black;
 
 overflow-y: auto;
+}
+
+#buttonbar{
+    display: flex;
+    
+    margin-top: 30px;
+    height: 45px;
+}
+
+.button{
+    margin-top: 20px;
+    height: 45px;
+    width: 20%;
+    margin-left: 40%;
+    margin-bottom: 30px;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    background: linear-gradient(-45deg, darkgoldenrod 40%,  rgb(216, 159, 14) 50%,  darkgoldenrod 60%); 
+    background-size: 300%;
+    background-position-x: 100%;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color: rgb(170, 125, 11);
+    filter: drop-shadow(2px 2px 15px rgba(170, 125, 11, 0.541));
+    box-shadow: 0 8px rgb(134, 99, 9);
+    
+}
+
+.button:focus, .button:hover
+{
+     border-color: rgb(170, 125, 11);
+    animation: shimmer 1s infinite linear;
+}
+
+@keyframes shimmer {
+   to {
+      background-position-x: 0%
+   }
+}
+
+.button:active {
+  background-color:  rgb(167, 122, 10);
+  box-shadow: 0 4px rgb(134, 99, 9);
+  transform: translateY(4px);
 }
