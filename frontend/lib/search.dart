@@ -14,12 +14,14 @@ class ItemSearch extends StatefulWidget {
   final String firstName;
   final String lastName;
   final String email;
+  final String userId;
 
   const ItemSearch({
     super.key,
     required this.firstName,
     required this.lastName,
     required this.email,
+    required this.userId,
   });
 
   @override
@@ -76,7 +78,7 @@ class ItemSearchState extends State<ItemSearch> {
                   return SizedBox(
                     width: 350,
                     height: 250,
-                    child: SearchMap(items: items),
+                    child: SearchMap(items: items, userId: widget.userId),
                   );
                 } else {
                   // if no data, show simple Text
@@ -122,8 +124,9 @@ class ItemSearchState extends State<ItemSearch> {
 }
 
 class SearchMap extends StatefulWidget {
-  const SearchMap({super.key, required this.items});
+  const SearchMap({super.key, required this.items, required this.userId});
   final List<Item> items;
+  final String userId;
 
   @override
   State<SearchMap> createState() => _SearchMapState();
@@ -150,7 +153,7 @@ class _SearchMapState extends State<SearchMap> {
           // Show item details
           showDialog(
             context: context,
-            builder: (BuildContext context) => ItemModal(item: item),
+            builder: (BuildContext context) => ItemModal(item: item, userId: widget.userId),
           );
         },
         // The visual content of the pin is a column with the icon and text
@@ -199,10 +202,12 @@ class _SearchMapState extends State<SearchMap> {
 
 class ItemModal extends StatefulWidget {
   final Item item;
+  final String userId;
   
   const ItemModal({
     super.key,
-    required this.item
+    required this.item,
+    required this.userId
   });
 
   @override
@@ -215,19 +220,24 @@ class ItemModalState extends State<ItemModal> {
   String _errorMessage = '';
   bool _isLoading = false;
 
+  String itemId = '';
+  String userId = '';
+
   Future<void> _track() async {
     setState(() {
       _isLoading = true;
       _errorMessage = '';
+      itemId = widget.item.itemId;
+      userId = widget.userId;
     });
 
     try {
       final response = await http.post(
-        Uri.parse('http://knightfind.xyz:4000/api/users/:userId/tracked-items/:itemId'),
+        Uri.parse('http://knightfind.xyz:4000/api/users/$userId/tracked-items/$itemId'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          //'userId': ,
-          //'itemId': widget.item.
+          'userId': widget.userId,
+          'itemId': widget.item.itemId
         }),
       );
 

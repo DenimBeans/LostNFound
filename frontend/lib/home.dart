@@ -14,6 +14,7 @@ import 'notifications.dart';
 import 'report.dart';
 import 'search.dart';
 import 'your_reports.dart';
+import 'tracking.dart';
 
 class AppHome extends StatefulWidget {
   final String firstName;
@@ -91,6 +92,7 @@ class _AppHomeState extends State<AppHome> {
           firstName: widget.firstName,
           lastName: widget.lastName,
           email: widget.email,
+          userId: widget.userId,
         ),
         InboxDisplay(userId: widget.userId),
       ][currentPageIndex],
@@ -101,7 +103,16 @@ class _AppHomeState extends State<AppHome> {
           children: [
             const SizedBox(height: 50),
             _buildDrawerButton(context, 'Tracked Items', () {
-              // TODO: Navigate to tracked items
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => TrackedItems(
+                    userId: widget.userId,
+                    firstName: widget.firstName,
+                    lastName: widget.lastName,
+                  ),
+                ),
+              );
             }),
             _buildDrawerButton(context, 'Your Reports', () {
               Navigator.push(
