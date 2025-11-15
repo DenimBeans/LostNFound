@@ -8,13 +8,13 @@ import 'home.dart';
 
 //  Notifications Inbox Widgets
 class Notification {
-  final int userId;
+  final String userId;
   final String notifText;
   final bool isRead;
   final bool isMeetup;
   final String location;
   final DateTime meetTime;
-  final int? senderId;
+  final String? senderId;
   final int? itemId;
 
   Notification({
@@ -43,17 +43,23 @@ class Notification {
 }
 
 class InboxDisplay extends StatelessWidget {
-  const InboxDisplay({super.key});
+
+  final String userId;
+
+  const InboxDisplay({
+    super.key,
+    required this.userId,
+  });
 
   Future<List<Notification>> get notifsFuture => getNotifs();
 
   Future<List<Notification>> getNotifs() async {
     final response = await http.get(
-      Uri.parse('http://174.138.65.216:4000/api/'),
+      Uri.parse('http://knightfind.xyz:4000/api/users/${userId}/notifications'),
       headers: {'Content-Type': 'application/json'},
     );
   
-    if (response.statusCode == 201) {
+    if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       return data.map((e) =>Notification.fromJson(e)).toList();
     } else {
