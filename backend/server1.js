@@ -15,13 +15,13 @@ app.use(cors());
 app.use(express.json());
 
 /* -------------------- Environment Vars ---------------------- */
-const MONGO_URI   = process.env.MONGO_URI;
-const PORT        = process.env.PORT || 4000;
-const JWT_SECRET  = process.env.ACCESS_TOKEN_SECRET || 'fallback_secret';
-const NODE_ENV    = process.env.NODE_ENV || 'development';
-const BASE_URL    = process.env.BASE_URL || `http://localhost:${PORT}`;
-const EMAIL_USER  = process.env.EMAIL_USER;
-const EMAIL_PASS  = process.env.EMAIL_PASSWORD;
+const MONGO_URI = process.env.MONGO_URI;
+const PORT = process.env.PORT || 4000;
+const JWT_SECRET = process.env.ACCESS_TOKEN_SECRET || 'fallback_secret';
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const BASE_URL = process.env.BASE_URL || `http://localhost:${PORT}`;
+const EMAIL_USER = process.env.EMAIL_USER;
+const EMAIL_PASS = process.env.EMAIL_PASSWORD;
 
 // Debug
 console.log('🔍 Connection string loaded:', MONGO_URI ? 'Yes ✅' : 'No ❌');
@@ -47,9 +47,9 @@ const transporter = nodemailer.createTransport({
 const userSchema = new mongoose.Schema(
   {
     firstName: { type: String, required: true, trim: true },
-    lastName:  { type: String, required: true, trim: true },
-    email:     { type: String, required: true, unique: true, trim: true, lowercase: true },
-    password:  { type: String, required: true },
+    lastName: { type: String, required: true, trim: true },
+    email: { type: String, required: true, unique: true, trim: true, lowercase: true },
+    password: { type: String, required: true },
 
     // Email verification + password reset
     isVerified: { type: Boolean, default: false },
@@ -69,9 +69,9 @@ const User = mongoose.model('User', userSchema);
 // Item schema (with claimerId + GeoJSON + consistent statuses)
 const itemSchema = new mongoose.Schema(
   {
-    title:       { type: String, required: true },
+    title: { type: String, required: true },
     description: { type: String, required: true },
-    category:    { type: String, required: true },
+    category: { type: String, required: true },
 
     status: {
       type: String,
@@ -87,14 +87,14 @@ const itemSchema = new mongoose.Schema(
     },
 
     // Relations
-    userId:    { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // reporter/owner
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // reporter/owner
     claimerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },  // PM requested
 
     // Optional metadata
     locationText: { type: String, default: '' },
-    lostAt:       { type: Date, default: Date.now },
-    imageUrl:     { type: String, default: '' },
-    isClaimed:    { type: Boolean, default: false }
+    lostAt: { type: Date, default: Date.now },
+    imageUrl: { type: String, default: '' },
+    isClaimed: { type: Boolean, default: false }
   },
   { timestamps: true }
 );
@@ -363,7 +363,7 @@ app.get('/api/items/nearby', async (req, res) => {
     const items = await Item.find({
       location: {
         $near: {
-          $geometry:  { type: 'Point', coordinates: [longitude, latitude] },
+          $geometry: { type: 'Point', coordinates: [longitude, latitude] },
           $maxDistance: km * 1000
         }
       }
