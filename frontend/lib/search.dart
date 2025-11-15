@@ -146,6 +146,10 @@ class _SearchMapState extends State<SearchMap> {
       child: GestureDetector(
         onTap: () {
           // Show item details
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => ItemModal(item: item),
+          );
         },
         // The visual content of the pin is a column with the icon and text
         child: Column(
@@ -184,5 +188,97 @@ class _SearchMapState extends State<SearchMap> {
     ];
 
     return MapUCF(pontoCentral: _pontoCentral, markers: _markers, dragMarker: null,);
+  }
+}
+
+class ItemModal extends StatefulWidget {
+  final Item item;
+  
+  const ItemModal({
+    super.key,
+    required this.item
+  });
+
+  @override
+  ItemModalState createState() {
+    return ItemModalState();
+  }
+}
+
+class ItemModalState extends State<ItemModal> {
+  String _errorMessage = '';
+  bool _isLoading = false;
+
+  Future<void> _track() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://knightfind.xyz:4000/api/users/:userId/tracked-items/:itemId'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          //'userId': ,
+          //'itemId': widget.item.
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['error'] == null || data['error'].isEmpty) {
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Tracking item!')));
+          }
+        } else {
+          setState(() {
+            _errorMessage = data['error'];
+          });
+        }
+      } else {
+        setState(() {
+          _errorMessage = 'Failed to track item. Error code ${response.statusCode.toString()}';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Network error. Please check your connection.';
+      });
+    }
+    finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SimpleDialog(
+      title: Text(widget.item.title),
+      children: <Widget>[
+      Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(widget.item.description ?? 'No description'),
+            BoldElevatedButton(
+              text: 'Track',
+              onPressed: () {
+                _isLoading ? null : _track();
+              },
+              minWidth: 20,
+              minHeight: 30
+            )
+          ]
+        )
+      )
+      ]
+    );
   }
 }
