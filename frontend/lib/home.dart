@@ -13,6 +13,7 @@ import 'main.dart';
 import 'notifications.dart';
 import 'report.dart';
 import 'search.dart';
+import 'your_reports.dart';
 
 class AppHome extends StatefulWidget {
   final String firstName;
@@ -91,9 +92,7 @@ class _AppHomeState extends State<AppHome> {
           lastName: widget.lastName,
           email: widget.email,
         ),
-        InboxDisplay(
-          userId: widget.userId
-        ),
+        InboxDisplay(userId: widget.userId),
       ][currentPageIndex],
       endDrawer: Drawer(
         backgroundColor: AppColors.secondaryBackground,
@@ -105,7 +104,16 @@ class _AppHomeState extends State<AppHome> {
               // TODO: Navigate to tracked items
             }),
             _buildDrawerButton(context, 'Your Reports', () {
-              // TODO: Navigate to your items
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => YourReports(
+                    userId: widget.userId,
+                    firstName: widget.firstName,
+                    lastName: widget.lastName,
+                  ),
+                ),
+              );
             }),
             _buildDrawerButton(context, 'Account Settings', () {
               Navigator.push(
@@ -225,6 +233,7 @@ class _MapUCFState extends State<MapUCF> {
 
 //  Item widgets
 class Item {
+  final String itemId;
   final String title;
   final String? description;
   final String? category;
@@ -237,6 +246,7 @@ class Item {
   final String? imageUrl;
 
   Item({
+    required this.itemId,
     required this.title,
     this.description,
     this.category,
@@ -264,6 +274,7 @@ class Item {
 
     //  Return complete item
     return Item(
+      itemId: json['_id'],
       title: json['title'],
       description: json['description'] ?? 'No item description give.',
       category: json['category'] ?? '---',
@@ -273,12 +284,13 @@ class Item {
       reporterFName: firstName ?? '',
       reporterLName: lastName ?? '',
       reporterEmail: email ?? '',
-      imageUrl: json['imageUrl'] ?? ''
+      imageUrl: json['imageUrl'] ?? '',
     );
   }
 }
 
 //  Hamburger Menu Contents
+
 class AboutModal extends StatelessWidget {
   const AboutModal({super.key});
 
