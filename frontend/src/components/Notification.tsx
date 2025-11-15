@@ -179,10 +179,10 @@ function Notification(){
             }
         }
         setviewNotifId(Notif)
-        setNotifTitle(Notif.title);
-        setNotifDescription(Notif.text);
-        setNotifCategory(Notif.category);
-        setNotifImageUrl(Notif.imageUrl);
+        setNotifTitle(Notif.itemId.title);
+        setNotifDescription(Notif.itemId.text);
+        setNotifCategory(Notif.itemId.category);
+        setNotifImageUrl(Notif.itemId.imageUrl);
 
     };
 
@@ -197,7 +197,7 @@ function Notification(){
     async function ReturnNotif(Notif: any,answer : string){
         if (answer == "Accept"){
             let obj = {
-                userId : itemUSERID, 
+                userId : Notif.senderId, 
                 text : Notif.text,
                 isMeetup : Notif.isMeetup,
                 location : Notif.location,
@@ -230,7 +230,7 @@ function Notification(){
         }
         else if (answer == "Contest"){
             let obj = {
-                userId : itemUSERID, 
+                userId : Notif.senderId, 
                 text : Notif.text,
                 isMeetup : Notif.isMeetup,
                 location : contestLocation,
@@ -263,7 +263,7 @@ function Notification(){
         }
         else if (answer == "Deny"){
             let obj = {
-                userId : itemUSERID, 
+                userId : Notif.senderId, 
                 text : Notif.text,
                 isMeetup : Notif.isMeetup,
                 location : Notif.location,
