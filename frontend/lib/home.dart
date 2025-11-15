@@ -91,7 +91,9 @@ class _AppHomeState extends State<AppHome> {
           lastName: widget.lastName,
           email: widget.email,
         ),
-        InboxDisplay(userId: widget.userId),
+        InboxDisplay(
+          userId: widget.userId
+        ),
       ][currentPageIndex],
       endDrawer: Drawer(
         backgroundColor: AppColors.secondaryBackground,
@@ -271,7 +273,7 @@ class Item {
       reporterFName: firstName ?? '',
       reporterLName: lastName ?? '',
       reporterEmail: email ?? '',
-      imageUrl: json['imageUrl'] ?? '',
+      imageUrl: json['imageUrl'] ?? ''
     );
   }
 }
