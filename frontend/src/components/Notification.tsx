@@ -180,7 +180,7 @@ function Notification() {
 
     async function View(Notif: any) {
         setNotifContainer(NotifContainer.map((j) => j._id === Notif._id ? {...j,isRead: true}: j));
-        
+        Read(Notif._id);
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
             if (Notif.isMeetup === false  && ViewNotIfButton.current) {
