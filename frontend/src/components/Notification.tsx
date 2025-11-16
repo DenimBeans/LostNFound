@@ -191,13 +191,21 @@ function Notification() {
         let Day = date.getDate();
         let Month = date.getMonth()+1;
         let Year = date.getFullYear();
+        let Hour = date.getHours();
+        let Minutes = date.getMinutes();
         if (Day < 10){
             Day = `0${Day}`
         }
         if (Month < 10){
             Month = `0${Month}`
         }
-        let FormatedDate = (Month+'/'+Day+'/'+Year);
+        if (Hour < 10){
+            Hour = `0${Hour}`
+        }
+        if (Minutes < 10){
+            Minutes = `0${Minutes}`
+        }
+        let FormatedDate = (Month+'/'+Day+'/'+Year+'--'+Hour+':'+Minutes);
         setNotifMeetTime(FormatedDate);
 
     };
