@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -41,6 +43,7 @@ class TrackedItemsState extends State<TrackedItems> {
 
   Future<List<Item>> getTrackedItems() async {
     try {
+      
       // Build query parameters
       var queryParams = <String, String>{
         'userId': widget.userId,
@@ -82,51 +85,6 @@ class TrackedItemsState extends State<TrackedItems> {
         _errorMessage = 'Error loading items: ${e.toString()}';
       });
       return []; // Return empty list instead of rethrowing
-    }
-  }
-
-  Future<void> _sendFoundNotif(String senderId, Item item) async {
-    try {
-      final response = await http.post(
-        Uri.parse('http://knightfind.xyz:4000/api/notificatoins'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'userId'
-          'text'
-          'isMeetup'
-          'location'
-          'meetTime'
-          'senderId'
-          'itemId'
-        })
-      );
-
-      if (response.statusCode == 201) {
-        final data = jsonDecode(response.body);
-
-        if (data['error'] == null || data['error'].isEmpty) {
-          if (mounted) {
-            //  After verification, user must return to the start page and login
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Verification email sent!')),
-            );
-          }
-        } else {          
-          setState(() {
-            _errorMessage = data['error'];
-          });
-        }
-      }
-      //  More error handling goes here
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error sending meeting notifcation: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
     }
   }
 
@@ -617,8 +575,15 @@ class TrackedItemsState extends State<TrackedItems> {
   }
 }
 
-class MeetupModal extends StatelessWidget {
+class MeetupModal extends StatefulWidget {
   const MeetupModal({super.key});
+
+  @override
+  State<MeetupModal> createState() => _MeetupModalState();
+}
+
+class _MeetupModalState extends State<MeetupModal> {
+  //String? _selectedLocation;
 
   @override
   Widget build(BuildContext context) {
@@ -642,6 +607,20 @@ class MeetupModal extends StatelessWidget {
               const SizedBox(height: 4),
               DatePicker(),
               TimePicker(),
+              LocationPicker(),
+              /* LocationPicker(
+                onLocationSelected: (String location) {
+                  _selectedLocation = location;
+                }
+              )*/
+              BoldElevatedButton(
+                text: 'Done!',
+                minWidth: 60,
+                minHeight: 30,
+                onPressed: () {
+
+                },
+              )
             ]
           ),
         ),
@@ -649,16 +628,17 @@ class MeetupModal extends StatelessWidget {
     );
   }
 }
+
 class DatePicker extends StatefulWidget {
   const DatePicker({
     super.key,
   });
 
   @override
-  State<DatePicker> createState() => __DatePickerState();
+  State<DatePicker> createState() => _DatePickerState();
 }
 
-class __DatePickerState extends State<DatePicker> {
+class _DatePickerState extends State<DatePicker> {
   DateTime? selectedDate;
 
   Future<void> _selectDate() async {
@@ -702,7 +682,7 @@ class TimePicker extends StatefulWidget {
 
 class _TimePickerState extends State<TimePicker> {
   TimeOfDay? selectedTime;
-  TimePickerEntryMode entryMode = TimePickerEntryMode.dial;
+  TimePickerEntryMode entryMode = TimePickerEntryMode.inputOnly;
   Orientation? orientation;
   TextDirection textDirection = TextDirection.ltr;
   MaterialTapTargetSize tapTargetSize = MaterialTapTargetSize.padded;
@@ -758,8 +738,11 @@ class _TimePickerState extends State<TimePicker> {
 }
 
 class LocationPicker extends StatefulWidget {
+  //final Function(String location)? onLocationSelected;
+
   const LocationPicker({
     super.key,
+    //this.onLocationSelected,
   });
 
   @override
@@ -767,9 +750,275 @@ class LocationPicker extends StatefulWidget {
 }
 
 class _LocationPickerState extends State<LocationPicker> {
+  final TextEditingController _locationController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
-    throw UnimplementedError();
+    return InputTextField(
+      label: 'Location',
+      isObscure: false,
+      controller: _locationController,
+      validator: (String? value) {
+        return (value == null || value.isEmpty)
+            ? 'Please enter a location'
+            : null;
+      },
+    );
+  }
+  /*
+  List<String> _suggestions = [];
+  Timer? _debounce;
+  final TextEditingController _locationController = TextEditingController();  
+  String _errorMessage = '';
+  bool _isLoading = false;
+
+  void _onSearchChanged(String search) {
+  debugPrint('onSearchChanged called with: $search');
+  if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      debugPrint('Debounce finished, calling _searchLocation');  
+      _searchLocation(search);
+    });
+  }
+
+  Future<void> _searchLocation(String search) async {
+    debugPrint('_searchLocation called with: $search');
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+      _suggestions = [];
+    });
+
+    if (search.isEmpty) {
+      debugPrint('Search empty, clearing suggestions');
+      setState(() => _suggestions = []);
+      return;
+    }
+
+    debugPrint('Setting loading to true');
+    setState(() => _isLoading = true);
+
+    try {
+      debugPrint('call api');
+      final response = await http.get(
+        Uri.parse('https://nominatim.openstreetmap.org/search?q=$search&format=json&limit=5&addressdetails=1'),
+        headers: {
+          'User-Agent': 'KnightFind/1.0',
+        },
+      );
+
+      debugPrint('Response status: ${response.statusCode}');
+      debugPrint('Response body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        debugPrint('Parsed ${data.length} results');
+
+        setState(() {
+          _suggestions = List<String>.from(
+            data.map((item) =>
+             item['display_name'].toString())
+          );
+          _isLoading = false;
+        });
+
+          debugPrint('Suggestions updated: ${_suggestions.length} items');  
+      }
+    } catch (e, stackTrace) {
+      debugPrint('ERROR in _searchLocation: $e');  
+      debugPrint('Stack trace: $stackTrace');
+      setState(() {
+        _errorMessage = 'Network error. Please check your connection.';
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    debugPrint('Building LocationPicker, suggestions count: ${_suggestions.length}');  // ADD THIS
+
+    return Column(
+      children: [
+        TextField(
+          controller: _locationController,
+          decoration: InputDecoration(
+            labelText: 'Meeting Location',
+            border: OutlineInputBorder(),
+            hintText: 'Search for a location',
+            prefixIcon: Icon(Icons.search),
+            suffixIcon: _isLoading 
+              ? Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : _locationController.text.isNotEmpty
+                  ? IconButton(
+                      icon: Icon(Icons.clear),
+                      onPressed: () {
+                        _locationController.clear();
+                        setState(() => _suggestions = []);
+                      },
+                    )
+                  : null,
+          ),
+          onChanged: _onSearchChanged,
+        ),
+        if (_suggestions.isNotEmpty)
+          Container(
+            margin: const EdgeInsets.only(top: 8),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            constraints: BoxConstraints(maxHeight: 200),
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: _suggestions.length,
+              itemBuilder: (context, index) {
+                final suggestion = _suggestions[index];
+                return ListTile(
+                  leading: Icon(Icons.location_on, color: Colors.red),
+                  title: Text(
+                    suggestion,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontSize: 14),
+                  ),
+                  onTap: () {
+                    _locationController.text = suggestion;
+                    if (widget.onLocationSelected != null) {
+                      widget.onLocationSelected!(
+                        suggestion,
+                      );
+                      setState(() => _suggestions = []);
+                    }
+                  },
+                );
+              },
+            ),
+          )
+      ],
+    );
+  }
+  
+  @override
+  void dispose() {
+    _locationController.dispose();
+    super.dispose();
+  }
+  */
+}
+
+class MeetingRequest extends StatefulWidget {
+  final String userId;
+  final String notifText;
+  final Item item;
+
+  const MeetingRequest({
+    super.key,
+    required this.userId,
+    required this.notifText,
+    required this.item,
+  });
+
+  @override
+  State<MeetingRequest> createState() => _MeetingRequestState();
+}
+
+class _MeetingRequestState extends State<MeetingRequest> { 
+  late Map<String, dynamic> userId; // Pass this
+  late String text; // Pass this
+  final bool isMeetup = true;
+  late String meetLocation; // Use callback
+  late DateTime meetDate; // Use callback
+  late TimeOfDay meetHour; // Use callback
+  late DateTime meetTime; // Recieve from date and hour
+  late Item item = widget.item; // Pass this
+  late String senderId; // Recieve from item
+  late String itemId; // Recieve from item
+  String _errorMessage = '';
+  bool _isLoading = false;
+
+  void getDate(DateTime date) {
+    meetDate = date;
+  }
+
+  void getTime(TimeOfDay time) {
+    meetHour = time;
+  }
+
+  void getLocation(String location) {
+    meetLocation = location;
+  }
+
+  @override
+  void initState() {
+    senderId = widget.userId;
+    text = widget.notifText;
+    item = widget.item;
+    userId = {
+      'firstName': item.reporterFName,
+      'lastName': item.reporterLName,
+      'email': item.reporterEmail
+    } as Map<String, dynamic>;
+    meetTime = DateTime(
+      meetDate.year,
+      meetDate.month,
+      meetDate.day,
+      meetHour.hour,
+      meetHour.minute
+    );
+    itemId = item.itemId;
+    debugPrint('userId: $userId\ntext: $text\nlocation $meetLocation\nmeetTime: ${meetTime.year}/${meetTime.month}/${meetTime.day}/${meetTime.hour}/${meetTime.minute}\nsenderId: $senderId\nitemId: $itemId');
+  }
+
+  Future<void> _sendFoundNotif(String senderId, Item item) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://knightfind.xyz:4000/api/notificatoins'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'userId': userId,
+          'text': text,
+          'isMeetup': isMeetup,
+          'location': meetLocation,
+          'meetTime': meetTime,
+          'senderId': senderId,
+          'itemId': itemId
+        })
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        if (data['error'] == null || data['error'].isEmpty) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Notification sent!')),
+            );
+          }
+        } else {          
+          setState(() {
+            _errorMessage = data['error'];
+          });
+        }
+      }
+      //  More error handling goes here
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error sending meeting notifcation: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox.shrink();
   }
 }
