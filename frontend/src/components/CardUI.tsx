@@ -235,12 +235,12 @@ function CardUI() {
             let res = JSON.parse(txt);
             setItemContainer(res.results);
             if(res.count == 0){
-                NoItemPage.current.style.display = 'none'
-                LostItemPage.current.style.display = 'flex'
-            }
-            else{
                 NoItemPage.current.style.display = 'flex'
                 LostItemPage.current.style.display = 'none'
+            }
+            else{
+                NoItemPage.current.style.display = 'none'
+                LostItemPage.current.style.display = 'flex'
             }
             }
             
