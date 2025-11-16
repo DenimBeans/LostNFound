@@ -180,7 +180,7 @@ function Notification() {
             if ((Notif.isMeetup === false || Notif.Toggle === true) && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'hidden';
             }
-            else if ((Notif.isMeetup === true || Notif.Toggle === false) && ViewNotIfButton.current) {
+            else if ((Notif.isMeetup === true && Notif.Toggle === false) && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'visible';
             }
         }
