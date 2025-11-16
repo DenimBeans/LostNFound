@@ -346,7 +346,7 @@ function Notification() {
             </div>
             <div id="Contest" ref={Contest}>
                 <input type="text" id="ContestLocation" className="Contest" onChange={handleContestLocation} />
-                <input type="date" id="ContestTime" className="Contest" onChange={handleContestDate} />
+                <input type="datetime-local" id="ContestTime" className="Contest" onChange={handleContestDate} />
                 <button type="button" id="SubmitContest" onClick={() => ReturnNotif(viewNotifId, "Contest")}>Submit new contest</button>
             </div>
             <div id="buttonholder">
