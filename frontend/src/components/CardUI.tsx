@@ -190,7 +190,7 @@ function CardUI() {
             }
             else{
                 setItemContainer(ItemContainer.filter((ItemContainer) => ItemContainer._id != itemId))
-                if(ItemContainer == []){
+                if(ItemContainer([])){
                     NoItemPage.current.style.display = 'flex'
                     LostItemPage.current.style.display = 'none'
                 }
