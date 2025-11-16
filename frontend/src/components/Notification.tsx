@@ -31,7 +31,7 @@ function Notification() {
     const [viewNotifId, setviewNotifId] = React.useState('');
     //contest
     const [contestLocation, setContestLocation] = React.useState('');
-    const [contestTime, setContestTime] = React.useState('');
+    const [contestTime, setContestTime] = React.useState<Date | null >(null);
     //View notification
     const [NotifTitle, setNotifTitle] = React.useState('');
     const [NotifDescription, setNotifDescription] = React.useState('');
@@ -44,8 +44,8 @@ function Notification() {
         setContestLocation(e.target.value);
     }
 
-    function handleContestDate(e: any) {
-        setContestTime(e.target.value);
+    function handleContestDate(e: React.ChangeEvent<HTMLInputElement>) {
+        setContestTime(new Date(e.target.value));
     }
 
     async function AllNotif(id: any) {
@@ -187,11 +187,11 @@ function Notification() {
         if (Notif?.meetTime) {
             var date = new Date(Notif.meetTime)
 
-            let Day = String(date.getUTCDate()).padStart(2, '0');
-            let Month = String(date.getUTCMonth() + 1).padStart(2, '0');
-            let Year = date.getUTCFullYear()
-            let Hour = String(date.getUTCHours()).padStart(2, '0');
-            let Minutes = String(date.getUTCMinutes()).padStart(2, '0');
+            let Day = String(date.getDate()).padStart(2, '0');
+            let Month = String(date.getMonth() + 1).padStart(2, '0');
+            let Year = date.getFullYear()
+            let Hour = String(date.getHours()).padStart(2, '0');
+            let Minutes = String(date.getMinutes()).padStart(2, '0');
 
 
             setNotifMeetTime(`${Month}/${Day}/${Year}--${Hour}:${Minutes}`);
@@ -208,6 +208,7 @@ function Notification() {
     };
 
     async function ReturnNotif(Notif: any, answer: string) {
+        const NotifId = Notif._id;
         if (answer == "Accept") {
             let obj = {
                 userId: Notif.senderId._id,
@@ -265,8 +266,7 @@ function Notification() {
                     console.log(res.error)
                 }
                 else {
-                    Delete(Notif._id);
-                    
+                    Delete(NotifId);
                 }
 
             }
@@ -283,7 +283,7 @@ function Notification() {
                 text: Notif.text,
                 isMeetup: Notif.isMeetup,
                 location: contestLocation,
-                meetTime: contestTime,
+                meetTime: contestTime ? contestTime.toISOString(): null,
                 senderId: itemUSERID,
                 itemId: Notif.itemId,
 
@@ -294,8 +294,8 @@ function Notification() {
                 userId: itemUSERID,
                 text: Notif.text,
                 isMeetup: false,
-                location: Notif.location,
-                meetTime: Notif.meetTime,
+                location: contestLocation,
+                meetTime: contestTime ? contestTime.toISOString(): null,
                 senderId: itemUSERID,
                 itemId: Notif.itemId,
 
@@ -333,7 +333,7 @@ function Notification() {
                     console.log(res.error)
                 }
                 else {
-                    Delete(Notif._id);
+                    Delete(NotifId);
                     
                 }
 
@@ -400,7 +400,7 @@ function Notification() {
                     console.log(res.error)
                 }
                 else {
-                    Delete(Notif._id);
+                    Delete(NotifId);
                     
                 }
             }
