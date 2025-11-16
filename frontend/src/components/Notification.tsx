@@ -186,27 +186,18 @@ function Notification() {
         setNotifCategory(Notif.itemId.category);
         setNotifImageUrl(Notif.itemId.imageUrl);
         setNotifMeetLoc(Notif.location);
+        if(Notif?.meetTime){
         var date = new Date(Notif.meetTime)
         
-        let Day = date.getDate();
-        let Month = date.getMonth()+1;
-        let Year = date.getFullYear();
-        let Hour = date.getHours();
-        let Minutes = date.getMinutes();
-        if (Day < 10){
-            Day = `0${Day}`
-        }
-        if (Month < 10){
-            Month = `0${Month}`
-        }
-        if (Hour < 10){
-            Hour = `0${Hour}`
-        }
-        if (Minutes < 10){
-            Minutes = `0${Minutes}`
-        }
-        let FormatedDate = (Month+'/'+Day+'/'+Year+'--'+Hour+':'+Minutes);
-        setNotifMeetTime(FormatedDate);
+        let Day = String(date.getDate()).padStart(2, '0');
+        let Month = String(date.getMonth()+1).padStart(2, '0');
+        let Year = date.getFullYear()
+        let Hour = String(date.getHours()).padStart(2,'0');
+        let Minutes = String(date.getMinutes()).padStart(2,'0');
+
+        
+        setNotifMeetTime(`${Month}/${Day}/${Year}--${Hour}:${Minutes}`);
+    }
 
     };
 
