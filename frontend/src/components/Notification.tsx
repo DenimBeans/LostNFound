@@ -242,14 +242,13 @@ function Notification() {
 
     async function ReturnNotif(Notif: any, answer: string) {
         console.log(Notif);
-        console.log(contestLocation)
-        console.log(contestTime)
+        
         const NotifId = Notif._id;
         if (answer == "Accept") {
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
-                isMeetup: false,
+                isMeetup: true,
                 location: Notif.location,
                 meetTime: Notif.meetTime,
                 senderId: itemUSERID,
