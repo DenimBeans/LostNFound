@@ -21,6 +21,8 @@ function Notification() {
         senderId: string;
         itemId: string;
 
+        Toggle: boolean;
+
 
     }
 
@@ -173,10 +175,10 @@ function Notification() {
 
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
-            if (Notif.isMeetup == false && ViewNotIfButton.current) {
-                ViewNotIfButton.current.style.visibility = 'none';
+            if ((Notif.isMeetup == false || Notif.Toggle == true) && ViewNotIfButton.current) {
+                ViewNotIfButton.current.style.visibility = 'hidden';
             }
-            else if (Notif.isMeetup == true && ViewNotIfButton.current) {
+            else if ((Notif.isMeetup == true && Notif.Toggle == false) && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'visible';
             }
         }
@@ -211,6 +213,7 @@ function Notification() {
 
     async function ReturnNotif(Notif: any, answer: string) {
         if (answer == "Accept") {
+            Notif.Toggle = true;
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
@@ -244,6 +247,7 @@ function Notification() {
             }
         }
         else if (answer == "Contest") {
+            Notif.Toggle = true;
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
@@ -277,6 +281,7 @@ function Notification() {
             }
         }
         else if (answer == "Deny") {
+            Notif.Toggle = true;
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
