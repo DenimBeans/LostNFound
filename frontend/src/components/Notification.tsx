@@ -62,7 +62,7 @@ function Notification() {
             let txt = await response.text();
             let res = JSON.parse(txt);
             setNotifContainer(res.results);
-
+            
         }
 
 
@@ -172,13 +172,15 @@ function Notification() {
     };
 
     async function View(Notif: any) {
-
+        if (ViewNotIf.Toggle === null || ViewNotIf.Toggle === undefined){
+            ViewNotIf.Toggle = false;
+        }
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
-            if ((Notif.isMeetup == false && Notif.Toggle == true) && ViewNotIfButton.current) {
+            if ((Notif.isMeetup === false || Notif.Toggle === true) && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'hidden';
             }
-            else if ((Notif.isMeetup == true && Notif.Toggle == false) && ViewNotIfButton.current) {
+            else if ((Notif.isMeetup === true || Notif.Toggle === false) && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'visible';
             }
         }
