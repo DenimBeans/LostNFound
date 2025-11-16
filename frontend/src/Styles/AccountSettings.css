@@ -11,7 +11,9 @@ border-radius: 20px;
 border-style:solid;
 border-color:black;
 }
-
+#firstname{
+    margin-top: 35px;
+}
 .AccountSet{
     width: 50%;
     margin-left: 25%;
@@ -39,7 +41,7 @@ border-color:black;
 
 width: 80%;
 background-color: rgb(101, 101, 101);
-height: 90vh;
+height: 50vh;
 
 flex-direction: column;
 z-index: 3;
@@ -62,7 +64,7 @@ overflow-y: auto;
 
 width: 80%;
 background-color: rgb(101, 101, 101);
-height: 90vh;
+height: 30vh;
 
 flex-direction: column;
 z-index: 3;
@@ -93,7 +95,7 @@ overflow-y: auto;
     margin-top: 20px;
     height: 45px;
     width: 20%;
-    margin-left: 40%;
+    margin-left: 20%;
     margin-bottom: 30px;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
     font-weight: bold;
@@ -150,4 +152,53 @@ overflow-y: auto;
     outline-color: darkgoldenrod;
     outline-style: solid;
     outline-width: 3px;
+}
+#Warning{
+    margin-top: 5%;
+    font-size: x-large;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    color: white;
+    text-shadow: 1px 1px 2px rgb(175, 173, 173);
+}
+
+#edituserbtn,#deleteuserbtn{
+    margin-top: 20px;
+    height: 45px;
+    width: 20%;
+    margin-left: 20%;
+    margin-bottom: 30px;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    background: linear-gradient(-45deg, darkgoldenrod 40%,  rgb(216, 159, 14) 50%,  darkgoldenrod 60%); 
+    background-size: 300%;
+    background-position-x: 100%;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color: rgb(170, 125, 11);
+    filter: drop-shadow(2px 2px 15px rgba(170, 125, 11, 0.541));
+    box-shadow: 0 8px rgb(134, 99, 9);
+    
+}
+
+#edituserbtn,#deleteuserbtn:focus, #edituserbtn,#deleteuserbtn:hover
+{
+     border-color: rgb(170, 125, 11);
+    animation: shimmer 1s infinite linear;
+}
+
+@keyframes shimmer {
+   to {
+      background-position-x: 0%
+   }
+}
+
+#edituserbtn,#deleteuserbtn:active {
+  background-color:  rgb(167, 122, 10);
+  box-shadow: 0 4px rgb(134, 99, 9);
+  transform: translateY(4px);
 }
