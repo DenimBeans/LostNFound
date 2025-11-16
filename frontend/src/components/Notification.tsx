@@ -168,14 +168,8 @@ function Notification() {
 
     async function View(Notif: any) {
         if (NotIf.Toggle === null || NotIf.Toggle === undefined) {
-            setNotifContainer(NotIfContainer => NotIfContainer.map(i => {
-                if (i._id === Notif._id) {
-                    return { ...i, Toggle: false }
-                }
-                else {
-                    return i;
-                }
-            }));
+            setNotifContainer(NotIfContainer => NotIfContainer.map(i => i._id === Notif._id ? {...i,Toggle:false} : i));
+            
         }
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
@@ -217,14 +211,7 @@ function Notification() {
 
     async function ReturnNotif(Notif: any, answer: string) {
         if (answer == "Accept") {
-            setNotifContainer(NotIfContainer => NotIfContainer.map(i => {
-                if (i._id === Notif._id) {
-                    return { ...i, Toggle: true }
-                }
-                else {
-                    return i;
-                }
-            }));
+            setNotifContainer(NotIfContainer => NotIfContainer.map(i => i._id === Notif._id ? {...i,Toggle:true} : i));
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
@@ -258,14 +245,7 @@ function Notification() {
             }
         }
         else if (answer == "Contest") {
-            setNotifContainer(NotIfContainer => NotIfContainer.map(i => {
-                if (i._id === Notif._id) {
-                    return { ...i, Toggle: true }
-                }
-                else {
-                    return i;
-                }
-            }));
+            setNotifContainer(NotIfContainer => NotIfContainer.map(i => i._id === Notif._id ? {...i,Toggle:true} : i));
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
@@ -299,14 +279,7 @@ function Notification() {
             }
         }
         else if (answer == "Deny") {
-            setNotifContainer(NotIfContainer => NotIfContainer.map(i => {
-                if (i._id === Notif._id) {
-                    return { ...i, Toggle: true }
-                }
-                else {
-                    return i;
-                }
-            }));
+            setNotifContainer(NotIfContainer => NotIfContainer.map(i => i._id === Notif._id ? {...i,Toggle:true} : i));
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
