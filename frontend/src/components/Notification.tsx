@@ -41,6 +41,8 @@ function Notification() {
     const [NotifDescription, setNotifDescription] = React.useState('');
     const [NotifCategory, setNotifCategory] = React.useState('');
     const [NotifImageUrl, setNotifImageUrl] = React.useState('');
+    const [NotifMeetLoc, setNotifMeetLoc] = React.useState('');
+    const [NotifMeetTime, setNotifMeetTime] = React.useState('');
 
     function handleContestLocation(e: any) {
         setContestLocation(e.target.value);
@@ -183,6 +185,8 @@ function Notification() {
         setNotifDescription(Notif.itemId.description);
         setNotifCategory(Notif.itemId.category);
         setNotifImageUrl(Notif.itemId.imageUrl);
+        setNotifMeetLoc(Notif.location);
+        setNotifMeetTime(Notif.meetTime);
 
     };
 
@@ -317,6 +321,9 @@ function Notification() {
                 <input type="text" id="NotifDesc" className="NotifData" value={NotifDescription} readOnly />
                 <input type="text" id="NotifCat" className="NotifData" value={NotifCategory} readOnly />
                 <input type="text" id="NotifImage" className="NotifData" value={NotifImageUrl} readOnly />
+                <span id = "MeetUpInfo">MeetUp Info</span>
+                <input type="text" id="NotifLoc" className="NotifData" value={NotifMeetLoc} readOnly />
+                <input type="text" id="NotifTime" className="NotifData" value={NotifMeetTime} readOnly />
                 <div id="ViewButtonBar" ref={ViewNotIfButton}>
                     <button type="button" id="NotifAccept" className="NotifButton" onClick={() => ReturnNotif(viewNotifId, "Accept")}>Accept</button>
                     <button type="button" id="NotifContest" className="NotifButton" onClick={() => StartContest(viewNotifId)}>Contest</button>
