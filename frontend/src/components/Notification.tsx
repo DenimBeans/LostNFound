@@ -135,6 +135,7 @@ function Notification() {
             }
             else {
                 setNotifContainer(NotifContainer.filter((NotifContainer) => NotifContainer._id != NotId))
+                AllNotif(NotId);
             }
 
 
