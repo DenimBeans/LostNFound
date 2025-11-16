@@ -56,6 +56,15 @@ function AccountSettings(){
         setnewPass(e.target.value);
     }
 
+    async function exit(){
+        if(EditUser.current){
+            EditUser.current.style.visibility = 'hidden';
+        }
+        else if(DeleteUser.current){
+            DeleteUser.current.style.visibility = 'hidden';
+        }
+    }
+
     function showEdit(){
         if(EditUser.current){
             EditUser.current.style.visibility = 'visible';
@@ -169,8 +178,11 @@ function AccountSettings(){
     
     return(
         <div id = "AccountSettingsMain">
+          <span id = "MainTitle">Thine knights heraldry!</span>
             <div id = "EditUser" ref = {EditUser}>
-                <input type = "text" className = "edituser" placeholder = {userFirst} onChange = {handleOldFirst}/>
+                <button type = "button" id="exit" onClick={() => exit()}>X</button>
+                <span id = "edittitle">Edit thine heraldry!</span>
+                <input type = "text" id = "editfirst" className = "edituser" placeholder = {userFirst} onChange = {handleOldFirst}/>
                 <input type = "text" className = "edituser" placeholder = {userLast} onChange = {handleOldLast}/>
                 <input type = "text" className = "edituser" placeholder = {userEmail} onChange = {handleOldEmail}/>
                 <input type = "text" className = "edituser" placeholder = "Old password"  onChange = {handleOldPass}/>
@@ -178,6 +190,7 @@ function AccountSettings(){
                 <button type = "button" id = "edituserbtn"  onClick = {EditUserInfo}>Submit new info</button>
             </div>
             <div id = "DeleteUser" ref = {DeleteUser}>
+                <button type = "button" id="exit" onClick={() => exit()}>X</button>
                 <span id = "Warning">Are you absolutly sure you want to delete your account?</span>
                 
                 <button type = "button" id = "deleteuserbtn"  onClick = {DeleteUserInfo}>Delete User!</button>
