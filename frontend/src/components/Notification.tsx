@@ -179,9 +179,7 @@ function Notification() {
     };
 
     async function View(Notif: any) {
-        
-        
-            
+        setNotifContainer(NotifContainer.map((j) => j._id === Notif._id ? {...j,isRead: true}: j));
         
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
