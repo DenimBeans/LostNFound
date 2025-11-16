@@ -737,7 +737,7 @@ class MeetingRequest extends StatefulWidget {
 }
 
 class _MeetingRequestState extends State<MeetingRequest> { 
-  late Map<String, dynamic> userId; // Pass this
+  late String userId; // Pass this
   late String text; // Pass this
   final bool isMeetup = true;
   final TextEditingController _locationController = TextEditingController();
@@ -771,11 +771,7 @@ class _MeetingRequestState extends State<MeetingRequest> {
     senderId = widget.userId;
     text = widget.notifText;
     item = widget.item;
-    userId = {
-      'firstName': item.reporterFName,
-      'lastName': item.reporterLName,
-      'email': item.reporterEmail
-    } as Map<String, dynamic>;
+    userId = item.reporterUserId;
     /*
     meetTime = DateTime(
       meetDate!.year,
@@ -805,44 +801,57 @@ class _MeetingRequestState extends State<MeetingRequest> {
     debugPrint('Updated meetTime: $meetTime');
   }
 
-  debugPrint('userId: $userId\ntext: $text\nlocation $meetLocation\nmeetTime: ${meetTime?.year}/${meetTime?.month}/${meetTime?.day}/${meetTime?.hour}/${meetTime?.minute}\nsenderId: $senderId\nitemId: $itemId');
+  debugPrint('userId: userId\ntext: $text\nlocation $meetLocation\nmeetTime: ${meetTime?.year}/${meetTime?.month}/${meetTime?.day}/${meetTime?.hour}/${meetTime?.minute}\nsenderId: $senderId\nitemId: $itemId');
 }
 
 Future<void> _sendFoundNotif(String senderId, Item item) async {
-  _updateMeetTime();
+  //_updateMeetTime();
   setState() => _isLoading = true;
 
   try {
+    debugPrint('About to use http post');
     final response = await http.post(
-      Uri.parse('http://knightfind.xyz:4000/api/notificatoins'),
+      Uri.parse('http://knightfind.xyz:4000/api/notifications'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
         'userId': userId,
         'text': text,
         'isMeetup': isMeetup,
         'location': meetLocation,
-        'meetTime': meetTime,
+        'meetTime': meetTime?.toIso8601String(),
         'senderId': senderId,
         'itemId': itemId
       })
     );
 
     setState() => _isLoading = false;
+    debugPrint('Done encoding json data, now awaiting response');
 
-
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       final data = jsonDecode(response.body);
-
+      debugPrint('Correct response code, decoded data, checking for errors now');
+      debugPrint('Full response: $data');  // See entire structure
+      debugPrint('err type: ${data['error'].runtimeType}');  // See what type it is
+      debugPrint('err: ${data['error']}');      
       if (data['error'] == null || data['error'].isEmpty) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Notification sent!')),
           );
+          debugPrint('Notification sent!');
         }
+        else {
+          debugPrint('err');
+        }
+      } else {
+        debugPrint('err');
       }
     }
-    //  More error handling goes here
+    else {
+      debugPrint('${response.statusCode}');
+    }
   } catch (e) {
+    debugPrint('Err sending meet notif $e');
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

@@ -249,6 +249,7 @@ class Item {
   final String status;
   final double lat;
   final double lng;
+  final String reporterUserId;
   final String reporterFName;
   final String reporterLName;
   final String reporterEmail;
@@ -262,6 +263,7 @@ class Item {
     required this.status,
     required this.lat,
     required this.lng,
+    required this.reporterUserId,
     required this.reporterFName,
     required this.reporterLName,
     required this.reporterEmail,
@@ -273,12 +275,16 @@ class Item {
     String? firstName;
     String? lastName;
     String? email;
+    String userId = '';
 
     if (json['userId'] is Map) {
       final user = json['userId'] as Map<String, dynamic>;
+      userId = user['_id'] ?? '';
       firstName = user['firstName'];
       lastName = user['lastName'];
       email = user['email'];
+    } else if (json['userId'] is String) {
+      userId = json['userId'] as String;
     }
 
     //  Return complete item
@@ -290,6 +296,7 @@ class Item {
       status: json['status'],
       lat: json['location']['coordinates'][1],
       lng: json['location']['coordinates'][0],
+      reporterUserId: userId,
       reporterFName: firstName ?? '',
       reporterLName: lastName ?? '',
       reporterEmail: email ?? '',
@@ -752,15 +759,5 @@ class _AccountSettingsState extends State<AccountSettings> {
         color: Colors.black87,
       ),
     );
-  }
-}
-
-//  Item Found Meeting Popup
-class ItemFound extends StatelessWidget {
-  const ItemFound({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
   }
 }
