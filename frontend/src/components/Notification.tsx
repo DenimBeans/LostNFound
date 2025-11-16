@@ -53,6 +53,7 @@ function Notification() {
     async function exit(){
         if(ViewNotIf.current){
                 ViewNotIf.current.style.visibility = 'hidden';
+                ViewNotIfButton.current.style.visibility = 'hidden';
         }
         
     }
@@ -60,6 +61,7 @@ function Notification() {
     async function exitContest(){
         if(Contest.current){
                 Contest.current.style.visibility = 'hidden';
+                ViewNotIfButton.current.style.visibility = 'hidden';
         }
         
     }
@@ -233,9 +235,6 @@ function Notification() {
             Contest.current.style.visibility = 'visible';
         }
         
-        setContestLocation(Notif.location);
-        setContestTime(Notif.meetTime);
-        
     };
 
     async function ReturnNotif(Notif: any, answer: string) {
@@ -301,6 +300,8 @@ function Notification() {
                 }
                 else {
                     Delete(NotifId);
+                    ViewNotIf.current.style.visibility = 'hidden';
+                    ViewNotIfButton.current.style.visibility = 'hidden';
                 }
 
             }
@@ -368,7 +369,9 @@ function Notification() {
                 }
                 else {
                     Delete(NotifId);
-                    
+                    Contest.current.style.visibility = 'hidden';
+                    ViewNotIf.current.style.visibility = 'hidden';
+                    ViewNotIfButton.current.style.visibility = 'hidden';
                 }
 
             }
@@ -435,6 +438,8 @@ function Notification() {
                 }
                 else {
                     Delete(NotifId);
+                    ViewNotIf.current.style.visibility = 'hidden';
+                    ViewNotIfButton.current.style.visibility = 'hidden';
                     
                 }
             }
