@@ -56,8 +56,8 @@ function Notification() {
 
             let txt = await response.text();
             let res = JSON.parse(txt);
-            setNotifContainer(res.results);
-
+            const Notifdata =  res.results.map((i: any) => ((i.Toggle === null || i.Toggle === undefined)?{...i,Toggle:false} : i));
+            setNotifContainer(Notifdata);
         }
 
 
@@ -167,10 +167,10 @@ function Notification() {
     };
 
     async function View(Notif: any) {
-        if (NotIf.Toggle === null || NotIf.Toggle === undefined) {
-            setNotifContainer(NotIfContainer => NotIfContainer.map(i => i._id === Notif._id ? {...i,Toggle:false} : i));
+        
+        
             
-        }
+        
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
             if ((Notif.isMeetup === false || Notif.Toggle === true) && ViewNotIfButton.current) {
