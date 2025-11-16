@@ -265,6 +265,7 @@ function Notification() {
                     console.log(res.error)
                 }
                 else {
+                    Delete(Notif._id);
                     window.location.reload();
                 }
 
@@ -332,6 +333,7 @@ function Notification() {
                     console.log(res.error)
                 }
                 else {
+                    Delete(Notif._id);
                     window.location.reload();
                 }
 
@@ -398,6 +400,7 @@ function Notification() {
                     console.log(res.error)
                 }
                 else {
+                    Delete(Notif._id);
                     window.location.reload();
                 }
             }
