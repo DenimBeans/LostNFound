@@ -60,11 +60,16 @@ function AccountSettings(){
         if(EditUser.current){
             EditUser.current.style.visibility = 'hidden';
         }
-        else if(DeleteUser.current){
-            DeleteUser.current.style.visibility = 'hidden';
-        }
+        
     }
 
+    async function exitDel(){
+        if(DeleteUser.current){
+            DeleteUser.current.style.visibility = 'hidden';
+        } 
+    }
+
+        
     function showEdit(){
         if(EditUser.current){
             EditUser.current.style.visibility = 'visible';
@@ -190,7 +195,7 @@ function AccountSettings(){
                 <button type = "button" id = "edituserbtn"  onClick = {EditUserInfo}>Submit new info</button>
             </div>
             <div id = "DeleteUser" ref = {DeleteUser}>
-                <button type = "button" id="exit" onClick={() => exit()}>X</button>
+                <button type = "button" id="exit" onClick={() => exitDel()}>X</button>
                 <span id = "Warning">Are you absolutly sure you want to delete your account?</span>
                 
                 <button type = "button" id = "deleteuserbtn"  onClick = {DeleteUserInfo}>Delete User!</button>

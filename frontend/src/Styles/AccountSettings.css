@@ -155,7 +155,6 @@ overflow-y: auto;
 }
 #Warning,#edittitle{
     margin-top: 5%;
-    margin-left: 5%;
     font-size: x-large;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
     display:flex;
@@ -165,7 +164,6 @@ overflow-y: auto;
 }
 #MainTitle{
     margin-top: 5%;
-    margin-left: 5%;
     font-size: x-large;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
     display:flex;
