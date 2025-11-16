@@ -121,8 +121,7 @@ border-color:black;
 
 overflow-y: auto;
 }
-
-.NotifData{
+#NotifMain{
     width: 50%;
     margin-left: 25%;
     margin-top: 15px;
@@ -139,7 +138,24 @@ overflow-y: auto;
     border-color:black;
 }
 
-.NotifData:focus{
+.NotifData,.NotifMeetUp{
+    width: 50%;
+    margin-left: 25%;
+    margin-top: 15px;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+}
+
+.NotifData:focus,.NotifMeetUp:focus{
     outline-color: darkgoldenrod;
     outline-style: solid;
     outline-width: 3px;
@@ -207,12 +223,12 @@ overflow-y: auto;
 
 #NotificationTitle{
     border-right: 0px;
-    width: 24%;
+    width: 36%;
 }
 
 #NotificationMeetup{
     text-align: center;
-    width: 24%;
+    width: 12%;
     border-left: 0px;
 
 }
@@ -223,4 +239,14 @@ overflow-y: auto;
     font-weight: bold;
     cursor: pointer;
     margin-right: 5px;
+}
+
+#Intro,#SenderInfo,#ItemInfo,#MeetUpInfo{
+    margin-top: 10px;
+    font-size: x-large;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    color: white;
+    text-shadow: 1px 1px 2px rgb(175, 173, 173);
 }

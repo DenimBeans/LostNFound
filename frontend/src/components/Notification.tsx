@@ -475,7 +475,7 @@ function Notification() {
             <div id="NotifPage" ref = {NotifPage}>
                 {NotifContainer.map(NotifContainer => (
                     <div key={NotifContainer._id} className="NotifContainers">
-                        <textarea id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly></textarea>
+                        <input type = "text" id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly/>
                         <input type="text" id="NotificationMeetup" className="NotTitle" value={NotifContainer.isRead} readOnly />
                         <button type="button" id="NotificationView" className="NotIfBtn" onClick={() => View(NotifContainer)}>View Report</button>
                         <button type="button" id="NotificationRead" className="NotIfBtn" onClick={() => Read(NotifContainer._id)}>Read</button>
@@ -494,7 +494,7 @@ function Notification() {
                 <textarea id="NotifMain" value = {NotifMain} readOnly></textarea>
 
                 <span id="SenderInfo">From</span>
-                <input type = 'text' id = 'from 'value = {Sender} readOnly></input>
+                <input type = 'text' id = 'from' className="NotifData" value = {Sender} readOnly></input>
 
                 <span id="ItemInfo">Item Info</span>
                 <input type="text" id="NotifTitle" className="NotifData" value={NotifTitle} readOnly />
@@ -512,7 +512,7 @@ function Notification() {
                     <button type="button" id="NotifDeny" className="NotifButton" onClick={() => ReturnNotif(viewNotifId, "Deny")}>Deny</button>
                 </div>
             </div>
-            
+
             <div id="Contest" ref={Contest}>
                 <button type = "button" id="exit" onClick={() => exitContest()}>X</button>
                 <input type="text" id="ContestLocation" className="Contest" onChange={handleContestLocation} />
