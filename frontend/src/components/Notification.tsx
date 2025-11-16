@@ -189,11 +189,11 @@ function Notification() {
         if(Notif?.meetTime){
         var date = new Date(Notif.meetTime)
         
-        let Day = String(date.getDate()).padStart(2, '0');
-        let Month = String(date.getMonth()+1).padStart(2, '0');
-        let Year = date.getFullYear()
-        let Hour = String(date.getHours()).padStart(2,'0');
-        let Minutes = String(date.getMinutes()).padStart(2,'0');
+        let Day = String(date.getUTCDate()).padStart(2, '0');
+        let Month = String(date.getUTCMonth()+1).padStart(2, '0');
+        let Year = date.getUTCFullYear()
+        let Hour = String(date.getUTCHours()).padStart(2,'0');
+        let Minutes = String(date.getUTCMinutes()).padStart(2,'0');
 
         
         setNotifMeetTime(`${Month}/${Day}/${Year}--${Hour}:${Minutes}`);
