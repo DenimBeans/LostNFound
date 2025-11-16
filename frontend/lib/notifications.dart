@@ -124,20 +124,13 @@ class Notification {
     // Safely parse itemId
     NotificationItem? parsedItem;
     if (json['itemId'] != null) {
-      debugPrint('itemId data: ${json['itemId']}');
       if (json['itemId'] is Map) {
         try {
           parsedItem = NotificationItem.fromJson(json['itemId']);
-          debugPrint('Item parsed successfully: ${parsedItem.title}');
         } catch (e) {
           debugPrint('Error parsing itemId: $e');
-          debugPrint('itemId JSON: ${json['itemId']}');
         }
-      } else if (json['itemId'] is String) {
-        debugPrint('itemId is just a string ID, not an object');
       }
-    } else {
-      debugPrint('itemId is null');
     }
 
     return Notification(
@@ -190,19 +183,9 @@ class _InboxDisplayState extends State<InboxDisplay> {
             },
           );
 
-      debugPrint('📡 Response status: ${response.statusCode}');
-      debugPrint('📦 Response body: ${response.body}');
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final results = data['results'] as List;
-        debugPrint('✅ Found ${results.length} notifications');
-
-        // Debug: Print first notification if exists
-        if (results.isNotEmpty) {
-          debugPrint('First notification data: ${results[0]}');
-        }
-
         return results.map((e) => Notification.fromJson(e)).toList();
       } else {
         throw Exception('Failed to load user notifications');
@@ -522,7 +505,8 @@ class _InboxDisplayState extends State<InboxDisplay> {
                               ),
                             ),
                             const SizedBox(height: 4),
-                            if (notif.itemId!.description != null)
+                            if (notif.itemId!.description != null &&
+                                notif.itemId!.description!.isNotEmpty)
                               Text(
                                 notif.itemId!.description!,
                                 style: TextStyle(
@@ -531,7 +515,8 @@ class _InboxDisplayState extends State<InboxDisplay> {
                                 ),
                               ),
                             const SizedBox(height: 8),
-                            if (notif.itemId!.category != null)
+                            if (notif.itemId!.category != null &&
+                                notif.itemId!.category!.isNotEmpty)
                               Container(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
@@ -679,8 +664,8 @@ class _InboxDisplayState extends State<InboxDisplay> {
 
   Future<void> _respondToMeetup(Notification notif, String responseType) async {
     try {
-      // Create response notification back to sender
-      final obj = {
+      // 1. Send notification to the other person
+      final notificationToSender = {
         'userId': notif.senderId!.id,
         'text': '$responseType - ${notif.notifText}',
         'isMeetup': notif.isMeetup,
@@ -690,26 +675,58 @@ class _InboxDisplayState extends State<InboxDisplay> {
         'itemId': notif.itemId?.itemId ?? '',
       };
 
-      final apiResponse = await http.post(
+      final responseToSender = await http.post(
         Uri.parse('http://knightfind.xyz:4000/api/notifications'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(obj),
+        body: jsonEncode(notificationToSender),
       );
 
-      if (apiResponse.statusCode == 201) {
-        /*// Delete the original notification after responding
-        await _deleteNotification(notif.notificationId);*/
+      if (responseToSender.statusCode != 201) {
+        throw Exception('Failed to send response to sender');
+      }
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Response sent: $responseType'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        }
+      // 2. Send confirmation notification back to current user
+      String confirmationText;
+      if (responseType == 'Accept') {
+        confirmationText =
+            'You accepted the meetup request. Location: ${notif.location}, Time: ${notif.meetTime != null ? "${notif.meetTime!.month}/${notif.meetTime!.day}/${notif.meetTime!.year} at ${notif.meetTime!.hour}:${notif.meetTime!.minute.toString().padLeft(2, '0')}" : "Not specified"}';
+      } else if (responseType == 'Deny') {
+        confirmationText = 'You denied the meetup request.';
       } else {
-        throw Exception('Failed to send response');
+        // This shouldn't happen for Accept/Deny, but just in case
+        confirmationText = 'You responded: $responseType';
+      }
+
+      final confirmationNotification = {
+        'userId': widget.userId,
+        'text': confirmationText,
+        'isMeetup': false,
+        'location': notif.location,
+        'meetTime': notif.meetTime?.toIso8601String(),
+        'senderId': widget.userId,
+        'itemId': notif.itemId?.itemId ?? '',
+      };
+
+      final confirmationResponse = await http.post(
+        Uri.parse('http://knightfind.xyz:4000/api/notifications'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(confirmationNotification),
+      );
+
+      if (confirmationResponse.statusCode != 201) {
+        throw Exception('Failed to send confirmation notification');
+      }
+
+      // 3. Delete the original notification
+      await _deleteNotification(notif.notificationId);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Response sent: $responseType'),
+            backgroundColor: Colors.green,
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
@@ -819,7 +836,8 @@ class _InboxDisplayState extends State<InboxDisplay> {
 
                     // Send contest notification with new details
                     try {
-                      final obj = {
+                      // 1. Send notification to the other person
+                      final notificationToSender = {
                         'userId': notif.senderId!.id,
                         'text': 'Contest - ${notif.notifText}',
                         'isMeetup': true,
@@ -829,30 +847,58 @@ class _InboxDisplayState extends State<InboxDisplay> {
                         'itemId': notif.itemId?.itemId ?? '',
                       };
 
-                      final response = await http.post(
+                      final responseToSender = await http.post(
                         Uri.parse(
                           'http://knightfind.xyz:4000/api/notifications',
                         ),
                         headers: {'Content-Type': 'application/json'},
-                        body: jsonEncode(obj),
+                        body: jsonEncode(notificationToSender),
                       );
 
-                      if (response.statusCode == 201) {
-                        // Delete the original notification
-                        await _deleteNotification(notif.notificationId);
+                      if (responseToSender.statusCode != 201) {
+                        throw Exception('Failed to send contest to sender');
+                      }
 
-                        if (mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Contest sent with new meeting details',
-                              ),
-                              backgroundColor: Colors.green,
+                      // 2. Send confirmation notification back to current user
+                      final confirmationText =
+                          'You contested the meetup with new details. Location: ${locationController.text}, Time: ${selectedDate.month}/${selectedDate.day}/${selectedDate.year} at ${selectedDate.hour}:${selectedDate.minute.toString().padLeft(2, '0')}';
+
+                      final confirmationNotification = {
+                        'userId': widget.userId,
+                        'text': confirmationText,
+                        'isMeetup': false,
+                        'location': locationController.text,
+                        'meetTime': selectedDate.toIso8601String(),
+                        'senderId': widget.userId,
+                        'itemId': notif.itemId?.itemId ?? '',
+                      };
+
+                      final confirmationResponse = await http.post(
+                        Uri.parse(
+                          'http://knightfind.xyz:4000/api/notifications',
+                        ),
+                        headers: {'Content-Type': 'application/json'},
+                        body: jsonEncode(confirmationNotification),
+                      );
+
+                      if (confirmationResponse.statusCode != 201) {
+                        throw Exception(
+                          'Failed to send confirmation notification',
+                        );
+                      }
+
+                      // 3. Delete the original notification
+                      await _deleteNotification(notif.notificationId);
+
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Contest sent with new meeting details',
                             ),
-                          );
-                        }
-                      } else {
-                        throw Exception('Failed to send contest');
+                            backgroundColor: Colors.green,
+                          ),
+                        );
                       }
                     } catch (e) {
                       if (mounted) {

@@ -85,9 +85,9 @@ overflow-y: auto;
 }
 
 #Contest{
-width: 80%;
+width: 40%;
 background-color: rgb(101, 101, 101);
-height: 90vh;
+height: 50vh;
 
 flex-direction: column;
 z-index: 3;
@@ -107,7 +107,30 @@ border-color:black;
 overflow-y: auto;
 }
 
-.NotIfData{
+.NotifData{
+    width: 50%;
+    margin-left: 25%;
+    margin-top: 15px;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+}
+
+.NotifData:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+}
+
+.Contest{
     width: 50%;
     margin-left: 25%;
     display:flex;
@@ -123,7 +146,7 @@ overflow-y: auto;
     border-color:black;
 }
 
-.NotIfData:focus{
+.Contest:focus{
     outline-color: darkgoldenrod;
     outline-style: solid;
     outline-width: 3px;
@@ -153,7 +176,7 @@ overflow-y: auto;
 }
 
 .NotIfContainers{
-    margin-top: 2px;
+    margin-top: 5px;
     margin-bottom: 2px;
     margin-left: 5px;
     display:flex;
@@ -161,6 +184,10 @@ overflow-y: auto;
     width: 99%;
     justify-content: center;
     flex-shrink: 0;
+
+    background: linear-gradient(-45deg, darkgoldenrod 40%,  rgb(216, 159, 14) 50%,  darkgoldenrod 60%); 
+    background-size: 300%;
+    background-position-x: 100%;
 }
 
 #NotificationTitle{

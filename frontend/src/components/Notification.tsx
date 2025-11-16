@@ -7,19 +7,15 @@ import '../Styles/Notification.css';
 function Notification() {
 
     interface NotifData {
-        _id: string;
-        title: string;
-        description: string;
-        category: string;
-        imageUrl: string;
 
         text: string;
         isMeetup: boolean;
         isRead: boolean;
         location: string;
         meetTime: Date;
-        senderId: string;
-        itemId: string;
+        senderId: { _id: string; firstname: string; lastName: string; }
+        itemId: { _id: string; title: string; description: string; category: string; imageUrl: string; }
+
 
 
     }
@@ -35,7 +31,7 @@ function Notification() {
     const [viewNotifId, setviewNotifId] = React.useState('');
     //contest
     const [contestLocation, setContestLocation] = React.useState('');
-    const [contestTime, setContestTime] = React.useState('');
+    const [contestTime, setContestTime] = React.useState<Date | null >(null);
     //View notification
     const [NotifTitle, setNotifTitle] = React.useState('');
     const [NotifDescription, setNotifDescription] = React.useState('');
@@ -48,8 +44,22 @@ function Notification() {
         setContestLocation(e.target.value);
     }
 
-    function handleContestDate(e: any) {
-        setContestTime(e.target.value);
+    function handleContestDate(e: React.ChangeEvent<HTMLInputElement>) {
+        setContestTime(new Date(e.target.value));
+    }
+
+    async function exit(){
+        if(ViewNotIf.current){
+                ViewNotIf.current.style.visibility = 'hidden';
+        }
+        
+    }
+
+    async function exitContest(){
+        if(Contest.current){
+                Contest.current.style.visibility = 'hidden';
+        }
+        
     }
 
     async function AllNotif(id: any) {
@@ -60,7 +70,6 @@ function Notification() {
             let txt = await response.text();
             let res = JSON.parse(txt);
             setNotifContainer(res.results);
-
         }
 
 
@@ -170,13 +179,14 @@ function Notification() {
     };
 
     async function View(Notif: any) {
-
+        setNotifContainer(NotifContainer.map((j) => j._id === Notif._id ? {...j,isRead: true}: j));
+        Read(Notif._id);
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
-            if (Notif.isMeetup == false && ViewNotIfButton.current) {
-                ViewNotIfButton.current.style.visibility = 'none';
+            if (Notif.isMeetup === false  && ViewNotIfButton.current) {
+                ViewNotIfButton.current.style.visibility = 'hidden';
             }
-            else if (Notif.isMeetup == true && ViewNotIfButton.current) {
+            else if (Notif.isMeetup === true  && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'visible';
             }
         }
@@ -186,27 +196,21 @@ function Notification() {
         setNotifCategory(Notif.itemId.category);
         setNotifImageUrl(Notif.itemId.imageUrl);
         setNotifMeetLoc(Notif.location);
-        var date = new Date(Notif.meetTime)
-        
-        let Day = date.getDate();
-        let Month = date.getMonth()+1;
-        let Year = date.getFullYear();
-        let Hour = date.getHours();
-        let Minutes = date.getMinutes();
-        if (Day < 10){
-            Day = `0${Day}`
+        if (Notif.meetTime != null) {
+            var date = new Date(Notif.meetTime)
+
+            let Day = String(date.getDate()).padStart(2, '0');
+            let Month = String(date.getMonth() + 1).padStart(2, '0');
+            let Year = date.getFullYear()
+            let Hour = String(date.getHours()).padStart(2, '0');
+            let Minutes = String(date.getMinutes()).padStart(2, '0');
+
+
+            setNotifMeetTime(`${Month}/${Day}/${Year}--${Hour}:${Minutes}`);
         }
-        if (Month < 10){
-            Month = `0${Month}`
+        else{
+            setNotifMeetTime('');
         }
-        if (Hour < 10){
-            Hour = `0${Hour}`
-        }
-        if (Minutes < 10){
-            Minutes = `0${Minutes}`
-        }
-        let FormatedDate = (Month+'/'+Day+'/'+Year+'--'+Hour+':'+Minutes);
-        setNotifMeetTime(FormatedDate);
 
     };
 
@@ -219,6 +223,7 @@ function Notification() {
     };
 
     async function ReturnNotif(Notif: any, answer: string) {
+        const NotifId = Notif._id;
         if (answer == "Accept") {
             let obj = {
                 userId: Notif.senderId._id,
@@ -231,6 +236,19 @@ function Notification() {
 
             };
             let js = JSON.stringify(obj);
+
+            let objRet = {
+                userId: itemUSERID,
+                text: Notif.text,
+                isMeetup: false,
+                location: Notif.location,
+                meetTime: Notif.meetTime,
+                senderId: itemUSERID,
+                itemId: Notif.itemId,
+
+            };
+            let jsRet = JSON.stringify(objRet);
+
             try {
                 const response = await fetch(buildAPIPath(`api/notifications`),
                     { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
@@ -242,7 +260,28 @@ function Notification() {
                     console.log(res.error)
                 }
                 else {
-                    window.location.reload();
+                    
+                }
+
+            }
+
+
+            catch (error: any) {
+                console.log("Frontend Error");
+            }
+            //Sent Back to user to log
+            try {
+                const response = await fetch(buildAPIPath(`api/notifications`),
+                    { method: 'POST', body: jsRet, headers: { 'Content-Type': 'application/json' } });
+
+                let txt = await response.text();
+                let res = JSON.parse(txt);
+
+                if (res.error != '') {
+                    console.log(res.error)
+                }
+                else {
+                    Delete(NotifId);
                 }
 
             }
@@ -253,17 +292,30 @@ function Notification() {
             }
         }
         else if (answer == "Contest") {
+            
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
                 isMeetup: Notif.isMeetup,
                 location: contestLocation,
-                meetTime: contestTime,
+                meetTime: contestTime ? contestTime.toISOString(): null,
                 senderId: itemUSERID,
                 itemId: Notif.itemId,
 
             };
             let js = JSON.stringify(obj);
+
+            let objRet = {
+                userId: itemUSERID,
+                text: Notif.text,
+                isMeetup: false,
+                location: contestLocation,
+                meetTime: contestTime ? contestTime.toISOString(): null,
+                senderId: itemUSERID,
+                itemId: Notif.itemId,
+
+            };
+            let jsRet = JSON.stringify(objRet);
             try {
                 const response = await fetch(buildAPIPath(`api/notifications`),
                     { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
@@ -275,7 +327,29 @@ function Notification() {
                     console.log(res.error)
                 }
                 else {
-                    window.location.reload();
+                    
+                }
+
+            }
+
+
+            catch (error: any) {
+                console.log("Frontend Error");
+            }
+            //Sent Back to user to log
+            try {
+                const response = await fetch(buildAPIPath(`api/notifications`),
+                    { method: 'POST', body: jsRet, headers: { 'Content-Type': 'application/json' } });
+
+                let txt = await response.text();
+                let res = JSON.parse(txt);
+
+                if (res.error != '') {
+                    console.log(res.error)
+                }
+                else {
+                    Delete(NotifId);
+                    
                 }
 
             }
@@ -286,6 +360,7 @@ function Notification() {
             }
         }
         else if (answer == "Deny") {
+            
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
@@ -297,6 +372,18 @@ function Notification() {
 
             };
             let js = JSON.stringify(obj);
+
+            let objRet = {
+                userId: itemUSERID,
+                text: Notif.text,
+                isMeetup: false,
+                location: Notif.location,
+                meetTime: Notif.meetTime,
+                senderId: itemUSERID,
+                itemId: Notif.itemId,
+
+            };
+            let jsRet = JSON.stringify(objRet);
             try {
                 const response = await fetch(buildAPIPath(`api/notifications`),
                     { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
@@ -308,7 +395,28 @@ function Notification() {
                     console.log(res.error)
                 }
                 else {
-                    window.location.reload();
+                    
+                }
+            }
+
+
+            catch (error: any) {
+                console.log("Frontend Error");
+            }
+            //Log back to user
+            try {
+                const response = await fetch(buildAPIPath(`api/notifications`),
+                    { method: 'POST', body: jsRet, headers: { 'Content-Type': 'application/json' } });
+
+                let txt = await response.text();
+                let res = JSON.parse(txt);
+
+                if (res.error != '') {
+                    console.log(res.error)
+                }
+                else {
+                    Delete(NotifId);
+                    
                 }
             }
 
@@ -328,20 +436,20 @@ function Notification() {
                     <div key={NotifContainer._id} className="NotifContainers">
                         <input type="text" id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly />
                         <input type="text" id="NotificationMeetup" className="NotTitle" value={NotifContainer.isRead} readOnly />
-                        <button type="button" id="NotificationView" className = "NotIfBtn" onClick={() => View(NotifContainer)}>View Report</button>
-                        <button type="button" id="NotificationRead" className = "NotIfBtn" onClick={() => Read(NotifContainer._id)}>Read</button>
-                        <button type="button" id="NotificationDelete" className = "NotIfBtn" onClick={() => Delete(NotifContainer._id)}>Delete</button>
+                        <button type="button" id="NotificationView" className="NotIfBtn" onClick={() => View(NotifContainer)}>View Report</button>
+                        <button type="button" id="NotificationRead" className="NotIfBtn" onClick={() => Read(NotifContainer._id)}>Read</button>
+                        <button type="button" id="NotificationDelete" className="NotIfBtn" onClick={() => Delete(NotifContainer._id)}>Delete</button>
                     </div>
                 ))}
 
             </div>
             <div id="ViewNotIf" ref={ViewNotIf}>
-
+                <button type = "button" id="exit" onClick={() => exit()}>X</button>
                 <input type="text" id="NotifTitle" className="NotifData" value={NotifTitle} readOnly />
                 <input type="text" id="NotifDesc" className="NotifData" value={NotifDescription} readOnly />
                 <input type="text" id="NotifCat" className="NotifData" value={NotifCategory} readOnly />
                 <input type="text" id="NotifImage" className="NotifData" value={NotifImageUrl} readOnly />
-                <span id = "MeetUpInfo">MeetUp Info</span>
+                <span id="MeetUpInfo">MeetUp Info</span>
                 <input type="text" id="NotifLoc" className="NotifData" value={NotifMeetLoc} readOnly />
                 <input type="text" id="NotifTime" className="NotifData" value={NotifMeetTime} readOnly />
                 <div id="ViewButtonBar" ref={ViewNotIfButton}>
@@ -351,8 +459,9 @@ function Notification() {
                 </div>
             </div>
             <div id="Contest" ref={Contest}>
+                <button type = "button" id="exit" onClick={() => exitContest()}>X</button>
                 <input type="text" id="ContestLocation" className="Contest" onChange={handleContestLocation} />
-                <input type="date" id="ContestTime" className="Contest" onChange={handleContestDate} />
+                <input type="datetime-local" id="ContestTime" className="Contest" onChange={handleContestDate} />
                 <button type="button" id="SubmitContest" onClick={() => ReturnNotif(viewNotifId, "Contest")}>Submit new contest</button>
             </div>
             <div id="buttonholder">
