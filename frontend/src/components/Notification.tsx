@@ -55,7 +55,7 @@ function Notification() {
 
             let txt = await response.text();
             let res = JSON.parse(txt);
-            setNotifContainer(Notifdata);
+            setNotifContainer(res.results);
         }
 
 
