@@ -72,7 +72,7 @@ function Notification() {
             let txt = await response.text();
             let res = JSON.parse(txt);
             setNotifContainer(res.results);
-            if(res.results === []){
+            if(res.count == 0){
                 NoNotif.current.style.display = 'flex';
             }
             else{
@@ -179,6 +179,7 @@ function Notification() {
             else {
                 setNotifContainer([])
                 NotifPage.current.style.display = 'none';
+                NoNotif.current.style.display = 'flex';
             }
 
 
