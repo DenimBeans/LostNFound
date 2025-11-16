@@ -190,6 +190,10 @@ function CardUI() {
             }
             else{
                 setItemContainer(ItemContainer.filter((ItemContainer) => ItemContainer._id != itemId))
+                if(ItemContainer == []){
+                    NoItemPage.current.style.display = 'flex'
+                    LostItemPage.current.style.display = 'none'
+                }
             }
 
             
@@ -217,7 +221,8 @@ function CardUI() {
                 setRepMessage(res.error)
             }
             else {
-                exitReport();
+                exitReport();      
+                LostItemPage.current.style.display = 'flex'
             }
         }
         catch (error: any) {
