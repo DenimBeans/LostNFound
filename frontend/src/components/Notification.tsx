@@ -232,12 +232,16 @@ function Notification() {
         if (Contest.current) {
             Contest.current.style.visibility = 'visible';
         }
+        
         setContestLocation(Notif.location);
         setContestTime(Notif.meetTime);
+        
     };
 
     async function ReturnNotif(Notif: any, answer: string) {
-        console.log();
+        console.log(Notif);
+        console.log(contestLocation)
+        console.log(contestTime)
         const NotifId = Notif.userId;
         if (answer == "Accept") {
             let obj = {
