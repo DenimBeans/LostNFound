@@ -198,7 +198,7 @@ function Notification() {
         setNotifCategory(Notif.itemId.category);
         setNotifImageUrl(Notif.itemId.imageUrl);
         setNotifMeetLoc(Notif.location);
-        if (Notif?.meetTime) {
+        if (Notif.meetTime != null) {
             var date = new Date(Notif.meetTime)
 
             let Day = String(date.getDate()).padStart(2, '0');
@@ -209,6 +209,9 @@ function Notification() {
 
 
             setNotifMeetTime(`${Month}/${Day}/${Year}--${Hour}:${Minutes}`);
+        }
+        else{
+            setNotifMeetTime('');
         }
 
     };
