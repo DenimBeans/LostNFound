@@ -175,7 +175,7 @@ function Notification() {
 
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
-            if ((Notif.isMeetup == false || Notif.Toggle == true) && ViewNotIfButton.current) {
+            if ((Notif.isMeetup == false && Notif.Toggle == true) && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'hidden';
             }
             else if ((Notif.isMeetup == true && Notif.Toggle == false) && ViewNotIfButton.current) {
