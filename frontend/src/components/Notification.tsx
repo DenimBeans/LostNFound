@@ -19,6 +19,8 @@ function Notification() {
 
 
     }
+    const NotifPage = useRef<HTMLDivElement>(null);
+    const NoNotif = useRef<HTMLDivElement>(null);
 
     const ViewNotIf = useRef<HTMLDivElement>(null);
     const ViewNotIfButton = useRef<HTMLDivElement>(null);
@@ -70,7 +72,14 @@ function Notification() {
             let txt = await response.text();
             let res = JSON.parse(txt);
             setNotifContainer(res.results);
+            if(res.count == 0){
+                NoNotif.current.style.display = 'flex';
+            }
+            else{
+                NotifPage.current.style.display = 'flex';
+            }
         }
+        
 
 
         catch (error: any) {
@@ -169,6 +178,8 @@ function Notification() {
             }
             else {
                 setNotifContainer([])
+                NotifPage.current.style.display = 'none';
+                NoNotif.current.style.display = 'flex';
             }
 
 
@@ -431,7 +442,7 @@ function Notification() {
 
     return (
         <div id="NotificationMain">
-            <div id="NotifPage">
+            <div id="NotifPage" ref = {NotifPage}>
                 {NotifContainer.map(NotifContainer => (
                     <div key={NotifContainer._id} className="NotifContainers">
                         <input type="text" id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly />
@@ -442,6 +453,9 @@ function Notification() {
                     </div>
                 ))}
 
+            </div>
+            <div id = "NoNotif" ref = {NoNotif}>
+                <span>No notifications!</span>
             </div>
             <div id="ViewNotIf" ref={ViewNotIf}>
                 <button type = "button" id="exit" onClick={() => exit()}>X</button>

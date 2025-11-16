@@ -12,6 +12,8 @@ import 'leaflet/dist/leaflet.css';
 import markerIconPng from "../assets/marker-icon.png";
 
 function CardUI() {
+    const LostItemPage = useRef<HTMLDivElement>(null);
+    const NoItemPage = useRef<HTMLDivElement>(null);
     const AddPopupRef = useRef<HTMLDivElement>(null);
     const EditPopupRef = useRef<HTMLDivElement>(null);
     const ViewPopupRef = useRef<HTMLDivElement>(null);
@@ -187,7 +189,8 @@ function CardUI() {
                 setMessage(res.error)
             }
             else{
-                setItemContainer(ItemContainer.filter((ItemContainer) => ItemContainer._id != itemId))
+                setItemContainer(ItemContainer.filter((ItemContainer) => ItemContainer._id !== itemId));
+                searchItem(itemUSERID);
             }
 
             
@@ -215,7 +218,8 @@ function CardUI() {
                 setRepMessage(res.error)
             }
             else {
-                exitReport();
+                exitReport();      
+                LostItemPage.current.style.display = 'flex'
             }
         }
         catch (error: any) {
@@ -232,6 +236,14 @@ function CardUI() {
             let txt = await response.text();
             let res = JSON.parse(txt);
             setItemContainer(res.results);
+            if(res.count == 0){
+                NoItemPage.current.style.display = 'flex'
+                LostItemPage.current.style.display = 'none'
+            }
+            else{
+                NoItemPage.current.style.display = 'none'
+                LostItemPage.current.style.display = 'flex'
+            }
             }
             
         
@@ -370,7 +382,7 @@ function ChangeView({center, zoom }: any) {
 
             <h1 id = "homeHeader" className = "inner-title">Item Reports</h1>
 
-            <div id = "LostItemPage">
+            <div id = "LostItemPage" ref = {LostItemPage}>
                 {ItemContainer.map(ItemContainer => (
                     <div key = {ItemContainer._id} className = "ItemContainers">
                         <input type = "text" id = "ContainerTitle" className = "containerInput" value = {ItemContainer.title} readOnly/>
@@ -381,6 +393,9 @@ function ChangeView({center, zoom }: any) {
                     </div>
                 ))}
                 
+            </div>
+            <div id = "NoItemPage" ref ={NoItemPage}>
+                <span>No items!</span>
             </div>
 
             <div id = "SearchBar">
