@@ -204,7 +204,7 @@ function AccountSettings(){
             <input type = "text" id = "firstname" className = "AccountSet" value = {userFirst} readOnly/>
             <span className = "MainAccountSet" id = "lname">Lastname</span>
             <input type = "text" id = "lastname" className = "AccountSet" value = {userLast}  readOnly/>
-            <span className = "MainAccountSet" id = "email">Email</span>
+            <span className = "MainAccountSet" id = "Setemail">Email</span>
             <input type = "text" id = "Accountemail" className = "AccountSet" value = {userEmail} readOnly/>
             
             
