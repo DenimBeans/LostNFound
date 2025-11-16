@@ -76,9 +76,12 @@ function Notification() {
             setNotifContainer(res.results);
             if(res.count == 0){
                 NoNotif.current.style.display = 'flex';
+                NotifPage.current.style.display = 'none';
             }
             else{
+                NoNotif.current.style.display = 'none';
                 NotifPage.current.style.display = 'flex';
+
             }
         }
         
