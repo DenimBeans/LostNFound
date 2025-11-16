@@ -242,7 +242,7 @@ function Notification() {
         console.log(Notif);
         console.log(contestLocation)
         console.log(contestTime)
-        const NotifId = Notif.userId;
+        const NotifId = Notif._id;
         if (answer == "Accept") {
             let obj = {
                 userId: Notif.senderId._id,
