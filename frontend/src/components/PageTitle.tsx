@@ -18,7 +18,7 @@ function PageTitle() {
     if (HomeRef.current && notifRef.current && accountRef.current && aboutRef.current
         && logoutRef.current && location === '/main')
     {
-      HomeRef.current.style.visibility = 'none';
+      HomeRef.current.style.display = 'none';
       notifRef.current.style.visibility = 'visible';
       accountRef.current.style.visibility = 'visible';
       aboutRef.current.style.visibility = 'visible';
@@ -28,7 +28,7 @@ function PageTitle() {
         && logoutRef.current && location === '/Notification')
     {
       HomeRef.current.style.visibility = 'visible';
-      notifRef.current.style.visibility = 'none';
+      notifRef.current.style.display = 'none';
       accountRef.current.style.visibility = 'visible';
       aboutRef.current.style.visibility = 'visible';
       logoutRef.current.style.visibility = 'visible';
@@ -38,7 +38,7 @@ function PageTitle() {
     {
       HomeRef.current.style.visibility = 'visible';
       notifRef.current.style.visibility = 'visible';
-      accountRef.current.style.visibility = 'none';
+      accountRef.current.style.display = 'none';
       aboutRef.current.style.visibility = 'visible';
       logoutRef.current.style.visibility = 'visible';
     }
@@ -48,7 +48,7 @@ function PageTitle() {
       HomeRef.current.style.visibility = 'visible';
       notifRef.current.style.visibility = 'visible';
       accountRef.current.style.visibility = 'visible';
-      aboutRef.current.style.visibility = 'none';
+      aboutRef.current.style.display = 'none';
       logoutRef.current.style.visibility = 'visible';
     }
     

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_dragmarker/flutter_map_dragmarker.dart';
 import 'package:latlong2/latlong.dart';
 import 'main.dart';
 import 'home.dart';
@@ -48,6 +49,13 @@ class EditItemPageState extends State<EditItemPage> {
     super.dispose();
   }
 
+  // Callback to update marker position when dragged
+  void _updateMarkerPosition(LatLng newPosition) {
+    setState(() {
+      _markerPosition = newPosition;
+    });
+  }
+
   Future<void> _updateItem() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -85,8 +93,8 @@ class EditItemPageState extends State<EditItemPage> {
             },
           );
 
-      print('📡 Response status: ${response.statusCode}');
-      print('📦 Response body: ${response.body}');
+      debugPrint('📡 Response status: ${response.statusCode}');
+      debugPrint('📦 Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         if (mounted) {
@@ -103,12 +111,42 @@ class EditItemPageState extends State<EditItemPage> {
         throw Exception(data['error'] ?? 'Failed to update item');
       }
     } catch (e) {
-      print('❌ Error: $e');
+      debugPrint('❌ Error: $e');
       setState(() {
         _errorMessage = e.toString().replaceAll('Exception: ', '');
         _isLoading = false;
       });
     }
+  }
+
+  // Helper function to create a draggable marker for editing
+  DragMarker _buildEditMarker({required LatLng point}) {
+    return DragMarker(
+      key: GlobalKey<DragMarkerWidgetState>(),
+      point: point,
+      size: const Size(95, 65),
+      builder: (_, pos, ___) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.location_pin, color: Colors.red, size: 40),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.white.withAlpha(204),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Text(
+                'Drag to move',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
+              ),
+            ),
+          ],
+        );
+      },
+      onDragEnd: (details, point) => _updateMarkerPosition(point),
+    );
   }
 
   @override
@@ -148,7 +186,7 @@ class EditItemPageState extends State<EditItemPage> {
                 ),
               ),
 
-            // Map with draggable marker
+            // Map with draggable marker using MapUCF widget
             const Text(
               'Location',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -158,43 +196,16 @@ class EditItemPageState extends State<EditItemPage> {
               height: 250,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: FlutterMap(
-                  options: MapOptions(
-                    initialCenter: _markerPosition,
-                    initialZoom: 17,
-                    onTap: (tapPosition, point) {
-                      setState(() {
-                        _markerPosition = point;
-                      });
-                    },
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate:
-                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.example.app',
-                    ),
-                    MarkerLayer(
-                      markers: [
-                        Marker(
-                          point: _markerPosition,
-                          width: 80,
-                          height: 80,
-                          child: const Icon(
-                            Icons.location_pin,
-                            size: 50,
-                            color: Colors.red,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                child: MapUCF(
+                  pontoCentral: _markerPosition,
+                  markers: null,
+                  dragMarker: [_buildEditMarker(point: _markerPosition)],
                 ),
               ),
             ),
             const SizedBox(height: 8),
             Text(
-              'Tap on the map to change location',
+              'Drag the marker to change location',
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey[600],

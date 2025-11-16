@@ -13,7 +13,7 @@ border-color:black;
 
 #NotifPage{
 height: 50vh;
-width: 50%;
+width: 100%;
 background-color: rgb(101, 101, 101);
 flex-direction: column;
 float: left;
@@ -23,9 +23,9 @@ border-bottom: 5px solid rgb(50, 50, 50);
 }
 
 #ViewNotIf{
-width: 80%;
+width: 40%;
 background-color: rgb(101, 101, 101);
-height: 90vh;
+height: 60vh;
 
 flex-direction: column;
 z-index: 3;
@@ -57,7 +57,7 @@ overflow-y: auto;
     margin-top: 20px;
     height: 45px;
     width: 20%;
-    margin-left: 40%;
+    margin-left: 10%;
     margin-bottom: 30px;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
     font-weight: bold;
@@ -105,4 +105,80 @@ border-style:solid;
 border-color:black;
 
 overflow-y: auto;
+}
+
+.NotIfData{
+    width: 50%;
+    margin-left: 25%;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+}
+
+.NotIfData:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+}
+
+.bottombutton{
+    margin-top: 20px;
+    height: 45px;
+    width: 20%;
+    margin-left: 20%;
+    margin-bottom: 30px;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    font-size: 16px;
+    background: linear-gradient(-45deg, darkgoldenrod 40%,  rgb(216, 159, 14) 50%,  darkgoldenrod 60%); 
+    background-size: 300%;
+    background-position-x: 100%;
+
+    
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color: rgb(170, 125, 11);
+    filter: drop-shadow(2px 2px 15px rgba(170, 125, 11, 0.541));
+    box-shadow: 0 8px rgb(134, 99, 9);
+}
+
+.NotIfContainers{
+    margin-top: 2px;
+    margin-bottom: 2px;
+    margin-left: 5px;
+    display:flex;
+    height: 50px;
+    width: 99%;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+#NotificationTitle{
+    border-right: 0px;
+    width: 24%;
+}
+
+#NotificationMeetup{
+    text-align: center;
+    width: 24%;
+    border-left: 0px;
+
+}
+
+.NotIfBtn{
+    border-radius: 8px;
+    font-family:  'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    font-weight: bold;
+    cursor: pointer;
+    margin-right: 5px;
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { buildAPIPath } from './Path';
 import { useEffect } from 'react';
 import { useRef } from 'react';
+import { format } from 'date-fns'
 import '../Styles/Notification.css';
 
 function Notification() {
@@ -41,6 +42,8 @@ function Notification() {
     const [NotifDescription, setNotifDescription] = React.useState('');
     const [NotifCategory, setNotifCategory] = React.useState('');
     const [NotifImageUrl, setNotifImageUrl] = React.useState('');
+    const [NotifMeetLoc, setNotifMeetLoc] = React.useState('');
+    const [NotifMeetTime, setNotifMeetTime] = React.useState('');
 
     function handleContestLocation(e: any) {
         setContestLocation(e.target.value);
@@ -183,6 +186,8 @@ function Notification() {
         setNotifDescription(Notif.itemId.description);
         setNotifCategory(Notif.itemId.category);
         setNotifImageUrl(Notif.itemId.imageUrl);
+        setNotifMeetLoc(Notif.location);
+        setNotifMeetTime(Notif.meetTime);
 
     };
 
@@ -304,9 +309,9 @@ function Notification() {
                     <div key={NotifContainer._id} className="NotifContainers">
                         <input type="text" id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly />
                         <input type="text" id="NotificationMeetup" className="NotTitle" value={NotifContainer.isRead} readOnly />
-                        <button type="button" id="NotificationView" onClick={() => View(NotifContainer)}>View Report</button>
-                        <button type="button" id="NotificationRead" onClick={() => Read(NotifContainer._id)}>Read</button>
-                        <button type="button" id="NotificationDelete" onClick={() => Delete(NotifContainer._id)}>Delete</button>
+                        <button type="button" id="NotificationView" className = "NotIfBtn" onClick={() => View(NotifContainer)}>View Report</button>
+                        <button type="button" id="NotificationRead" className = "NotIfBtn" onClick={() => Read(NotifContainer._id)}>Read</button>
+                        <button type="button" id="NotificationDelete" className = "NotIfBtn" onClick={() => Delete(NotifContainer._id)}>Delete</button>
                     </div>
                 ))}
 
@@ -317,6 +322,9 @@ function Notification() {
                 <input type="text" id="NotifDesc" className="NotifData" value={NotifDescription} readOnly />
                 <input type="text" id="NotifCat" className="NotifData" value={NotifCategory} readOnly />
                 <input type="text" id="NotifImage" className="NotifData" value={NotifImageUrl} readOnly />
+                <span id = "MeetUpInfo">MeetUp Info</span>
+                <input type="text" id="NotifLoc" className="NotifData" value={NotifMeetLoc} readOnly />
+                <input type="date" id="NotifTime" className="NotifData" value={format(NotifMeetTime, 'MM/dd/yyyy')} readOnly />
                 <div id="ViewButtonBar" ref={ViewNotIfButton}>
                     <button type="button" id="NotifAccept" className="NotifButton" onClick={() => ReturnNotif(viewNotifId, "Accept")}>Accept</button>
                     <button type="button" id="NotifContest" className="NotifButton" onClick={() => StartContest(viewNotifId)}>Contest</button>
