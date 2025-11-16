@@ -154,29 +154,11 @@ class _SearchMapState extends State<SearchMap> {
             builder: (BuildContext context) => ItemModal(item: item, userId: widget.userId),
           );
         },
-        // The visual content of the pin is a column with the icon and text
-        child: Column(
-          children: [
-            const Icon(
-              Icons.location_pin,
-              //color: color,
-              size: 40,
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.white.withAlpha(204),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                item.title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 12,
-                ),
-              ),
-            ),
-          ],
+        // Marker represented by icon on map
+        child: Icon(
+          Icons.location_pin,
+          //color: color,
+          size: 40,
         ),
       ),
     );

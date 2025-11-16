@@ -329,7 +329,7 @@ class TrackedItemsState extends State<TrackedItems> {
                             onPressed: () {
                               showDialog(
                                 context: context,
-                                builder: (BuildContext context) => MeetupModal(),
+                                builder: (BuildContext context) => MeetupModal(userId: widget.userId, item: item),
                               );
                             },
                             minWidth: double.infinity,
@@ -362,22 +362,6 @@ class TrackedItemsState extends State<TrackedItems> {
     );
   }
 
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'lost':
-        return Colors.orange;
-      case 'found':
-        return Colors.green;
-      case 'pending':
-        return Colors.blue;
-      case 'claimed':
-        return Colors.purple;
-      case 'returned':
-        return Colors.grey;
-      default:
-        return Colors.grey;
-    }
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -484,6 +468,7 @@ class TrackedItemsState extends State<TrackedItems> {
       ),
     );
   }
+  
   Widget _buildItemCard(Item item) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -543,24 +528,6 @@ class TrackedItemsState extends State<TrackedItems> {
                         style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                       ),
                     const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                     // decoration: BoxDecoration(
-                     //   color: _getStatusColor(item.status),
-                     //   borderRadius: BorderRadius.circular(12),
-                     // ),
-                      child: Text(
-                        item.status.toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
                   ],
                 ),
               ),
@@ -576,15 +543,26 @@ class TrackedItemsState extends State<TrackedItems> {
 }
 
 class MeetupModal extends StatefulWidget {
-  const MeetupModal({super.key});
+  final String userId;
+  final Item item;
+  final Function(DateTime)? onDateSelected;
+  final Function(TimeOfDay)? onTimeSelected;
+  final Function(String)? onLocationSelected;
+
+  const MeetupModal({
+    super.key,
+    required this.userId,
+    required this.item,
+    this.onDateSelected,
+    this.onTimeSelected,
+    this.onLocationSelected,
+  });
 
   @override
   State<MeetupModal> createState() => _MeetupModalState();
 }
 
 class _MeetupModalState extends State<MeetupModal> {
-  //String? _selectedLocation;
-
   @override
   Widget build(BuildContext context) {
     return SimpleDialog(
@@ -605,22 +583,7 @@ class _MeetupModalState extends State<MeetupModal> {
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 4),
-              DatePicker(),
-              TimePicker(),
-              LocationPicker(),
-              /* LocationPicker(
-                onLocationSelected: (String location) {
-                  _selectedLocation = location;
-                }
-              )*/
-              BoldElevatedButton(
-                text: 'Done!',
-                minWidth: 60,
-                minHeight: 30,
-                onPressed: () {
-
-                },
-              )
+              MeetingRequest(userId: widget.userId, notifText: 'Temp nothing text', item: widget.item),
             ]
           ),
         ),
@@ -630,8 +593,11 @@ class _MeetupModalState extends State<MeetupModal> {
 }
 
 class DatePicker extends StatefulWidget {
+  final ValueChanged<DateTime?>? onDateChanged;
+
   const DatePicker({
     super.key,
+    this.onDateChanged,
   });
 
   @override
@@ -644,14 +610,18 @@ class _DatePickerState extends State<DatePicker> {
   Future<void> _selectDate() async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: DateTime(2025, 11, 17),
+      initialDate: DateTime.now(),
       firstDate: DateTime(2025),
       lastDate: DateTime(2026),
     );
 
-    setState(() {
-      selectedDate = pickedDate;
-    });
+    if (pickedDate != null) {
+      setState(() {
+        selectedDate = pickedDate;
+      });
+  }
+
+    widget.onDateChanged?.call(pickedDate);
   }
 
   @override
@@ -665,15 +635,21 @@ class _DatePickerState extends State<DatePicker> {
               ? '${selectedDate!.day}/${selectedDate!.month}'
               : 'Select a date!',
         ),
-        OutlinedButton(onPressed: _selectDate, child: const Text('Select Date')),
+        OutlinedButton(
+          onPressed: _selectDate,
+          child: const Text('Select Date')
+        ),
       ],
     );
   }
 }
 
 class TimePicker extends StatefulWidget {
+  final ValueChanged<TimeOfDay?>? onTimeChanged;
+
   const TimePicker({
     super.key,
+    this.onTimeChanged
   });
 
   @override
@@ -682,11 +658,18 @@ class TimePicker extends StatefulWidget {
 
 class _TimePickerState extends State<TimePicker> {
   TimeOfDay? selectedTime;
-  TimePickerEntryMode entryMode = TimePickerEntryMode.inputOnly;
-  Orientation? orientation;
-  TextDirection textDirection = TextDirection.ltr;
-  MaterialTapTargetSize tapTargetSize = MaterialTapTargetSize.padded;
   bool use24HourTime = false;
+
+  Future<void> _selectTime() async {
+    final TimeOfDay? pickedTime = await showTimePicker(
+      context: context,
+      initialTime: selectedTime ?? TimeOfDay.now(),
+    );
+    setState(() {
+      selectedTime = pickedTime;
+    });
+    widget.onTimeChanged?.call(pickedTime);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -700,37 +683,8 @@ class _TimePickerState extends State<TimePicker> {
               : 'Select a time!',
         ),
         ElevatedButton(
+          onPressed: _selectTime,
           child: const Text('Select time'),
-          onPressed: () async {
-            final TimeOfDay? time = await showTimePicker(
-              context: context,
-              initialTime: selectedTime ?? TimeOfDay.now(),
-              initialEntryMode: entryMode,
-              orientation: orientation,
-              builder: (BuildContext context, Widget? child) {
-                // We just wrap these environmental changes around the
-                // child in this builder so that we can apply the
-                // options selected above. In regular usage, this is
-                // rarely necessary, because the default values are
-                // usually used as-is.
-                return Theme(
-                  data: Theme.of(context).copyWith(materialTapTargetSize: tapTargetSize),
-                  child: Directionality(
-                    textDirection: textDirection,
-                    child: MediaQuery(
-                      data: MediaQuery.of(
-                        context,
-                      ).copyWith(alwaysUse24HourFormat: use24HourTime),
-                      child: child!,
-                    ),
-                  ),
-                );
-              },
-            );
-            setState(() {
-              selectedTime = time;
-            });
-          },
         ),
       ],
     );
@@ -738,11 +692,12 @@ class _TimePickerState extends State<TimePicker> {
 }
 
 class LocationPicker extends StatefulWidget {
-  //final Function(String location)? onLocationSelected;
+  final TextEditingController controller;
 
   const LocationPicker({
     super.key,
-    //this.onLocationSelected,
+    required this.controller,
+    //this.onLocationChanged,
   });
 
   @override
@@ -750,14 +705,12 @@ class LocationPicker extends StatefulWidget {
 }
 
 class _LocationPickerState extends State<LocationPicker> {
-  final TextEditingController _locationController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return InputTextField(
       label: 'Location',
       isObscure: false,
-      controller: _locationController,
+      controller: widget.controller,
       validator: (String? value) {
         return (value == null || value.isEmpty)
             ? 'Please enter a location'
@@ -765,149 +718,6 @@ class _LocationPickerState extends State<LocationPicker> {
       },
     );
   }
-  /*
-  List<String> _suggestions = [];
-  Timer? _debounce;
-  final TextEditingController _locationController = TextEditingController();  
-  String _errorMessage = '';
-  bool _isLoading = false;
-
-  void _onSearchChanged(String search) {
-  debugPrint('onSearchChanged called with: $search');
-  if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      debugPrint('Debounce finished, calling _searchLocation');  
-      _searchLocation(search);
-    });
-  }
-
-  Future<void> _searchLocation(String search) async {
-    debugPrint('_searchLocation called with: $search');
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-      _suggestions = [];
-    });
-
-    if (search.isEmpty) {
-      debugPrint('Search empty, clearing suggestions');
-      setState(() => _suggestions = []);
-      return;
-    }
-
-    debugPrint('Setting loading to true');
-    setState(() => _isLoading = true);
-
-    try {
-      debugPrint('call api');
-      final response = await http.get(
-        Uri.parse('https://nominatim.openstreetmap.org/search?q=$search&format=json&limit=5&addressdetails=1'),
-        headers: {
-          'User-Agent': 'KnightFind/1.0',
-        },
-      );
-
-      debugPrint('Response status: ${response.statusCode}');
-      debugPrint('Response body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        debugPrint('Parsed ${data.length} results');
-
-        setState(() {
-          _suggestions = List<String>.from(
-            data.map((item) =>
-             item['display_name'].toString())
-          );
-          _isLoading = false;
-        });
-
-          debugPrint('Suggestions updated: ${_suggestions.length} items');  
-      }
-    } catch (e, stackTrace) {
-      debugPrint('ERROR in _searchLocation: $e');  
-      debugPrint('Stack trace: $stackTrace');
-      setState(() {
-        _errorMessage = 'Network error. Please check your connection.';
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    debugPrint('Building LocationPicker, suggestions count: ${_suggestions.length}');  // ADD THIS
-
-    return Column(
-      children: [
-        TextField(
-          controller: _locationController,
-          decoration: InputDecoration(
-            labelText: 'Meeting Location',
-            border: OutlineInputBorder(),
-            hintText: 'Search for a location',
-            prefixIcon: Icon(Icons.search),
-            suffixIcon: _isLoading 
-              ? Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : _locationController.text.isNotEmpty
-                  ? IconButton(
-                      icon: Icon(Icons.clear),
-                      onPressed: () {
-                        _locationController.clear();
-                        setState(() => _suggestions = []);
-                      },
-                    )
-                  : null,
-          ),
-          onChanged: _onSearchChanged,
-        ),
-        if (_suggestions.isNotEmpty)
-          Container(
-            margin: const EdgeInsets.only(top: 8),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            constraints: BoxConstraints(maxHeight: 200),
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: _suggestions.length,
-              itemBuilder: (context, index) {
-                final suggestion = _suggestions[index];
-                return ListTile(
-                  leading: Icon(Icons.location_on, color: Colors.red),
-                  title: Text(
-                    suggestion,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  onTap: () {
-                    _locationController.text = suggestion;
-                    if (widget.onLocationSelected != null) {
-                      widget.onLocationSelected!(
-                        suggestion,
-                      );
-                      setState(() => _suggestions = []);
-                    }
-                  },
-                );
-              },
-            ),
-          )
-      ],
-    );
-  }
-  
-  @override
-  void dispose() {
-    _locationController.dispose();
-    super.dispose();
-  }
-  */
 }
 
 class MeetingRequest extends StatefulWidget {
@@ -930,30 +740,34 @@ class _MeetingRequestState extends State<MeetingRequest> {
   late Map<String, dynamic> userId; // Pass this
   late String text; // Pass this
   final bool isMeetup = true;
-  late String meetLocation; // Use callback
-  late DateTime meetDate; // Use callback
-  late TimeOfDay meetHour; // Use callback
-  late DateTime meetTime; // Recieve from date and hour
+  final TextEditingController _locationController = TextEditingController();
+  late String meetLocation = '';
+  DateTime? meetDate; // Use callback
+  TimeOfDay? meetHour; // Use callback
+  DateTime? meetTime; // Recieve from date and hour
   late Item item = widget.item; // Pass this
   late String senderId; // Recieve from item
-  late String itemId; // Recieve from item
+  String? itemId; // Recieve from item
   String _errorMessage = '';
   bool _isLoading = false;
 
-  void getDate(DateTime date) {
-    meetDate = date;
+  void getDate(DateTime? date) {
+    setState(() {
+      meetDate = date;
+    });
+    _updateMeetTime();
   }
 
-  void getTime(TimeOfDay time) {
-    meetHour = time;
-  }
-
-  void getLocation(String location) {
-    meetLocation = location;
+  void getTime(TimeOfDay? time) {
+    setState(() {
+      meetHour = time;
+    });
+    _updateMeetTime();
   }
 
   @override
   void initState() {
+    super.initState();
     senderId = widget.userId;
     text = widget.notifText;
     item = widget.item;
@@ -962,63 +776,114 @@ class _MeetingRequestState extends State<MeetingRequest> {
       'lastName': item.reporterLName,
       'email': item.reporterEmail
     } as Map<String, dynamic>;
+    /*
     meetTime = DateTime(
-      meetDate.year,
-      meetDate.month,
-      meetDate.day,
-      meetHour.hour,
-      meetHour.minute
+      meetDate!.year,
+      meetDate!.month,
+      meetDate!.day,
+      meetHour!.hour,
+      meetHour!.minute
     );
-    itemId = item.itemId;
-    debugPrint('userId: $userId\ntext: $text\nlocation $meetLocation\nmeetTime: ${meetTime.year}/${meetTime.month}/${meetTime.day}/${meetTime.hour}/${meetTime.minute}\nsenderId: $senderId\nitemId: $itemId');
+    meetLocation = _locationController.text;
+    */
+    itemId = item.itemId;  // Make sure item.itemId exists in your Item class
+    
+    debugPrint('Initialized: senderId=$senderId, itemId=$itemId');
   }
 
-  Future<void> _sendFoundNotif(String senderId, Item item) async {
-    try {
-      final response = await http.post(
-        Uri.parse('http://knightfind.xyz:4000/api/notificatoins'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'userId': userId,
-          'text': text,
-          'isMeetup': isMeetup,
-          'location': meetLocation,
-          'meetTime': meetTime,
-          'senderId': senderId,
-          'itemId': itemId
-        })
+  void _updateMeetTime() {
+  if (meetDate != null && meetHour != null) {
+    setState(() {
+      meetTime = DateTime(
+        meetDate!.year,
+        meetDate!.month,
+        meetDate!.day,
+        meetHour!.hour,
+        meetHour!.minute
       );
+    });
+    debugPrint('Updated meetTime: $meetTime');
+  }
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+  debugPrint('userId: $userId\ntext: $text\nlocation $meetLocation\nmeetTime: ${meetTime?.year}/${meetTime?.month}/${meetTime?.day}/${meetTime?.hour}/${meetTime?.minute}\nsenderId: $senderId\nitemId: $itemId');
+}
 
-        if (data['error'] == null || data['error'].isEmpty) {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Notification sent!')),
-            );
-          }
-        } else {          
-          setState(() {
-            _errorMessage = data['error'];
-          });
+Future<void> _sendFoundNotif(String senderId, Item item) async {
+  _updateMeetTime();
+  setState() => _isLoading = true;
+
+  try {
+    final response = await http.post(
+      Uri.parse('http://knightfind.xyz:4000/api/notificatoins'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'userId': userId,
+        'text': text,
+        'isMeetup': isMeetup,
+        'location': meetLocation,
+        'meetTime': meetTime,
+        'senderId': senderId,
+        'itemId': itemId
+      })
+    );
+
+    setState() => _isLoading = false;
+
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      if (data['error'] == null || data['error'].isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Notification sent!')),
+          );
         }
       }
-      //  More error handling goes here
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error sending meeting notifcation: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
     }
+    //  More error handling goes here
+  } catch (e) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error sending meeting notifcation: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+}
+
+  @override
+  void dispose() {
+    _locationController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox.shrink();
+    return Column(
+      children: [
+        DatePicker(onDateChanged: getDate),
+        TimePicker(onTimeChanged: getTime),
+        LocationPicker(controller: _locationController,),
+        BoldElevatedButton(
+          text: 'Done!',
+          minWidth: 60,
+          minHeight: 30,
+          onPressed: () {
+            if (meetTime != null) {
+              meetLocation = _locationController.text;
+              debugPrint('Sending with meetTime: $meetTime, location: $meetLocation');
+              _sendFoundNotif(senderId, item);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Please select date and time')),
+              );
+            }
+          },
+        ),
+      ],
+    );
   }
 }
