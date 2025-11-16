@@ -16,7 +16,6 @@ function Notification() {
         senderId: { _id: string; firstname: string; lastName: string; }
         itemId: { _id: string; title: string; description: string; category: string; imageUrl: string; }
 
-        Toggle: boolean;
 
 
     }
@@ -56,7 +55,6 @@ function Notification() {
 
             let txt = await response.text();
             let res = JSON.parse(txt);
-            const Notifdata =  res.results.map((i: any) => ((i.Toggle === null || i.Toggle === undefined)?{...i,Toggle:false} : i));
             setNotifContainer(Notifdata);
         }
 
@@ -173,10 +171,10 @@ function Notification() {
         
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
-            if ((Notif.isMeetup === false || Notif.Toggle === true) && ViewNotIfButton.current) {
+            if (Notif.isMeetup === false  && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'hidden';
             }
-            else if ((Notif.isMeetup === true && Notif.Toggle === false) && ViewNotIfButton.current) {
+            else if (Notif.isMeetup === true  && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'visible';
             }
         }
@@ -211,7 +209,6 @@ function Notification() {
 
     async function ReturnNotif(Notif: any, answer: string) {
         if (answer == "Accept") {
-            setNotifContainer(NotIfContainer => NotIfContainer.map(i => i._id === Notif._id ? {...i,Toggle:true} : i));
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
@@ -223,9 +220,43 @@ function Notification() {
 
             };
             let js = JSON.stringify(obj);
+
+            let objRet = {
+                userId: itemUSERID,
+                text: Notif.text,
+                isMeetup: `${false}`,
+                location: Notif.location,
+                meetTime: Notif.meetTime,
+                senderId: itemUSERID,
+                itemId: Notif.itemId,
+
+            };
+            let jsRet = JSON.stringify(objRet);
+
             try {
                 const response = await fetch(buildAPIPath(`api/notifications`),
                     { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
+
+                let txt = await response.text();
+                let res = JSON.parse(txt);
+
+                if (res.error != '') {
+                    console.log(res.error)
+                }
+                else {
+                    
+                }
+
+            }
+
+
+            catch (error: any) {
+                console.log("Frontend Error");
+            }
+            //Sent Back to user to log
+            try {
+                const response = await fetch(buildAPIPath(`api/notifications`),
+                    { method: 'POST', body: jsRet, headers: { 'Content-Type': 'application/json' } });
 
                 let txt = await response.text();
                 let res = JSON.parse(txt);
@@ -245,7 +276,7 @@ function Notification() {
             }
         }
         else if (answer == "Contest") {
-            setNotifContainer(NotIfContainer => NotIfContainer.map(i => i._id === Notif._id ? {...i,Toggle:true} : i));
+            
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
@@ -257,9 +288,42 @@ function Notification() {
 
             };
             let js = JSON.stringify(obj);
+
+            let objRet = {
+                userId: itemUSERID,
+                text: Notif.text,
+                isMeetup: `${false}`,
+                location: Notif.location,
+                meetTime: Notif.meetTime,
+                senderId: itemUSERID,
+                itemId: Notif.itemId,
+
+            };
+            let jsRet = JSON.stringify(objRet);
             try {
                 const response = await fetch(buildAPIPath(`api/notifications`),
                     { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
+
+                let txt = await response.text();
+                let res = JSON.parse(txt);
+
+                if (res.error != '') {
+                    console.log(res.error)
+                }
+                else {
+                    
+                }
+
+            }
+
+
+            catch (error: any) {
+                console.log("Frontend Error");
+            }
+            //Sent Back to user to log
+            try {
+                const response = await fetch(buildAPIPath(`api/notifications`),
+                    { method: 'POST', body: jsRet, headers: { 'Content-Type': 'application/json' } });
 
                 let txt = await response.text();
                 let res = JSON.parse(txt);
@@ -279,7 +343,7 @@ function Notification() {
             }
         }
         else if (answer == "Deny") {
-            setNotifContainer(NotIfContainer => NotIfContainer.map(i => i._id === Notif._id ? {...i,Toggle:true} : i));
+            
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
@@ -291,9 +355,41 @@ function Notification() {
 
             };
             let js = JSON.stringify(obj);
+
+            let objRet = {
+                userId: itemUSERID,
+                text: Notif.text,
+                isMeetup: `${false}`,
+                location: Notif.location,
+                meetTime: Notif.meetTime,
+                senderId: itemUSERID,
+                itemId: Notif.itemId,
+
+            };
+            let jsRet = JSON.stringify(objRet);
             try {
                 const response = await fetch(buildAPIPath(`api/notifications`),
                     { method: 'POST', body: js, headers: { 'Content-Type': 'application/json' } });
+
+                let txt = await response.text();
+                let res = JSON.parse(txt);
+
+                if (res.error != '') {
+                    console.log(res.error)
+                }
+                else {
+                    
+                }
+            }
+
+
+            catch (error: any) {
+                console.log("Frontend Error");
+            }
+            //Log back to user
+            try {
+                const response = await fetch(buildAPIPath(`api/notifications`),
+                    { method: 'POST', body: jsRet, headers: { 'Content-Type': 'application/json' } });
 
                 let txt = await response.text();
                 let res = JSON.parse(txt);
