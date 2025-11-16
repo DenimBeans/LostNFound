@@ -7,19 +7,14 @@ import '../Styles/Notification.css';
 function Notification() {
 
     interface NotifData {
-        _id: string;
-        title: string;
-        description: string;
-        category: string;
-        imageUrl: string;
 
         text: string;
         isMeetup: boolean;
         isRead: boolean;
         location: string;
         meetTime: Date;
-        senderId: string;
-        itemId: string;
+        senderId: { _id: string; firstname: string; lastName: string; }
+        itemId: { _id: string; title: string; description: string; category: string; imageUrl: string; }
 
         Toggle: boolean;
 
@@ -62,7 +57,7 @@ function Notification() {
             let txt = await response.text();
             let res = JSON.parse(txt);
             setNotifContainer(res.results);
-            
+
         }
 
 
@@ -172,8 +167,15 @@ function Notification() {
     };
 
     async function View(Notif: any) {
-        if (ViewNotIf.Toggle === null || ViewNotIf.Toggle === undefined){
-            ViewNotIf.Toggle = false;
+        if (NotIf.Toggle === null || NotIf.Toggle === undefined) {
+            setNotifContainer(NotIfContainer => NotIfContainer.map(i => {
+                if (i._id === Notif._id) {
+                    return { ...i, Toggle: false }
+                }
+                else {
+                    return i;
+                }
+            }));
         }
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
@@ -190,18 +192,18 @@ function Notification() {
         setNotifCategory(Notif.itemId.category);
         setNotifImageUrl(Notif.itemId.imageUrl);
         setNotifMeetLoc(Notif.location);
-        if(Notif?.meetTime){
-        var date = new Date(Notif.meetTime)
-        
-        let Day = String(date.getUTCDate()).padStart(2, '0');
-        let Month = String(date.getUTCMonth()+1).padStart(2, '0');
-        let Year = date.getUTCFullYear()
-        let Hour = String(date.getUTCHours()).padStart(2,'0');
-        let Minutes = String(date.getUTCMinutes()).padStart(2,'0');
+        if (Notif?.meetTime) {
+            var date = new Date(Notif.meetTime)
 
-        
-        setNotifMeetTime(`${Month}/${Day}/${Year}--${Hour}:${Minutes}`);
-    }
+            let Day = String(date.getUTCDate()).padStart(2, '0');
+            let Month = String(date.getUTCMonth() + 1).padStart(2, '0');
+            let Year = date.getUTCFullYear()
+            let Hour = String(date.getUTCHours()).padStart(2, '0');
+            let Minutes = String(date.getUTCMinutes()).padStart(2, '0');
+
+
+            setNotifMeetTime(`${Month}/${Day}/${Year}--${Hour}:${Minutes}`);
+        }
 
     };
 
@@ -215,7 +217,14 @@ function Notification() {
 
     async function ReturnNotif(Notif: any, answer: string) {
         if (answer == "Accept") {
-            Notif.Toggle = true;
+            setNotifContainer(NotIfContainer => NotIfContainer.map(i => {
+                if (i._id === Notif._id) {
+                    return { ...i, Toggle: true }
+                }
+                else {
+                    return i;
+                }
+            }));
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
@@ -249,7 +258,14 @@ function Notification() {
             }
         }
         else if (answer == "Contest") {
-            Notif.Toggle = true;
+            setNotifContainer(NotIfContainer => NotIfContainer.map(i => {
+                if (i._id === Notif._id) {
+                    return { ...i, Toggle: true }
+                }
+                else {
+                    return i;
+                }
+            }));
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
@@ -283,7 +299,14 @@ function Notification() {
             }
         }
         else if (answer == "Deny") {
-            Notif.Toggle = true;
+            setNotifContainer(NotIfContainer => NotIfContainer.map(i => {
+                if (i._id === Notif._id) {
+                    return { ...i, Toggle: true }
+                }
+                else {
+                    return i;
+                }
+            }));
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
@@ -326,9 +349,9 @@ function Notification() {
                     <div key={NotifContainer._id} className="NotifContainers">
                         <input type="text" id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly />
                         <input type="text" id="NotificationMeetup" className="NotTitle" value={NotifContainer.isRead} readOnly />
-                        <button type="button" id="NotificationView" className = "NotIfBtn" onClick={() => View(NotifContainer)}>View Report</button>
-                        <button type="button" id="NotificationRead" className = "NotIfBtn" onClick={() => Read(NotifContainer._id)}>Read</button>
-                        <button type="button" id="NotificationDelete" className = "NotIfBtn" onClick={() => Delete(NotifContainer._id)}>Delete</button>
+                        <button type="button" id="NotificationView" className="NotIfBtn" onClick={() => View(NotifContainer)}>View Report</button>
+                        <button type="button" id="NotificationRead" className="NotIfBtn" onClick={() => Read(NotifContainer._id)}>Read</button>
+                        <button type="button" id="NotificationDelete" className="NotIfBtn" onClick={() => Delete(NotifContainer._id)}>Delete</button>
                     </div>
                 ))}
 
@@ -339,7 +362,7 @@ function Notification() {
                 <input type="text" id="NotifDesc" className="NotifData" value={NotifDescription} readOnly />
                 <input type="text" id="NotifCat" className="NotifData" value={NotifCategory} readOnly />
                 <input type="text" id="NotifImage" className="NotifData" value={NotifImageUrl} readOnly />
-                <span id = "MeetUpInfo">MeetUp Info</span>
+                <span id="MeetUpInfo">MeetUp Info</span>
                 <input type="text" id="NotifLoc" className="NotifData" value={NotifMeetLoc} readOnly />
                 <input type="text" id="NotifTime" className="NotifData" value={NotifMeetTime} readOnly />
                 <div id="ViewButtonBar" ref={ViewNotIfButton}>
