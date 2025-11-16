@@ -107,7 +107,7 @@ border-color:black;
 overflow-y: auto;
 }
 
-.NotIfData{
+.NotifData{
     width: 50%;
     margin-left: 25%;
     display:flex;
@@ -123,7 +123,29 @@ overflow-y: auto;
     border-color:black;
 }
 
-.NotIfData:focus{
+.NotifData:focus{
+    outline-color: darkgoldenrod;
+    outline-style: solid;
+    outline-width: 3px;
+}
+
+.Contest{
+    width: 50%;
+    margin-left: 25%;
+    display:flex;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-size: large;
+
+    border-width: 3px;
+    border-radius: 20px;
+    border-style:solid;
+    border-color:black;
+}
+
+.Contest:focus{
     outline-color: darkgoldenrod;
     outline-style: solid;
     outline-width: 3px;

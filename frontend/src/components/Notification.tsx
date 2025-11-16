@@ -48,6 +48,20 @@ function Notification() {
         setContestTime(new Date(e.target.value));
     }
 
+    async function exit(){
+        if(ViewNotIf.current){
+                ViewNotIf.current.style.visibility = 'hidden';
+        }
+        
+    }
+
+    async function exitContest(){
+        if(Contest.current){
+                Contest.current.style.visibility = 'hidden';
+        }
+        
+    }
+
     async function AllNotif(id: any) {
         try {
             const response = await fetch(buildAPIPath(`api/users/${id}/notifications`),
@@ -429,7 +443,7 @@ function Notification() {
 
             </div>
             <div id="ViewNotIf" ref={ViewNotIf}>
-
+                <button type = "button" id="exit" onClick={() => exit()}>X</button>
                 <input type="text" id="NotifTitle" className="NotifData" value={NotifTitle} readOnly />
                 <input type="text" id="NotifDesc" className="NotifData" value={NotifDescription} readOnly />
                 <input type="text" id="NotifCat" className="NotifData" value={NotifCategory} readOnly />
@@ -444,6 +458,7 @@ function Notification() {
                 </div>
             </div>
             <div id="Contest" ref={Contest}>
+                <button type = "button" id="exit" onClick={() => exitContest()}>X</button>
                 <input type="text" id="ContestLocation" className="Contest" onChange={handleContestLocation} />
                 <input type="datetime-local" id="ContestTime" className="Contest" onChange={handleContestDate} />
                 <button type="button" id="SubmitContest" onClick={() => ReturnNotif(viewNotifId, "Contest")}>Submit new contest</button>
