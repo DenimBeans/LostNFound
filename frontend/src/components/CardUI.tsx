@@ -190,11 +190,7 @@ function CardUI() {
             }
             else{
                 setItemContainer(ItemContainer.filter((ItemContainer) => ItemContainer._id !== itemId));
-                
-                if(ItemContainer.length === 0){
-                    NoItemPage.current.style.display = 'flex'
-                    LostItemPage.current.style.display = 'none'
-                }
+                searchItem(itemUSERID);
             }
 
             
