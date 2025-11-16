@@ -224,7 +224,7 @@ function Notification() {
             let objRet = {
                 userId: itemUSERID,
                 text: Notif.text,
-                isMeetup: `${false}`,
+                isMeetup: false,
                 location: Notif.location,
                 meetTime: Notif.meetTime,
                 senderId: itemUSERID,
@@ -266,7 +266,7 @@ function Notification() {
                 }
                 else {
                     Delete(Notif._id);
-                    window.location.reload();
+                    
                 }
 
             }
@@ -293,7 +293,7 @@ function Notification() {
             let objRet = {
                 userId: itemUSERID,
                 text: Notif.text,
-                isMeetup: `${false}`,
+                isMeetup: false,
                 location: Notif.location,
                 meetTime: Notif.meetTime,
                 senderId: itemUSERID,
@@ -334,7 +334,7 @@ function Notification() {
                 }
                 else {
                     Delete(Notif._id);
-                    window.location.reload();
+                    
                 }
 
             }
@@ -361,7 +361,7 @@ function Notification() {
             let objRet = {
                 userId: itemUSERID,
                 text: Notif.text,
-                isMeetup: `${false}`,
+                isMeetup: false,
                 location: Notif.location,
                 meetTime: Notif.meetTime,
                 senderId: itemUSERID,
@@ -401,7 +401,7 @@ function Notification() {
                 }
                 else {
                     Delete(Notif._id);
-                    window.location.reload();
+                    
                 }
             }
 

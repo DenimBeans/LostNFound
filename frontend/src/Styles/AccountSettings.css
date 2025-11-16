@@ -39,7 +39,7 @@ border-color:black;
 
 #EditUser{
 
-width: 80%;
+width: 40%;
 background-color: rgb(101, 101, 101);
 height: 60vh;
 
@@ -62,7 +62,7 @@ overflow-y: auto;
 }
 #DeleteUser{
 
-width: 80%;
+width: 40%;
 background-color: rgb(101, 101, 101);
 height: 30vh;
 
@@ -227,7 +227,7 @@ overflow-y: auto;
 #exit{
     width: 35px;
     height: 35px;
-    margin-left: 96.5%;
+    margin-left: 92%;
     margin-top: 5px;
     position: absolute;
 
