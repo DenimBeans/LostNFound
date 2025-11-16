@@ -191,6 +191,7 @@ function Notification() {
     };
 
     async function View(Notif: any) {
+        console.log(Notif);
         setNotifContainer(NotifContainer.map((j) => j._id === Notif._id ? {...j,isRead: true}: j));
         Read(Notif._id);
         if (ViewNotIf.current) {
@@ -227,6 +228,7 @@ function Notification() {
     };
 
     async function StartContest(Notif: any) {
+        console.log(Notif);
         if (Contest.current) {
             Contest.current.style.visibility = 'visible';
         }
@@ -235,12 +237,13 @@ function Notification() {
     };
 
     async function ReturnNotif(Notif: any, answer: string) {
+        console.log(Notif);
         const NotifId = Notif._id;
         if (answer == "Accept") {
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
-                isMeetup: Notif.isMeetup,
+                isMeetup: false,
                 location: Notif.location,
                 meetTime: Notif.meetTime,
                 senderId: itemUSERID,
@@ -376,7 +379,7 @@ function Notification() {
             let obj = {
                 userId: Notif.senderId._id,
                 text: Notif.text,
-                isMeetup: Notif.isMeetup,
+                isMeetup: false,
                 location: Notif.location,
                 meetTime: Notif.meetTime,
                 senderId: itemUSERID,
