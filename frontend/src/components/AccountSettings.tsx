@@ -200,10 +200,12 @@ function AccountSettings(){
                 
                 <button type = "button" id = "deleteuserbtn"  onClick = {DeleteUserInfo}>Delete User!</button>
             </div>
-            
-            <span className = "MainAccountSet" id = "fname">Firstname:<input type = "text" id = "firstname" className = "AccountSet" value = {userFirst} readOnly/></span>
-            <span className = "MainAccountSet" id = "lname">Lastname:<input type = "text" id = "lastname" className = "AccountSet" value = {userLast}  readOnly/></span>
-            <span className = "MainAccountSet" id = "email">Email:<input type = "text" id = "Accountemail" className = "AccountSet" value = {userEmail} readOnly/></span>
+            <span className = "MainAccountSet" id = "fname">Firstname</span>
+            <input type = "text" id = "firstname" className = "AccountSet" value = {userFirst} readOnly/>
+            <span className = "MainAccountSet" id = "lname">Lastname</span>
+            <input type = "text" id = "lastname" className = "AccountSet" value = {userLast}  readOnly/>
+            <span className = "MainAccountSet" id = "email">Email</span>
+            <input type = "text" id = "Accountemail" className = "AccountSet" value = {userEmail} readOnly/>
             
             
             <div id = "buttonbar">

@@ -182,6 +182,7 @@ overflow-y: auto;
 }
 
 .MainAccountSet{
+    margin-top: 15px;
     font-size: x-large;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
     display:flex;
