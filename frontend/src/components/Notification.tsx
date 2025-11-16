@@ -335,7 +335,7 @@ function Notification() {
                 <input type="text" id="NotifImage" className="NotifData" value={NotifImageUrl} readOnly />
                 <span id = "MeetUpInfo">MeetUp Info</span>
                 <input type="text" id="NotifLoc" className="NotifData" value={NotifMeetLoc} readOnly />
-                <input type="date" id="NotifTime" className="NotifData" value={NotifMeetTime} readOnly />
+                <input type="text" id="NotifTime" className="NotifData" value={NotifMeetTime} readOnly />
                 <div id="ViewButtonBar" ref={ViewNotIfButton}>
                     <button type="button" id="NotifAccept" className="NotifButton" onClick={() => ReturnNotif(viewNotifId, "Accept")}>Accept</button>
                     <button type="button" id="NotifContest" className="NotifButton" onClick={() => StartContest(viewNotifId)}>Contest</button>
