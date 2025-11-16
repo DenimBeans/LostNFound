@@ -340,6 +340,11 @@ class _InboxDisplayState extends State<InboxDisplay> {
   }
 
   void _showNotificationDetails(Notification notif) {
+    // Automatically mark as read when opening the notification
+    if (!notif.isRead) {
+      _markAsRead(notif.notificationId);
+    }
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -624,19 +629,6 @@ class _InboxDisplayState extends State<InboxDisplay> {
                     // Standard Action Buttons
                     Row(
                       children: [
-                        if (!notif.isRead)
-                          Expanded(
-                            child: BoldElevatedButton(
-                              text: 'Mark Read',
-                              onPressed: () {
-                                Navigator.pop(context);
-                                _markAsRead(notif.notificationId);
-                              },
-                              minWidth: double.infinity,
-                              minHeight: 45,
-                            ),
-                          ),
-                        if (!notif.isRead) const SizedBox(width: 12),
                         Expanded(
                           child: BoldElevatedButton(
                             text: 'Delete',
