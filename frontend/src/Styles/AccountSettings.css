@@ -155,6 +155,7 @@ overflow-y: auto;
 }
 #Warning{
     margin-top: 5%;
+    margin-left: 5%;
     font-size: x-large;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
     display:flex;
