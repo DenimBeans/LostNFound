@@ -39,7 +39,7 @@ border-color:black;
 
 #EditUser{
 
-width: 40%;
+width: 60%;
 background-color: rgb(101, 101, 101);
 height: 60vh;
 
@@ -62,9 +62,9 @@ overflow-y: auto;
 }
 #DeleteUser{
 
-width: 40%;
+width: 60%;
 background-color: rgb(101, 101, 101);
-height: 30vh;
+height: 40vh;
 
 flex-direction: column;
 z-index: 3;
@@ -173,6 +173,15 @@ overflow-y: auto;
 }
 #MainTitle{
     margin-top: 5%;
+    font-size: x-large;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    color: white;
+    text-shadow: 1px 1px 2px rgb(175, 173, 173);
+}
+
+.MainAccountSet{
     font-size: x-large;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
     display:flex;
