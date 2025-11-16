@@ -237,8 +237,8 @@ function Notification() {
     };
 
     async function ReturnNotif(Notif: any, answer: string) {
-        console.log(Notif);
-        const NotifId = Notif._id;
+        console.log();
+        const NotifId = Notif.userId;
         if (answer == "Accept") {
             let obj = {
                 userId: Notif.senderId._id,
