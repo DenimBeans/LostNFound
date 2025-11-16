@@ -153,8 +153,17 @@ overflow-y: auto;
     outline-style: solid;
     outline-width: 3px;
 }
-#Warning,#edittitle{
+#Warning{
     margin-top: 5%;
+    font-size: x-large;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    color: white;
+    text-shadow: 1px 1px 2px rgb(175, 173, 173);
+}
+#edittitle{
+    margin-top: 15px;
     font-size: x-large;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
     display:flex;
