@@ -13,7 +13,7 @@ function Notification() {
         isRead: boolean;
         location: string;
         meetTime: Date;
-        senderId: { _id: string; firstname: string; lastName: string; }
+        senderId: { _id: string; firstName: string; lastName: string; }
         itemId: { _id: string; title: string; description: string; category: string; imageUrl: string; }
 
 
@@ -35,10 +35,15 @@ function Notification() {
     const [contestLocation, setContestLocation] = React.useState('');
     const [contestTime, setContestTime] = React.useState<Date | null >(null);
     //View notification
+    const [NotifMain, setNotifMain] = React.useState('');
+
+    const [Sender, setSender] = React.useState('');
+
     const [NotifTitle, setNotifTitle] = React.useState('');
     const [NotifDescription, setNotifDescription] = React.useState('');
     const [NotifCategory, setNotifCategory] = React.useState('');
     const [NotifImageUrl, setNotifImageUrl] = React.useState('');
+
     const [NotifMeetLoc, setNotifMeetLoc] = React.useState('');
     const [NotifMeetTime, setNotifMeetTime] = React.useState('');
 
@@ -53,6 +58,7 @@ function Notification() {
     async function exit(){
         if(ViewNotIf.current){
                 ViewNotIf.current.style.visibility = 'hidden';
+                ViewNotIfButton.current.style.visibility = 'hidden';
         }
         
     }
@@ -60,6 +66,7 @@ function Notification() {
     async function exitContest(){
         if(Contest.current){
                 Contest.current.style.visibility = 'hidden';
+                ViewNotIfButton.current.style.visibility = 'hidden';
         }
         
     }
@@ -74,9 +81,12 @@ function Notification() {
             setNotifContainer(res.results);
             if(res.count == 0){
                 NoNotif.current.style.display = 'flex';
+                NotifPage.current.style.display = 'none';
             }
             else{
+                NoNotif.current.style.display = 'none';
                 NotifPage.current.style.display = 'flex';
+
             }
         }
         
@@ -135,6 +145,7 @@ function Notification() {
             }
             else {
                 setNotifContainer(NotifContainer.filter((NotifContainer) => NotifContainer._id != NotId))
+                AllNotif(itemUSERID);
             }
 
 
@@ -190,6 +201,7 @@ function Notification() {
     };
 
     async function View(Notif: any) {
+        console.log(Notif);
         setNotifContainer(NotifContainer.map((j) => j._id === Notif._id ? {...j,isRead: true}: j));
         Read(Notif._id);
         if (ViewNotIf.current) {
@@ -202,10 +214,16 @@ function Notification() {
             }
         }
         setviewNotifId(Notif)
+
+        setNotifMain(Notif.text)
+
+        setSender(`${Notif.senderId.firstName}  ${Notif.senderId.lastName}`);
+
         setNotifTitle(Notif.itemId.title);
         setNotifDescription(Notif.itemId.description);
         setNotifCategory(Notif.itemId.category);
         setNotifImageUrl(Notif.itemId.imageUrl);
+
         setNotifMeetLoc(Notif.location);
         if (Notif.meetTime != null) {
             var date = new Date(Notif.meetTime)
@@ -226,20 +244,24 @@ function Notification() {
     };
 
     async function StartContest(Notif: any) {
+        console.log(Notif);
         if (Contest.current) {
             Contest.current.style.visibility = 'visible';
         }
-        setContestLocation(Notif.location);
-        setContestTime(Notif.meetTime);
+        
     };
 
     async function ReturnNotif(Notif: any, answer: string) {
+        console.log(Notif);
+        
         const NotifId = Notif._id;
         if (answer == "Accept") {
+            let Response = `Meeting accepted, Location at ${Notif.location} and the meeting will take place at ${Notif.meetTime}.`
+            let Self = `You have accepted this meeting at Location at ${Notif.location} and the meeting will take place at ${Notif.meetTime}.`
             let obj = {
                 userId: Notif.senderId._id,
-                text: Notif.text,
-                isMeetup: Notif.isMeetup,
+                text: Response,
+                isMeetup: false,
                 location: Notif.location,
                 meetTime: Notif.meetTime,
                 senderId: itemUSERID,
@@ -250,7 +272,7 @@ function Notification() {
 
             let objRet = {
                 userId: itemUSERID,
-                text: Notif.text,
+                text: self,
                 isMeetup: false,
                 location: Notif.location,
                 meetTime: Notif.meetTime,
@@ -293,6 +315,8 @@ function Notification() {
                 }
                 else {
                     Delete(NotifId);
+                    ViewNotIf.current.style.visibility = 'hidden';
+                    ViewNotIfButton.current.style.visibility = 'hidden';
                 }
 
             }
@@ -303,10 +327,11 @@ function Notification() {
             }
         }
         else if (answer == "Contest") {
-            
+            let Response = `The meetup at ${Notif.location} at the time ${Notif.meetTime} was contested.`
+            let Self = `You contested the meetup with new information, Location: ${contestLocation} Time: ${contestTime}`
             let obj = {
                 userId: Notif.senderId._id,
-                text: Notif.text,
+                text: Response,
                 isMeetup: Notif.isMeetup,
                 location: contestLocation,
                 meetTime: contestTime ? contestTime.toISOString(): null,
@@ -318,7 +343,7 @@ function Notification() {
 
             let objRet = {
                 userId: itemUSERID,
-                text: Notif.text,
+                text: Self,
                 isMeetup: false,
                 location: contestLocation,
                 meetTime: contestTime ? contestTime.toISOString(): null,
@@ -360,7 +385,9 @@ function Notification() {
                 }
                 else {
                     Delete(NotifId);
-                    
+                    Contest.current.style.visibility = 'hidden';
+                    ViewNotIf.current.style.visibility = 'hidden';
+                    ViewNotIfButton.current.style.visibility = 'hidden';
                 }
 
             }
@@ -371,11 +398,12 @@ function Notification() {
             }
         }
         else if (answer == "Deny") {
-            
+            let Response = `This meetup has been rejected.`
+            let Self = `You have denied this meeting at the location ${Notif.location} at the time of ${Notif.meetTime}`
             let obj = {
                 userId: Notif.senderId._id,
-                text: Notif.text,
-                isMeetup: Notif.isMeetup,
+                text: Response,
+                isMeetup: false,
                 location: Notif.location,
                 meetTime: Notif.meetTime,
                 senderId: itemUSERID,
@@ -386,7 +414,7 @@ function Notification() {
 
             let objRet = {
                 userId: itemUSERID,
-                text: Notif.text,
+                text: Self,
                 isMeetup: false,
                 location: Notif.location,
                 meetTime: Notif.meetTime,
@@ -427,6 +455,8 @@ function Notification() {
                 }
                 else {
                     Delete(NotifId);
+                    ViewNotIf.current.style.visibility = 'hidden';
+                    ViewNotIfButton.current.style.visibility = 'hidden';
                     
                 }
             }
@@ -445,7 +475,7 @@ function Notification() {
             <div id="NotifPage" ref = {NotifPage}>
                 {NotifContainer.map(NotifContainer => (
                     <div key={NotifContainer._id} className="NotifContainers">
-                        <input type="text" id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly />
+                        <input type = "text" id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly/>
                         <input type="text" id="NotificationMeetup" className="NotTitle" value={NotifContainer.isRead} readOnly />
                         <button type="button" id="NotificationView" className="NotIfBtn" onClick={() => View(NotifContainer)}>View Report</button>
                         <button type="button" id="NotificationRead" className="NotIfBtn" onClick={() => Read(NotifContainer._id)}>Read</button>
@@ -459,25 +489,37 @@ function Notification() {
             </div>
             <div id="ViewNotIf" ref={ViewNotIf}>
                 <button type = "button" id="exit" onClick={() => exit()}>X</button>
+
+                <span id="Intro">Notification Details</span>
+                <textarea id="NotifMain" value = {NotifMain} readOnly></textarea>
+
+                <span id="SenderInfo">From</span>
+                <input type = 'text' id = 'from' className="NotifData" value = {Sender} readOnly></input>
+
+                <span id="ItemInfo">Item Info</span>
                 <input type="text" id="NotifTitle" className="NotifData" value={NotifTitle} readOnly />
                 <input type="text" id="NotifDesc" className="NotifData" value={NotifDescription} readOnly />
                 <input type="text" id="NotifCat" className="NotifData" value={NotifCategory} readOnly />
                 <input type="text" id="NotifImage" className="NotifData" value={NotifImageUrl} readOnly />
+
                 <span id="MeetUpInfo">MeetUp Info</span>
-                <input type="text" id="NotifLoc" className="NotifData" value={NotifMeetLoc} readOnly />
-                <input type="text" id="NotifTime" className="NotifData" value={NotifMeetTime} readOnly />
+                <input type="text" id="NotifLoc" className="NotifMeetUp" value={NotifMeetLoc} readOnly />
+                <input type="text" id="NotifTime" className="NotifMeetUp" value={NotifMeetTime} readOnly />
+
                 <div id="ViewButtonBar" ref={ViewNotIfButton}>
                     <button type="button" id="NotifAccept" className="NotifButton" onClick={() => ReturnNotif(viewNotifId, "Accept")}>Accept</button>
                     <button type="button" id="NotifContest" className="NotifButton" onClick={() => StartContest(viewNotifId)}>Contest</button>
                     <button type="button" id="NotifDeny" className="NotifButton" onClick={() => ReturnNotif(viewNotifId, "Deny")}>Deny</button>
                 </div>
             </div>
+
             <div id="Contest" ref={Contest}>
                 <button type = "button" id="exit" onClick={() => exitContest()}>X</button>
                 <input type="text" id="ContestLocation" className="Contest" onChange={handleContestLocation} />
                 <input type="datetime-local" id="ContestTime" className="Contest" onChange={handleContestDate} />
                 <button type="button" id="SubmitContest" onClick={() => ReturnNotif(viewNotifId, "Contest")}>Submit new contest</button>
             </div>
+
             <div id="buttonholder">
                 <button type="button" className="bottombutton" onClick={ReadAll}>Read-ALL</button>
                 <button type="button" className="bottombutton" onClick={DeleteAll}>Delete-ALL</button>
