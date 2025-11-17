@@ -490,7 +490,7 @@ function Notification() {
                 {NotifContainer.map(NotifContainer => (
                     <div key={NotifContainer._id} className="NotifContainers">
                         <input type="text" style={{opacity : NotifContainer.isRead ? 0.7 : 1}} id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly />
-                        <input type="text" id="NotificationMeetup" className="NotTitle" value={NotifContainer.isRead} readOnly />
+                        
                         <button type="button" id="NotificationView" className="NotIfBtn" onClick={() => View(NotifContainer)}>View Report</button>
                         <button type="button" id="NotificationRead" className="NotIfBtn" onClick={() => Read(NotifContainer._id)}>Read</button>
                         <button type="button" id="NotificationDelete" className="NotIfBtn" onClick={() => Delete(NotifContainer._id)}>Delete</button>

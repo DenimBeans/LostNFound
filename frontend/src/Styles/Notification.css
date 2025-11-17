@@ -242,7 +242,8 @@ overflow-y: auto;
 
 #NotificationTitle{
     border-right: 0px;
-    width: 36%;
+    width: 48%;
+    margin-right: 10px;
     filter: drop-shadow(1px 0.5px 1px black)
 }
 
