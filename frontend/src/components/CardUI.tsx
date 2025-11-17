@@ -4,6 +4,9 @@ import {useEffect} from 'react';
 import {useRef} from 'react';
 import '../Styles/MainPage.css';
 import '../Styles/FrontPage.css';
+import Edit from '../assets/edit.webp'
+import Delete from '../assets/delete.webp'
+import Empty from '../assets/EmptyIcon.webp'
 
 //Map imports - Jean
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -387,15 +390,15 @@ function ChangeView({center, zoom }: any) {
                     <div key = {ItemContainer._id} className = "ItemContainers">
                         <input type = "text" id = "ContainerTitle" className = "containerInput" value = {ItemContainer.title} readOnly/>
                         <input type = "text" id = "ContainerStatus" className = "containerInput" value = {ItemContainer.status} readOnly/>
-                        <button type = "button" id = "ContainerData" className = "containerBtn" onClick = {() => {ItemPage(ItemContainer)}}>View Report</button>
-                        <button type = "button" id = "ContainerEdit" className = "containerBtn" onClick = {() => EditPage(ItemContainer)}>Edit</button>
-                        <button type = "button" id = "ContainerDelete" className = "containerBtn" onClick = {() => DeleteItem(ItemContainer._id)}>Delete</button>
+                        <button type = "button" id = "ContainerData" className = "containerBtn" onClick = {() => {ItemPage(ItemContainer)}}></button>
+                        <button type = "button" id = "ContainerEdit" className = "containerBtn" onClick = {() => EditPage(ItemContainer)}></button>
+                        <button type = "button" id = "ContainerDelete" className = "containerBtn" onClick = {() => DeleteItem(ItemContainer._id)}></button>
                     </div>
                 ))}
                 
             </div>
             <div id = "NoItemPage" ref ={NoItemPage}>
-                <span>No items!</span>
+                <span id = "NoItems">You have no items created.</span>
             </div>
 
             <div id = "SearchBar">
