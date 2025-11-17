@@ -390,15 +390,15 @@ function ChangeView({center, zoom }: any) {
                     <div key = {ItemContainer._id} className = "ItemContainers">
                         <input type = "text" id = "ContainerTitle" className = "containerInput" value = {ItemContainer.title} readOnly/>
                         <input type = "text" id = "ContainerStatus" className = "containerInput" value = {ItemContainer.status} readOnly/>
-                        <button type = "button" id = "ContainerData" className = "containerBtn" onClick = {() => {ItemPage(ItemContainer)}}>View Report</button>
-                        <button type = "button" id = "ContainerEdit" className = "containerBtn" onClick = {() => EditPage(ItemContainer)}>Edit</button>
-                        <button type = "button" id = "ContainerDelete" className = "containerBtn" onClick = {() => DeleteItem(ItemContainer._id)}>Delete</button>
+                        <button type = "button" id = "ContainerData" className = "containerBtn" onClick = {() => {ItemPage(ItemContainer)}}></button>
+                        <button type = "button" id = "ContainerEdit" className = "containerBtn" onClick = {() => EditPage(ItemContainer)}></button>
+                        <button type = "button" id = "ContainerDelete" className = "containerBtn" onClick = {() => DeleteItem(ItemContainer._id)}></button>
                     </div>
                 ))}
                 
             </div>
             <div id = "NoItemPage" ref ={NoItemPage}>
-                <img alt = "EmptyItems" src = {Empty} id = "EmptyItem"/>
+                
             </div>
 
             <div id = "SearchBar">
