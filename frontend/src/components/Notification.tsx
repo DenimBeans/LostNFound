@@ -506,7 +506,7 @@ function Notification() {
                         <input type="text" style={{opacity : NotifContainer.isRead ? 0.7 : 1}} id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly />
                         
                         <button type="button" id="NotificationView" className="NotIfBtn" onClick={() => View(NotifContainer)}></button>
-                        <button type="button" id="NotificationRead" className="NotIfBtn" onClick={() => Read(NotifContainer._id)}>Read</button>
+                        
                         <button type="button" id="NotificationDelete" className="NotIfBtn" onClick={() => Delete(NotifContainer._id)}></button>
                     </div>
                 ))}
