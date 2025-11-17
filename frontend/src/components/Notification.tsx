@@ -340,7 +340,7 @@ function Notification() {
             let formattedOriginalTime = Notif.meetTime ? formatTimeAsEST(Notif.meetTime) : Notif.meetTime;
             let formattedContestTime = contestTime ? formatTimeAsEST(contestTime.toISOString()) : contestTime;
             let Response = `The meetup at ${Notif.location} on ${formattedOriginalTime} was contested.`
-            let Self = `You contested the meetup at ${contestLocation} on ${formattedContestTime} with new information.`
+            let Self = `You contested the meetup  with new information: ${contestLocation} on ${formattedContestTime}.`
             let obj = {
                 userId: Notif.senderId._id,
                 text: Response,
