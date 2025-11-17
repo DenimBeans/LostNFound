@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'dart:convert';
@@ -29,14 +30,58 @@ class ItemSearch extends StatefulWidget {
 }
 
 class ItemSearchState extends State<ItemSearch> {
+  //  Retrieve user coords
+
+  /// When the location services are not enabled or permissions
+  /// are denied the `Future` will return an error.
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the 
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale 
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
+      }
+    }
+    
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately. 
+      return Future.error(
+        'Location permissions are permanently denied, we cannot request permissions.');
+    } 
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    return await Geolocator.getCurrentPosition();
+  }
+
+
   Future<List<Item>> get itemsFuture => searchItems();
 
   Future<List<Item>> searchItems() async {
+    Position userPos = await _determinePosition();
+
     final queryParams = {
       //  Using UCF's coordinates for now
       //  Eventually will need to be replaced with user coords
-      'lat': '28.6024274',
-      'lng': '-81.2000599',
+      'lat': userPos.latitude, // ?? '28.6024274',
+      'lng': userPos.longitude, // ?? '-81.2000599',
       'radius': '5',
     };
 
@@ -57,41 +102,33 @@ class ItemSearchState extends State<ItemSearch> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Column(
-        children: [
-          SizedBox(
-            height: 250,
-            //  To display items in ListView
-            child: FutureBuilder<List<Item>>(
-              future: itemsFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  // until data is fetched, show loader
-                  return const CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else if (snapshot.hasData) {
-                  // once data is fetched, pass it to the map
-                  final items = snapshot.data!;
-                  return SizedBox(
-                    width: 350,
-                    height: 250,
-                    child: SearchMap(items: items, userId: widget.userId),
-                  );
-                } else {
-                  // if no data, show simple Text
-                  return const Text("No data available");
-                }
-              },
-            ),
+      child: Center(
+        child: SizedBox(
+          height: 250,
+          //  To display items in ListView
+          child: FutureBuilder<List<Item>>(
+            future: itemsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // until data is fetched, show loader
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else if (snapshot.hasData) {
+                // once data is fetched, pass it to the map
+                final items = snapshot.data!;
+                return SizedBox(
+                  width: 350,
+                  height: 250,
+                  child: SearchMap(items: items, userId: widget.userId),
+                );
+              } else {
+                // if no data, show simple Text
+                return const Text("No data available");
+              }
+            },
           ),
-          const SizedBox(height: 20),
-          InputTextField(label: 'Search Item', isObscure: false),
-          const SizedBox(height: 20),
-          //SizedBox(width: 350, height: 250, child: const SearchMap()),
-          const SizedBox(height: 20),
-          // Search results will be populated from API
-        ],
+        ),
       ),
     );
   }
