@@ -14,7 +14,7 @@ border-color:black;
 #NotifPage{
 display: none;
 
-height: 50vh;
+height: 60vh;
 width: 100%;
 background-color: rgb(101, 101, 101);
 flex-direction: column;
@@ -22,6 +22,13 @@ float: left;
 overflow-y: auto;
 overflow-x: auto;
 border-bottom: 5px solid rgb(50, 50, 50);
+
+border-width: 3px;
+border-radius: 20px;
+border-style: solid;
+border-color: #000;
+
+text-align: center;
 }
 
 #NoNotif{
@@ -101,14 +108,14 @@ overflow-y: auto;
 
 #readAll{
 background-image:url('../assets/read-all.webp') ;
-background-size: contain;
+background-size: cover;
 background-repeat: no-repeat;
 background-position: center;
 }
 
 #deleteAll{
 background-image:url('../assets/delete\ all.webp') ;
-background-size: contain;
+background-size: cover;
 background-repeat: no-repeat;
 background-position: center;
 }
@@ -197,9 +204,9 @@ overflow-y: auto;
 
 .bottombutton{
     margin-top: 20px;
-    height: 45px;
-    width: 20%;
-    margin-left: 20%;
+    height: 60px;
+    width: 10%;
+    margin-left: 25%;
     margin-bottom: 30px;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
     font-weight: bold;
@@ -218,7 +225,7 @@ overflow-y: auto;
     box-shadow: 0 8px rgb(134, 99, 9);
 }
 
-.NotIfContainers{
+.NotifContainers{
     margin-top: 5px;
     margin-bottom: 2px;
     margin-left: 5px;
