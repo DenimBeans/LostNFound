@@ -355,6 +355,10 @@ overflow-y: auto;
     margin-right: 5px;
 }
 
+#EmptyNotification{
+    justify-content: center;
+}
+
 #Intro,#SenderInfo,#ItemInfo{
     margin-top: 10px;
     font-size: x-large;
