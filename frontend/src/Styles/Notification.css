@@ -161,11 +161,23 @@ background-repeat: no-repeat;
 background-position: center;
 }
 
-#deleteAll{
-background-color: rgb(175, 11, 11);
+#readAll{
+background-color: darkgoldenrod;
 color: white;
 border-style: solid;
-border-color: rgb(110, 1, 1);
+border-color: darkgoldenrod;
+border-width: 1px;    
+background-image:url('../assets/delete\ all.webp') ;
+background-size:contain;
+background-repeat: no-repeat;
+background-position: center;
+}
+
+#deleteAll{
+background-color: darkgoldenrod;
+color: white;
+border-style: solid;
+border-color: darkgoldenrod;
 border-width: 1px;    
 background-image:url('../assets/delete\ all.webp') ;
 background-size:contain;
