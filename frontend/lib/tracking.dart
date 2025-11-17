@@ -584,7 +584,7 @@ class _MeetupModalState extends State<MeetupModal> {
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 4),
-              MeetingRequest(userId: widget.userId, notifText: 'Temp nothing text', item: widget.item),
+              MeetingRequest(userId: widget.userId, item: widget.item),
             ]
           ),
         ),
@@ -595,13 +595,11 @@ class _MeetupModalState extends State<MeetupModal> {
 
 class MeetingRequest extends StatefulWidget {
   final String userId;
-  final String notifText;
   final Item item;
 
   const MeetingRequest({
     super.key,
     required this.userId,
-    required this.notifText,
     required this.item,
   });
 
@@ -614,6 +612,7 @@ class _MeetingRequestState extends State<MeetingRequest> {
   late String text; // Pass this
   final bool isMeetup = true;
   final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
   late String meetLocation = '';
   late Item item = widget.item; // Pass this
   late String senderId; // Receive from item
@@ -626,7 +625,6 @@ class _MeetingRequestState extends State<MeetingRequest> {
   void initState() {
     super.initState();
     senderId = widget.userId;
-    text = widget.notifText;
     item = widget.item;
     userId = item.reporterUserId;
     itemId = item.itemId;
@@ -655,6 +653,16 @@ class _MeetingRequestState extends State<MeetingRequest> {
             labelText: 'Location',
             border: OutlineInputBorder(),
           ),
+        ),
+        SizedBox(height: 8,),
+        // Notification text input
+        TextField(
+          controller: _messageController,
+          decoration: const InputDecoration(
+            labelText: 'Message',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: 3,
         ),
 
         const SizedBox(height: 16),
@@ -742,7 +750,7 @@ class _MeetingRequestState extends State<MeetingRequest> {
 
               final notificationToSender = {
                 'userId': userId,
-                'text': text,
+                'text': _messageController.text,
                 'isMeetup': isMeetup,
                 'location': _locationController.text,
                 'meetTime': selectedDate.toUtc().toIso8601String(),
@@ -766,11 +774,17 @@ class _MeetingRequestState extends State<MeetingRequest> {
 
               if (responseToSender.statusCode != 201) {
                 throw Exception('Failed to send meet request ${responseToSender.statusCode}');
-              }
-              } catch (e) {
-                debugPrint('err: ${e.toString()}');
-              }
-            },
+              } /*else {
+                if(context.mounted) {
+                  Navigator.of(
+                    context
+                  ).pop;
+                }
+              }*/
+            } catch (e) {
+              debugPrint('err: ${e.toString()}'); 
+            }
+          },
         ),
       ]
     );
