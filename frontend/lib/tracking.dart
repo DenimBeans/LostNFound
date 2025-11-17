@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -7,7 +6,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'main.dart';
 import 'home.dart';
-import 'notifications.dart';
 
 class TrackedItems extends StatefulWidget {
   final String userId;
@@ -44,11 +42,8 @@ class TrackedItemsState extends State<TrackedItems> {
 
   Future<List<Item>> getTrackedItems() async {
     try {
-      
       // Build query parameters
-      var queryParams = <String, String>{
-        'userId': widget.userId,
-      };
+      var queryParams = <String, String>{'userId': widget.userId};
 
       final uri = Uri.http(
         'knightfind.xyz:4000',
@@ -56,7 +51,7 @@ class TrackedItemsState extends State<TrackedItems> {
         queryParams,
       );
 
-      debugPrint('🔍 Fetching items from: $uri'); // Debug log
+      debugPrint('🔍 Fetching items from: $uri');
 
       final response = await http
           .get(uri, headers: {'Content-Type': 'application/json'})
@@ -67,13 +62,13 @@ class TrackedItemsState extends State<TrackedItems> {
             },
           );
 
-      debugPrint('📡 Response status: ${response.statusCode}'); // Debug log
-      debugPrint('📦 Response body: ${response.body}'); // Debug log
+      debugPrint('📡 Response status: ${response.statusCode}');
+      debugPrint('📦 Response body: ${response.body}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final results = data['results'] as List;
-        debugPrint('✅ Found ${results.length} items'); // Debug log
+        debugPrint('✅ Found ${results.length} items');
         return results.map((e) => Item.fromJson(e)).toList();
       } else {
         throw Exception(
@@ -81,7 +76,7 @@ class TrackedItemsState extends State<TrackedItems> {
         );
       }
     } catch (e) {
-      debugPrint('❌ Error: $e'); // Debug log
+      debugPrint('❌ Error: $e');
       setState(() {
         _errorMessage = 'Error loading items: ${e.toString()}';
       });
@@ -92,7 +87,9 @@ class TrackedItemsState extends State<TrackedItems> {
   Future<void> _removeTracking(String userId, String itemId) async {
     try {
       final response = await http.delete(
-        Uri.parse('http://knightfind.xyz:4000/api/users/$userId/tracked-items/$itemId'),
+        Uri.parse(
+          'http://knightfind.xyz:4000/api/users/$userId/tracked-items/$itemId',
+        ),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -129,7 +126,9 @@ class TrackedItemsState extends State<TrackedItems> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Remove Tracking'),
-          content: Text('Are you sure you want to stop tracking "${item.title}"?'),
+          content: Text(
+            'Are you sure you want to stop tracking "${item.title}"?',
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -140,7 +139,10 @@ class TrackedItemsState extends State<TrackedItems> {
                 Navigator.of(context).pop();
                 _removeTracking(widget.userId, item.itemId);
               },
-              child: const Text('Stop Tracking', style: TextStyle(color: Colors.red)),
+              child: const Text(
+                'Stop Tracking',
+                style: TextStyle(color: Colors.red),
+              ),
             ),
           ],
         );
@@ -326,15 +328,35 @@ class TrackedItemsState extends State<TrackedItems> {
                       children: [
                         Expanded(
                           child: BoldElevatedButton(
-                            text: 'Found!',
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) => MeetupModal(userId: widget.userId, item: item),
-                              );
-                            },
+                            text: item.status == 'found'
+                                ? 'Already Found'
+                                : 'Found!',
+                            onPressed: item.status == 'found'
+                                ? null
+                                : () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) =>
+                                          MeetupModal(
+                                            userId: widget.userId,
+                                            item: item,
+                                            finderFirstName: widget.firstName,
+                                            finderLastName: widget.lastName,
+                                            onMeetupScheduled: () {
+                                              // Refresh the tracked items list after scheduling
+                                              setState(() {
+                                                _itemsFuture =
+                                                    getTrackedItems();
+                                              });
+                                            },
+                                          ),
+                                    );
+                                  },
                             minWidth: double.infinity,
                             minHeight: 45,
+                            backgroundColor: item.status == 'found'
+                                ? Colors.grey
+                                : AppColors.primaryButton,
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -469,7 +491,7 @@ class TrackedItemsState extends State<TrackedItems> {
       ),
     );
   }
-  
+
   Widget _buildItemCard(Item item) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
@@ -546,17 +568,23 @@ class TrackedItemsState extends State<TrackedItems> {
 class MeetupModal extends StatefulWidget {
   final String userId;
   final Item item;
+  final String finderFirstName;
+  final String finderLastName;
   final Function(DateTime)? onDateSelected;
   final Function(TimeOfDay)? onTimeSelected;
   final Function(String)? onLocationSelected;
+  final VoidCallback? onMeetupScheduled;
 
   const MeetupModal({
     super.key,
     required this.userId,
     required this.item,
+    required this.finderFirstName,
+    required this.finderLastName,
     this.onDateSelected,
     this.onTimeSelected,
     this.onLocationSelected,
+    this.onMeetupScheduled,
   });
 
   @override
@@ -584,8 +612,14 @@ class _MeetupModalState extends State<MeetupModal> {
                 style: TextStyle(fontSize: 16),
               ),
               const SizedBox(height: 4),
-              MeetingRequest(userId: widget.userId, item: widget.item),
-            ]
+              MeetingRequest(
+                userId: widget.userId,
+                item: widget.item,
+                finderFirstName: widget.finderFirstName,
+                finderLastName: widget.finderLastName,
+                onMeetupScheduled: widget.onMeetupScheduled,
+              ),
+            ],
           ),
         ),
       ],
@@ -596,11 +630,17 @@ class _MeetupModalState extends State<MeetupModal> {
 class MeetingRequest extends StatefulWidget {
   final String userId;
   final Item item;
+  final String finderFirstName;
+  final String finderLastName;
+  final VoidCallback? onMeetupScheduled;
 
   const MeetingRequest({
     super.key,
     required this.userId,
     required this.item,
+    required this.finderFirstName,
+    required this.finderLastName,
+    this.onMeetupScheduled,
   });
 
   @override
@@ -608,15 +648,14 @@ class MeetingRequest extends StatefulWidget {
 }
 
 class _MeetingRequestState extends State<MeetingRequest> {
-  late String userId; // Pass this
-  late String text; // Pass this
+  late String userId;
+  late String text;
   final bool isMeetup = true;
   final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _messageController = TextEditingController();
   late String meetLocation = '';
-  late Item item = widget.item; // Pass this
-  late String senderId; // Receive from item
-  String? itemId; // Receive from item
+  late Item item = widget.item;
+  late String senderId;
+  String? itemId;
 
   late DateTime selectedDate;
   late TimeOfDay selectedTime;
@@ -630,15 +669,36 @@ class _MeetingRequestState extends State<MeetingRequest> {
     itemId = item.itemId;
 
     selectedDate = DateTime.now().add(Duration(hours: 1));
-    selectedTime = TimeOfDay(hour: selectedDate.hour, minute: selectedDate.minute);
+    selectedTime = TimeOfDay(
+      hour: selectedDate.hour,
+      minute: selectedDate.minute,
+    );
 
     debugPrint('Initialized: senderId=$senderId, itemId=$itemId');
   }
-  
+
   @override
   void dispose() {
     _locationController.dispose();
     super.dispose();
+  }
+
+  Future<void> _updateItemStatus(String itemId) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('http://knightfind.xyz:4000/api/items/$itemId/status'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'status': 'found'}),
+      );
+
+      if (response.statusCode != 200) {
+        debugPrint('Failed to update item status: ${response.statusCode}');
+      } else {
+        debugPrint('Item status updated to found');
+      }
+    } catch (e) {
+      debugPrint('Error updating item status: $e');
+    }
   }
 
   @override
@@ -654,17 +714,6 @@ class _MeetingRequestState extends State<MeetingRequest> {
             border: OutlineInputBorder(),
           ),
         ),
-        SizedBox(height: 8,),
-        // Notification text input
-        TextField(
-          controller: _messageController,
-          decoration: const InputDecoration(
-            labelText: 'Message',
-            border: OutlineInputBorder(),
-          ),
-          maxLines: 3,
-        ),
-
         const SizedBox(height: 16),
 
         // Date picker
@@ -736,57 +785,81 @@ class _MeetingRequestState extends State<MeetingRequest> {
               return;
             }
             if (!selectedDate.isAfter(DateTime.now())) {
-              debugPrint('selected date not in future. selected date: $selectedDate cur ${DateTime.now()}');
+              debugPrint(
+                'selected date not in future. selected date: $selectedDate cur ${DateTime.now()}',
+              );
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Please select a future date and time')),
+                const SnackBar(
+                  content: Text('Please select a future date and time'),
+                ),
               );
               return;
             }
 
-            //  Now make API call
             try {
               debugPrint('selectedDate before payload: $selectedDate');
-              debugPrint('selectedDate hour: ${selectedDate.hour}, minute: ${selectedDate.minute}');
+              debugPrint(
+                'selectedDate hour: ${selectedDate.hour}, minute: ${selectedDate.minute}',
+              );
+
+              // Create the notification text with finder's name
+              String notificationText =
+                  '${widget.finderFirstName} ${widget.finderLastName} has found your item and wants to meet up!';
 
               final notificationToSender = {
                 'userId': userId,
-                'text': _messageController.text,
+                'text': notificationText,
                 'isMeetup': isMeetup,
                 'location': _locationController.text,
                 'meetTime': selectedDate.toUtc().toIso8601String(),
                 'senderId': senderId,
-                'itemId': itemId ?? ''
+                'itemId': itemId ?? '',
               };
 
               final responseToSender = await http.post(
-                Uri.parse(
-                  'http://knightfind.xyz:4000/api/notifications',
-                ),
+                Uri.parse('http://knightfind.xyz:4000/api/notifications'),
                 headers: {'Content-Type': 'application/json'},
                 body: jsonEncode(notificationToSender),
               );
-              final data = jsonDecode(responseToSender.body);
-
-              debugPrint('Correct response code, decoded data, checking for errors now');
-              debugPrint('Full response: $data');
-              debugPrint('err type: ${data['error'].runtimeType}');
-              debugPrint('err: ${data['error']}');
 
               if (responseToSender.statusCode != 201) {
-                throw Exception('Failed to send meet request ${responseToSender.statusCode}');
-              } /*else {
-                if(context.mounted) {
-                  Navigator.of(
-                    context
-                  ).pop;
-                }
-              }*/
+                throw Exception(
+                  'Failed to send meet request ${responseToSender.statusCode}',
+                );
+              }
+
+              // Update item status to "found"
+              await _updateItemStatus(itemId!);
+
+              // Show success message
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Meeting request sent successfully!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+
+                // Call the callback to refresh the list
+                widget.onMeetupScheduled?.call();
+
+                // Close the dialog
+                Navigator.of(context).pop();
+              }
             } catch (e) {
-              debugPrint('err: ${e.toString()}'); 
+              debugPrint('err: ${e.toString()}');
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Error: ${e.toString()}'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
             }
           },
         ),
-      ]
+      ],
     );
   }
 }

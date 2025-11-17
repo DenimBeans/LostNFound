@@ -482,7 +482,7 @@ class EmailField extends StatelessWidget {
 
 class BoldElevatedButton extends StatelessWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double minWidth;
   final double minHeight;
   final Color? backgroundColor;
@@ -491,7 +491,7 @@ class BoldElevatedButton extends StatelessWidget {
   const BoldElevatedButton({
     super.key,
     required this.text,
-    required this.onPressed,
+    this.onPressed,
     required this.minWidth,
     required this.minHeight,
     this.backgroundColor,
