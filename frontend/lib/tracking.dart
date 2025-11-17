@@ -660,6 +660,14 @@ class _MeetingRequestState extends State<MeetingRequest> {
   late DateTime selectedDate;
   late TimeOfDay selectedTime;
 
+  // Helper to convert EST local time to UTC for backend
+  String _convertESTToUTC(DateTime estLocalTime) {
+    // The selectedDate is in "local EST" - we need to convert it to what would be UTC
+    // EST is UTC-5, so a time in EST needs 5 hours added to get UTC
+    final utcTime = estLocalTime.add(const Duration(hours: 5));
+    return utcTime.toIso8601String();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -811,7 +819,7 @@ class _MeetingRequestState extends State<MeetingRequest> {
                 'text': notificationText,
                 'isMeetup': isMeetup,
                 'location': _locationController.text,
-                'meetTime': selectedDate.toUtc().toIso8601String(),
+                'meetTime': _convertESTToUTC(selectedDate),
                 'senderId': senderId,
                 'itemId': itemId ?? '',
               };

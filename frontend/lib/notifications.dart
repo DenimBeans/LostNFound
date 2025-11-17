@@ -88,10 +88,10 @@ class Notification {
     if (json['meetTime'] != null) {
       try {
         if (json['meetTime'] is String) {
-          // Parse as UTC and store the UTC DateTime
-          parsedMeetTime = DateTime.parse(json['meetTime']).toUtc();
+          // Parse the UTC string directly - don't convert again
+          parsedMeetTime = DateTime.parse(json['meetTime']);
         } else if (json['meetTime'] is DateTime) {
-          parsedMeetTime = (json['meetTime'] as DateTime).toUtc();
+          parsedMeetTime = json['meetTime'] as DateTime;
         }
       } catch (e) {
         debugPrint('Error parsing meetTime: $e');
@@ -176,6 +176,14 @@ class _InboxDisplayState extends State<InboxDisplay> {
     final hours = estTime.hour.toString().padLeft(2, '0');
     final minutes = estTime.minute.toString().padLeft(2, '0');
     return '$month/$day/$year $hours:$minutes EST';
+  }
+
+  // Helper to convert EST local time to UTC for backend
+  String _convertESTToUTC(DateTime estLocalTime) {
+    // The input time is in "local EST" - we need to convert it to UTC
+    // EST is UTC-5, so a time in EST needs 5 hours added to get UTC
+    final utcTime = estLocalTime.add(const Duration(hours: 5));
+    return utcTime.toIso8601String();
   }
 
   @override
@@ -691,7 +699,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
         'text': textToSender,
         'isMeetup': notif.isMeetup,
         'location': notif.location,
-        'meetTime': notif.meetTime?.toUtc().toIso8601String(),
+        'meetTime': _convertESTToUTC(notif.meetTime ?? DateTime.now()),
         'senderId': widget.userId,
         'itemId': notif.itemId?.itemId ?? '',
       };
@@ -724,7 +732,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
         'text': confirmationText,
         'isMeetup': false,
         'location': notif.location,
-        'meetTime': notif.meetTime?.toUtc().toIso8601String(),
+        'meetTime': _convertESTToUTC(notif.meetTime ?? DateTime.now()),
         'senderId': widget.userId,
         'itemId': notif.itemId?.itemId ?? '',
       };
@@ -868,7 +876,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
                             'The meetup at ${notif.location} at the time $formattedOriginalTime was contested.',
                         'isMeetup': true,
                         'location': locationController.text,
-                        'meetTime': selectedDate.toUtc().toIso8601String(),
+                        'meetTime': _convertESTToUTC(selectedDate),
                         'senderId': widget.userId,
                         'itemId': notif.itemId?.itemId ?? '',
                       };
@@ -897,7 +905,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
                         'text': confirmationText,
                         'isMeetup': false,
                         'location': locationController.text,
-                        'meetTime': selectedDate.toUtc().toIso8601String(),
+                        'meetTime': _convertESTToUTC(selectedDate),
                         'senderId': widget.userId,
                         'itemId': notif.itemId?.itemId ?? '',
                       };
