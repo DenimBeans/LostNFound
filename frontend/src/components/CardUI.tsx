@@ -364,7 +364,7 @@ function CardUI() {
                 <Popup minWidth={90}>
                     <span onClick={toggleDraggable}>
                     {draggable
-                        ? `Marker is draggable! ${position}`
+                        ? `Marker is draggable!`
                         : 'Click here to make marker draggable.'}
                     </span>
                 </Popup>
