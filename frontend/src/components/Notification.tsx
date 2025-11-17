@@ -525,7 +525,7 @@ function Notification() {
                 <input type='text' id='from' className="NotifData" value={Sender} readOnly></input>
 
                 <span id="ItemInfo">Item Info</span>
-                <div id = "imgContainer" ref = {imageViewRef}>
+                <div id = "imgContainerNotif" ref = {imageViewRef}>
                     <img id = "reportImg" src = {VitemImage}/>
                 </div>
                 <input type="text" id="NotifTitle" className="NotifData" value={NotifTitle} readOnly />

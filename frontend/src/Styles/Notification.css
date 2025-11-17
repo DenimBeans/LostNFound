@@ -78,7 +78,7 @@ background: black;
 border-radius: 16px;
 }
 
-#imgContainer
+#imgContainerNotif
 {
     height: 15vh;
     
@@ -356,7 +356,7 @@ overflow-y: auto;
 }
 
 #EmptyNotifications{
-    justify-content: center;
+    height: inherit;
 }
 
 #Intro,#SenderInfo,#ItemInfo{
