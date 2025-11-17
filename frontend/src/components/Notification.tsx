@@ -7,6 +7,18 @@ import Empty from '../assets/EmptyIcon.webp'
 
 function Notification() {
 
+    // Helper function to format ISO 8601 string as EST time
+    const formatTimeAsEST = (isoString: string): string => {
+        const date = new Date(isoString);
+        // Parse as local time, not UTC
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${month}/${day}/${year} ${hours}:${minutes} EST`;
+    };
+
     interface NotifData {
 
         text: string;
@@ -229,16 +241,7 @@ function Notification() {
 
         setNotifMeetLoc(Notif.location);
         if (Notif.meetTime != null) {
-            var date = new Date(Notif.meetTime)
-
-            let Day = String(date.getDate()).padStart(2, '0');
-            let Month = String(date.getMonth() + 1).padStart(2, '0');
-            let Year = date.getFullYear()
-            let Hour = String(date.getHours()).padStart(2, '0');
-            let Minutes = String(date.getMinutes()).padStart(2, '0');
-
-
-            setNotifMeetTime(`${Month}/${Day}/${Year}--${Hour}:${Minutes}`);
+            setNotifMeetTime(formatTimeAsEST(Notif.meetTime));
         }
         else {
             setNotifMeetTime('');
@@ -259,8 +262,9 @@ function Notification() {
 
         const NotifId = Notif._id;
         if (answer == "Accept") {
-            let Response = `Meeting accepted, Location at ${Notif.location} and the meeting will take place at ${Notif.meetTime}.`
-            let Self = `You have accepted this meeting at Location at ${Notif.location} and the meeting will take place at ${Notif.meetTime}.`
+            let formattedTime = Notif.meetTime ? formatTimeAsEST(Notif.meetTime) : Notif.meetTime;
+            let Response = `Meeting accepted, Location at ${Notif.location} and the meeting will take place at ${formattedTime}.`
+            let Self = `You have accepted this meeting at Location at ${Notif.location} and the meeting will take place at ${formattedTime}.`
             let obj = {
                 userId: Notif.senderId._id,
                 text: Response,
@@ -330,8 +334,10 @@ function Notification() {
             }
         }
         else if (answer == "Contest") {
-            let Response = `The meetup at ${Notif.location} at the time ${Notif.meetTime} was contested.`
-            let Self = `You contested the meetup with new information, Location: ${contestLocation} Time: ${contestTime}`
+            let formattedOriginalTime = Notif.meetTime ? formatTimeAsEST(Notif.meetTime) : Notif.meetTime;
+            let formattedContestTime = contestTime ? formatTimeAsEST(contestTime.toISOString()) : contestTime;
+            let Response = `The meetup at ${Notif.location} at the time ${formattedOriginalTime} was contested.`
+            let Self = `You contested the meetup with new information, Location: ${contestLocation} Time: ${formattedContestTime}`
             let obj = {
                 userId: Notif.senderId._id,
                 text: Response,
