@@ -88,9 +88,10 @@ class Notification {
     if (json['meetTime'] != null) {
       try {
         if (json['meetTime'] is String) {
-          parsedMeetTime = DateTime.parse(json['meetTime']);
+          // Parse as UTC and store the UTC DateTime
+          parsedMeetTime = DateTime.parse(json['meetTime']).toUtc();
         } else if (json['meetTime'] is DateTime) {
-          parsedMeetTime = json['meetTime'];
+          parsedMeetTime = (json['meetTime'] as DateTime).toUtc();
         }
       } catch (e) {
         debugPrint('Error parsing meetTime: $e');
@@ -162,14 +163,13 @@ class _InboxDisplayState extends State<InboxDisplay> {
   String _errorMessage = '';
 
   // Helper function to format DateTime as EST string
-  // Input: DateTime object (which is always in local timezone in Dart)
-  // We convert to UTC first to get the actual stored time, then display it
+  // Hardcoded EST (UTC-5) to ensure consistency across all devices
+  // Input: DateTime object parsed from backend UTC string
   String _formatTimeAsEST(DateTime? dateTime) {
     if (dateTime == null) return '';
-    // The DateTime object is in local time; convert to UTC to see what was sent to backend
-    final utcTime = dateTime.toUtc();
-    // Now subtract 5 hours to get EST (UTC-5)
-    final estTime = utcTime.subtract(Duration(hours: 5));
+    // Assume input is already in UTC (from backend)
+    // Subtract exactly 5 hours to convert UTC to EST
+    final estTime = dateTime.subtract(const Duration(hours: 5));
     final day = estTime.day.toString().padLeft(2, '0');
     final month = estTime.month.toString().padLeft(2, '0');
     final year = estTime.year;

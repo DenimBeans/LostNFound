@@ -8,11 +8,11 @@ import Empty from '../assets/EmptyIcon.webp'
 function Notification() {
 
     // Helper function to format ISO 8601 string as EST time
+    // Hardcoded EST (UTC-5) to ensure consistency across all devices
     const formatTimeAsEST = (isoString: string): string => {
         const date = new Date(isoString);
         // The isoString comes from backend as UTC (with Z suffix)
-        // JavaScript automatically parses it as UTC
-        // We need to subtract 5 hours to display as EST (UTC-5)
+        // Hardcode UTC-5 offset to ensure consistent EST display
         const estTime = new Date(date.getTime() - (5 * 60 * 60 * 1000));
         const day = String(estTime.getUTCDate()).padStart(2, '0');
         const month = String(estTime.getUTCMonth() + 1).padStart(2, '0');
