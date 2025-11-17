@@ -88,8 +88,28 @@ class Notification {
     if (json['meetTime'] != null) {
       try {
         if (json['meetTime'] is String) {
-          // Parse the UTC string directly - don't convert again
-          parsedMeetTime = DateTime.parse(json['meetTime']);
+          // Parse the backend time string - always treat as UTC
+          var timeStr = json['meetTime'].toString();
+          var parsed = DateTime.parse(timeStr);
+
+          // If the string doesn't have Z, it means it's already meant to be UTC
+          // but without the Z marker, so we need to ensure it's treated as UTC
+          if (!timeStr.endsWith('Z') && !parsed.isUtc) {
+            // Convert from the parsed local DateTime to UTC
+            // The parsed time IS the UTC time we want, just not marked as such
+            parsedMeetTime = DateTime.utc(
+              parsed.year,
+              parsed.month,
+              parsed.day,
+              parsed.hour,
+              parsed.minute,
+              parsed.second,
+              parsed.millisecond,
+              parsed.microsecond,
+            );
+          } else {
+            parsedMeetTime = parsed;
+          }
         } else if (json['meetTime'] is DateTime) {
           parsedMeetTime = json['meetTime'] as DateTime;
         }
@@ -180,10 +200,10 @@ class _InboxDisplayState extends State<InboxDisplay> {
 
   // Helper to convert EST local time to UTC for backend
   String _convertESTToUTC(DateTime estLocalTime) {
-    // The input time is in "local EST" - we need to convert it to UTC
-    // EST is UTC-5, so a time in EST needs 5 hours added to get UTC
-    final utcTime = estLocalTime.add(const Duration(hours: 5));
-    return utcTime.toIso8601String();
+    // The input time is device-local, which we're treating as EST
+    // Add 5 hours to convert from EST to UTC, then convert to UTC timezone
+    final utcEquivalent = estLocalTime.add(const Duration(hours: 5)).toUtc();
+    return utcEquivalent.toIso8601String();
   }
 
   @override
@@ -499,7 +519,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
                             border: Border.all(color: Colors.grey[300]!),
                           ),
                           child: Text(
-                            '${notif.meetTime!.month}/${notif.meetTime!.day}/${notif.meetTime!.year} at ${notif.meetTime!.hour}:${notif.meetTime!.minute.toString().padLeft(2, '0')}',
+                            _formatTimeAsEST(notif.meetTime),
                             style: const TextStyle(fontSize: 16),
                           ),
                         ),
