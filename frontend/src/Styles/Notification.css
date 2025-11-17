@@ -78,25 +78,29 @@ background: black;
 border-radius: 16px;
 }
 
-#imgContainer
+#imgContainerNotif
 {
     height: 15vh;
-    overflow: hidden;
+    
     margin-bottom: 15px;
     display: flex;
 }
 
 #NoNotif{
-display: none;
-
-height: 50vh;
-width: 100%;
-background-color: rgb(101, 101, 101);
-flex-direction: column;
-float: left;
-overflow-y: auto;
-overflow-x: auto;
-border-bottom: 5px solid rgb(50, 50, 50);
+    display: none;
+    height: 60vh;
+    width: 100%;
+    background-color: #656565;
+    flex-direction: column;
+    float: left;
+    overflow-y: auto;
+    clip-path: fill-box;
+    border-bottom: 5px solid rgb(50, 50, 50);
+    border-width: 3px;
+    border-radius: 20px;
+    border-bottom-style: outset;
+    border-color: #000;
+    text-align: center;
 }
 
 #ViewNotIf{
@@ -349,6 +353,10 @@ overflow-y: auto;
     font-weight: bold;
     cursor: pointer;
     margin-right: 5px;
+}
+
+#EmptyNotifications{
+    height: inherit;
 }
 
 #Intro,#SenderInfo,#ItemInfo{
