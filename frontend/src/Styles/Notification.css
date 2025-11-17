@@ -52,7 +52,7 @@ background-color: rgb(101, 101, 101);
 flex-direction: column;
 float: left;
 overflow-y: auto;
-overflow-x: auto;
+
 border-bottom: 5px solid rgb(50, 50, 50);
 
 border-width: 3px;
@@ -60,8 +60,14 @@ border-radius: 20px;
 border-bottom-style: outset;
 border-color: #000;
 
+
 text-align: center;
 }
+
+#NotifPage::-webkit-scrollbar{
+
+}
+
 
 #NoNotif{
 display: none;
