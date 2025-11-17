@@ -99,6 +99,20 @@ overflow-y: auto;
     visibility: hidden;
 }
 
+#readAll{
+background-image:url('../assets/read-all.webp') ;
+background-size: contain;
+background-repeat: no-repeat;
+background-position: center;
+}
+
+#deleteAll{
+background-image:url('../assets/delete\ all.webp') ;
+background-size: contain;
+background-repeat: no-repeat;
+background-position: center;
+}
+
 #Contest{
 width: 40%;
 background-color: rgb(101, 101, 101);
