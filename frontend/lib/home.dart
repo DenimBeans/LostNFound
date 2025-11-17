@@ -221,7 +221,7 @@ class _MapUCFState extends State<MapUCF> {
       // Map options, such as initial center and zoom
       options: MapOptions(
         initialCenter: widget.pontoCentral,
-        initialZoom: 15.0, // Displays all of campus
+        initialZoom: 16.0, // Displays all of campus
       ),
       // The map is built in layers
       children: [
@@ -675,7 +675,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                       minHeight: 45,
                     ),
             ),
-
+            /*
             const SizedBox(height: 32),
             const Divider(),
             const SizedBox(height: 20),
@@ -741,7 +741,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                   );
                 },
               ),
-            ),
+            ),*/
 
             const SizedBox(height: 40),
           ],

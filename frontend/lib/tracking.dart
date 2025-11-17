@@ -213,7 +213,7 @@ class TrackedItemsState extends State<TrackedItems> {
                                     size: 40,
                                     color: Colors.red,
                                   ),
-                                  Container(
+                                  /* Container(
                                     padding: const EdgeInsets.symmetric(
                                       horizontal: 5,
                                       vertical: 2,
@@ -229,7 +229,7 @@ class TrackedItemsState extends State<TrackedItems> {
                                         fontSize: 12,
                                       ),
                                     ),
-                                  ),
+                                  ),*/
                                 ],
                               ),
                             ),
