@@ -200,10 +200,18 @@ class _InboxDisplayState extends State<InboxDisplay> {
 
   // Helper to convert EST local time to UTC for backend
   String _convertESTToUTC(DateTime estLocalTime) {
-    // The input time is device-local, which we're treating as EST
-    // Add 5 hours to convert from EST to UTC, then convert to UTC timezone
-    final utcEquivalent = estLocalTime.add(const Duration(hours: 5)).toUtc();
-    return utcEquivalent.toIso8601String();
+    // The input time is device-local, which we're treating as "EST time"
+    // To convert EST to UTC: add 5 hours (EST is UTC-5)
+    // We create a NEW DateTime in UTC with the adjusted time
+    final utcTime = DateTime.utc(
+      estLocalTime.year,
+      estLocalTime.month,
+      estLocalTime.day,
+      estLocalTime.hour + 5,
+      estLocalTime.minute,
+      estLocalTime.second,
+    );
+    return utcTime.toIso8601String();
   }
 
   @override
@@ -707,7 +715,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
 
       if (responseType == 'Accept') {
         textToSender =
-            'Meeting accepted, Location at ${notif.location} and the meeting will take place at $formattedTime';
+            'The meetup was accepted, will be held at ${notif.location} on $formattedTime.';
       } else if (responseType == 'Deny') {
         textToSender = 'Your meetup request has been rejected.';
       } else {
@@ -717,7 +725,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
       final notificationToSender = {
         'userId': notif.senderId!.id,
         'text': textToSender,
-        'isMeetup': notif.isMeetup,
+        'isMeetup': false,
         'location': notif.location,
         'meetTime': _convertESTToUTC(notif.meetTime ?? DateTime.now()),
         'senderId': widget.userId,
@@ -738,10 +746,10 @@ class _InboxDisplayState extends State<InboxDisplay> {
       String confirmationText;
       if (responseType == 'Accept') {
         confirmationText =
-            'You have accepted this meeting at Location at ${notif.location} and the meeting will take place at $formattedTime';
+            'You have accepted this meetup at ${notif.location} on $formattedTime.';
       } else if (responseType == 'Deny') {
         confirmationText =
-            'You have denied this meeting at the location ${notif.location} at the time of $formattedTime';
+            'You have denied this meetup at ${notif.location} on $formattedTime.';
       } else {
         // This shouldn't happen for Accept/Deny, but just in case
         confirmationText = 'You responded: $responseType';
@@ -893,7 +901,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
                       final notificationToSender = {
                         'userId': notif.senderId!.id,
                         'text':
-                            'The meetup at ${notif.location} at the time $formattedOriginalTime was contested.',
+                            'The meetup at ${notif.location} on $formattedOriginalTime was contested.',
                         'isMeetup': true,
                         'location': locationController.text,
                         'meetTime': _convertESTToUTC(selectedDate),
@@ -914,11 +922,25 @@ class _InboxDisplayState extends State<InboxDisplay> {
                       }
 
                       // 2. Send confirmation notification back to current user
-                      String formattedContestTime = _formatTimeAsEST(
-                        selectedDate,
+                      final day = selectedDate.day.toString().padLeft(2, '0');
+                      final month = selectedDate.month.toString().padLeft(
+                        2,
+                        '0',
                       );
+                      final year = selectedDate.year;
+                      final hours = selectedDate.hour.toString().padLeft(
+                        2,
+                        '0',
+                      );
+                      final minutes = selectedDate.minute.toString().padLeft(
+                        2,
+                        '0',
+                      );
+                      String formattedContestTime =
+                          '$month/$day/$year $hours:$minutes EST';
+
                       final confirmationText =
-                          'You contested the meetup with new information, Location: ${locationController.text} Time: $formattedContestTime';
+                          'You contested the meetup with new information: ${locationController.text} on $formattedContestTime.';
 
                       final confirmationNotification = {
                         'userId': widget.userId,

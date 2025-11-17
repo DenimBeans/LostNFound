@@ -662,10 +662,18 @@ class _MeetingRequestState extends State<MeetingRequest> {
 
   // Helper to convert EST local time to UTC for backend
   String _convertESTToUTC(DateTime estLocalTime) {
-    // The selectedDate is device-local time, which we're treating as EST
-    // Add 5 hours to convert from EST to UTC, then convert to UTC timezone
-    final utcEquivalent = estLocalTime.add(const Duration(hours: 5)).toUtc();
-    return utcEquivalent.toIso8601String();
+    // The selectedDate is device-local time which we're treating as "EST time"
+    // To convert EST to UTC: add 5 hours (EST is UTC-5)
+    // We create a NEW DateTime in UTC with the adjusted time
+    final utcTime = DateTime.utc(
+      estLocalTime.year,
+      estLocalTime.month,
+      estLocalTime.day,
+      estLocalTime.hour + 5,
+      estLocalTime.minute,
+      estLocalTime.second,
+    );
+    return utcTime.toIso8601String();
   }
 
   @override

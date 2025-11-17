@@ -266,8 +266,8 @@ function Notification() {
         const NotifId = Notif._id;
         if (answer == "Accept") {
             let formattedTime = Notif.meetTime ? formatTimeAsEST(Notif.meetTime) : Notif.meetTime;
-            let Response = `Meeting accepted, Location at ${Notif.location} and the meeting will take place at ${formattedTime}.`
-            let Self = `You have accepted this meeting at Location at ${Notif.location} and the meeting will take place at ${formattedTime}.`
+            let Response = `The meetup was accepted, will be held at ${Notif.location} on ${formattedTime}.`;
+            let Self = `You have accepted this meetup at ${Notif.location} on ${formattedTime}.`;
             let obj = {
                 userId: Notif.senderId._id,
                 text: Response,
@@ -339,12 +339,12 @@ function Notification() {
         else if (answer == "Contest") {
             let formattedOriginalTime = Notif.meetTime ? formatTimeAsEST(Notif.meetTime) : Notif.meetTime;
             let formattedContestTime = contestTime ? formatTimeAsEST(contestTime.toISOString()) : contestTime;
-            let Response = `The meetup at ${Notif.location} at the time ${formattedOriginalTime} was contested.`
-            let Self = `You contested the meetup with new information, Location: ${contestLocation} Time: ${formattedContestTime}`
+            let Response = `The meetup at ${Notif.location} on ${formattedOriginalTime} was contested.`
+            let Self = `You contested the meetup at ${contestLocation} on ${formattedContestTime} with new information.`
             let obj = {
                 userId: Notif.senderId._id,
                 text: Response,
-                isMeetup: Notif.isMeetup,
+                isMeetup: true,
                 location: contestLocation,
                 meetTime: contestTime ? contestTime.toISOString() : null,
                 senderId: itemUSERID,
@@ -410,8 +410,9 @@ function Notification() {
             }
         }
         else if (answer == "Deny") {
-            let Response = `This meetup has been rejected.`
-            let Self = `You have denied this meeting at the location ${Notif.location} at the time of ${Notif.meetTime}`
+            let formattedTime = Notif.meetTime ? formatTimeAsEST(Notif.meetTime) : Notif.meetTime;
+            let Response = `Your meetup request has been rejected.`
+            let Self = `You have denied this meetup at ${Notif.location} on ${formattedTime}.`
             let obj = {
                 userId: Notif.senderId._id,
                 text: Response,
