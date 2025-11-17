@@ -32,6 +32,7 @@ class ItemSearch extends StatefulWidget {
 class ItemSearchState extends State<ItemSearch> {
   //  Retrieve user coords
 
+  /*
   /// When the location services are not enabled or permissions
   /// are denied the `Future` will return an error.
   Future<Position> _determinePosition() async {
@@ -70,17 +71,21 @@ class ItemSearchState extends State<ItemSearch> {
     // continue accessing the position of the device.
     return await Geolocator.getCurrentPosition();
   }
+  */
 
   Future<List<Item>> get itemsFuture => searchItems();
 
   Future<List<Item>> searchItems() async {
-    Position userPos = await _determinePosition();
+    //Position userPos = await _determinePosition();
 
     final queryParams = {
-      //  Using UCF's coordinates for now
-      //  Eventually will need to be replaced with user coords
+      //  Hardcoded UCF coordinates
+      'lat': '28.6024274',
+      'lng': '-81.2000599',
+      /*
       'lat': userPos.latitude, // ?? '28.6024274',
       'lng': userPos.longitude, // ?? '-81.2000599',
+      */
       'radius': '5',
     };
 
@@ -101,6 +106,33 @@ class ItemSearchState extends State<ItemSearch> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      child: Center(
+        child: SizedBox(
+          height: 250,
+          child: FutureBuilder<List<Item>>(
+            future: itemsFuture,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                // until data is fetched, show loader
+                return const CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else if (snapshot.hasData) {
+                // once data is fetched, pass it to the map
+                final items = snapshot.data!;
+                return SizedBox(
+                  width: 350,
+                  height: 250,
+                  child: SearchMap(items: items, userId: widget.userId),
+                );
+              } else {
+                // if no data, show simple Text
+                return const Text("No data available");
+              }
+            },
+          )
+        )
+      /*
       child: FutureBuilder<Position>(
         future: _determinePosition(),
         builder: (context, snapshot) {
@@ -126,7 +158,7 @@ class ItemSearchState extends State<ItemSearch> {
                     return SizedBox(
                       width: 350,
                       height: 250,
-                      child: SearchMap(items: items, userId: widget.userId, userPos: userPos),
+                      child: SearchMap(items: items, userId: widget.userId) //, userPos: userPos),
                     );
                   } else {
                     // if no data, show simple Text
@@ -136,7 +168,7 @@ class ItemSearchState extends State<ItemSearch> {
               ),
             );
           }
-        }
+        }*/
       ),
     );
   }
@@ -167,17 +199,20 @@ class ItemSearchState extends State<ItemSearch> {
 }
 
 class SearchMap extends StatefulWidget {
-  const SearchMap({super.key, required this.items, required this.userId, required this.userPos});
+  const SearchMap({super.key, required this.items, required this.userId}); //, required this.userPos});
   final List<Item> items;
   final String userId;
-  final Position userPos;
+  //final Position userPos;
 
   @override
   State<SearchMap> createState() => _SearchMapState();
 }
 
 class _SearchMapState extends State<SearchMap> {
-  late final LatLng _pontoCentral = LatLng(widget.userPos.latitude, widget.userPos.longitude);
+  //  Hardcoded UCF coordinates for center
+  static const LatLng _pontoCentral = LatLng(28.6024274, -81.2000599);
+
+  //late final LatLng _pontoCentral = LatLng(widget.userPos.latitude, widget.userPos.longitude);
 
   // A list that will hold our pins (markers)
   late final List<Marker> _markers;
