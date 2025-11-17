@@ -156,7 +156,7 @@ overflow-y: auto;
 
 #readAll{
 background-image:url('../assets/read-all.webp') ;
-background-size: cover;
+background-size: contain;
 background-repeat: no-repeat;
 background-position: center;
 }
@@ -168,7 +168,7 @@ border-style: solid;
 border-color: rgb(110, 1, 1);
 border-width: 1px;    
 background-image:url('../assets/delete\ all.webp') ;
-background-size: cover;
+background-size:contain;
 background-repeat: no-repeat;
 background-position: center;
 }
@@ -208,6 +208,10 @@ overflow-y: auto;
     border-radius: 20px;
     border-style:solid;
     border-color:black;
+}
+
+#NotifLoc,#NotifTime{
+    display: none;
 }
 
 .NotifData,.NotifMeetUp{

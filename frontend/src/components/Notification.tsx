@@ -41,6 +41,7 @@ function Notification() {
     const ViewNotIf = useRef<HTMLDivElement>(null);
     const ViewNotIfButton = useRef<HTMLDivElement>(null);
     const Contest = useRef<HTMLDivElement>(null);
+    const meettime = useRef<HTMLInputElement>(null);
     
 
 
@@ -226,10 +227,12 @@ function Notification() {
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
             if (Notif.isMeetup === false && ViewNotIfButton.current) {
+                meettime.current.style.display = 'none'
                 ViewNotIfButton.current.style.visibility = 'hidden';
             }
             else if (Notif.isMeetup === true && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'visible';
+                meettime.current.style.display = 'flex'
             }
         }
         setviewNotifId(Notif)
@@ -518,8 +521,8 @@ function Notification() {
 
                 <span id="MeetUpInfo">MeetUp Info</span>
 
-                <input type="text" id="NotifLoc" className="NotifMeetUp" value={NotifMeetLoc} readOnly />
-                <input type="text" id="NotifTime" className="NotifMeetUp" value={NotifMeetTime} readOnly />
+                <input type="text" id="NotifLoc" ref = {meettime} className="NotifMeetUp" value={NotifMeetLoc} readOnly />
+                <input type="text" id="NotifTime" ref = {meettime} className="NotifMeetUp" value={NotifMeetTime} readOnly />
 
                 <div id="ViewButtonBar" ref={ViewNotIfButton}>
                     <button type="button" id="NotifAccept" className="NotifButton" onClick={() => ReturnNotif(viewNotifId, "Accept")}>Accept</button>
