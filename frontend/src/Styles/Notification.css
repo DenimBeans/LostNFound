@@ -52,6 +52,7 @@ background-color: rgb(101, 101, 101);
 flex-direction: column;
 float: left;
 overflow-y: auto;
+clip-path:fill-box;
 
 border-bottom: 5px solid rgb(50, 50, 50);
 
@@ -67,6 +68,10 @@ text-align: center;
 #NotifPage::-webkit-scrollbar{
 border-width: 3px;
 border-radius: 20px;
+}
+
+#NotifPage::-webkit-scrollbar-thumb{
+min-height: 30px;
 }
 
 
