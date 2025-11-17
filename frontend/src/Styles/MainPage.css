@@ -33,12 +33,12 @@ background-color: rgb(101, 101, 101);
 flex-direction: column;
 float: left;
 overflow-y: auto;
-overflow-x: auto;
+
 border-bottom: 5px solid rgb(50, 50, 50);
 }
 
 #NoItems{
-    margin-top: 20px;
+
     font-size: x-large;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
     display:flex;
