@@ -94,8 +94,9 @@ border-bottom: 5px solid rgb(50, 50, 50);
     border-style: solid;
     border-color: rgb(7, 36, 69);
     border-width: 1px;
-    background-image:url('../assets/View.webp') no-repeat ;
+    background-image:url('../assets/View.webp');
     background-size: contain;
+    background-repeat: no-repeat;
 }
 
 #ContainerEdit, #ContainerDelete
@@ -110,8 +111,9 @@ border-bottom: 5px solid rgb(50, 50, 50);
     border-style: solid;
     border-color: rgb(121, 74, 12);
     border-width: 1px;
-    background-image:url('../assets/edit.webp') no-repeat ;
+    background-image:url('../assets/edit.webp') ;
     background-size: contain;
+    background-repeat: no-repeat;
 }
 
 #ContainerDelete
@@ -121,8 +123,9 @@ border-bottom: 5px solid rgb(50, 50, 50);
     border-style: solid;
     border-color: rgb(110, 1, 1);
     border-width: 1px;
-    background-image:url('../assets/delete.webp') no-repeat ;
+    background-image:url('../assets/delete.webp') ;
     background-size: contain;
+    background-repeat: no-repeat;
 }
 
 #statusFilter, #categoryFilter
@@ -484,4 +487,5 @@ overflow-y: auto;
 #NoItemPage{
     background-image:url('../assets/EmptyIcon.webp') ;
     background-size: contain;
+    background-repeat: no-repeat;
 }
