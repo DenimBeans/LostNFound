@@ -42,7 +42,7 @@ class ItemSearchState extends State<ItemSearch> {
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       // Location services are not enabled don't continue
-      // accessing the position and request users of the 
+      // accessing the position and request users of the
       // App to enable the location services.
       return Future.error('Location services are disabled.');
     }
@@ -53,18 +53,19 @@ class ItemSearchState extends State<ItemSearch> {
       if (permission == LocationPermission.denied) {
         // Permissions are denied, next time you could try
         // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale 
+        // Android's shouldShowRequestPermissionRationale
         // returned true. According to Android guidelines
         // your App should show an explanatory UI now.
         return Future.error('Location permissions are denied');
       }
     }
-    
+
     if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately. 
+      // Permissions are denied forever, handle appropriately.
       return Future.error(
-        'Location permissions are permanently denied, we cannot request permissions.');
-    } 
+        'Location permissions are permanently denied, we cannot request permissions.',
+      );
+    }
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
@@ -110,13 +111,13 @@ class ItemSearchState extends State<ItemSearch> {
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else if (snapshot.hasData) {
-                Position userPos = snapshot.data!;
-                return SizedBox(
-                  height: 250,
-                  //  To display items in ListView
-                  child: FutureBuilder<List<Item>>(
-                    future: itemsFuture,
-                    builder: (context, snapshot) {
+              Position userPos = snapshot.data!;
+              return SizedBox(
+                height: 250,
+                //  To display items in ListView
+                child: FutureBuilder<List<Item>>(
+                  future: itemsFuture,
+                  builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       // until data is fetched, show loader
                       return const CircularProgressIndicator();
@@ -128,7 +129,11 @@ class ItemSearchState extends State<ItemSearch> {
                       return SizedBox(
                         width: 350,
                         height: 250,
-                        child: SearchMap(items: items, userId: widget.userId, userPos: userPos),
+                        child: SearchMap(
+                          items: items,
+                          userId: widget.userId,
+                          userPos: userPos,
+                        ),
                       );
                     } else {
                       // if no data, show simple Text
@@ -138,11 +143,11 @@ class ItemSearchState extends State<ItemSearch> {
                 ),
               );
             } else {
-            return const Text("No position data available");
+              return const Text("No position data available");
             }
-          }
+          },
         ),
-      )
+      ),
     );
   }
 
@@ -172,7 +177,12 @@ class ItemSearchState extends State<ItemSearch> {
 }
 
 class SearchMap extends StatefulWidget {
-  const SearchMap({super.key, required this.items, required this.userId, required this.userPos});
+  const SearchMap({
+    super.key,
+    required this.items,
+    required this.userId,
+    required this.userPos,
+  });
   final List<Item> items;
   final String userId;
   final Position userPos;
@@ -182,7 +192,10 @@ class SearchMap extends StatefulWidget {
 }
 
 class _SearchMapState extends State<SearchMap> {
-  late final LatLng _pontoCentral = LatLng(widget.userPos.latitude, widget.userPos.longitude);
+  late final LatLng _pontoCentral = LatLng(
+    widget.userPos.latitude,
+    widget.userPos.longitude,
+  );
 
   // A list that will hold our pins (markers)
   late final List<Marker> _markers;
@@ -202,7 +215,8 @@ class _SearchMapState extends State<SearchMap> {
           // Show item details
           showDialog(
             context: context,
-            builder: (BuildContext context) => ItemModal(item: item, userId: widget.userId),
+            builder: (BuildContext context) =>
+                ItemModal(item: item, userId: widget.userId),
           );
         },
         // Marker represented by icon on map
@@ -234,12 +248,8 @@ class _SearchMapState extends State<SearchMap> {
 class ItemModal extends StatefulWidget {
   final Item item;
   final String userId;
-  
-  const ItemModal({
-    super.key,
-    required this.item,
-    required this.userId
-  });
+
+  const ItemModal({super.key, required this.item, required this.userId});
 
   @override
   ItemModalState createState() {
@@ -264,11 +274,13 @@ class ItemModalState extends State<ItemModal> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://knightfind.xyz:4000/api/users/$userId/tracked-items/$itemId'),
+        Uri.parse(
+          'http://knightfind.xyz:4000/api/users/$userId/tracked-items/$itemId',
+        ),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'userId': widget.userId,
-          'itemId': widget.item.itemId
+          'itemId': widget.item.itemId,
         }),
       );
 
@@ -288,15 +300,15 @@ class ItemModalState extends State<ItemModal> {
         }
       } else {
         setState(() {
-          _errorMessage = 'Failed to track item. Error code ${response.statusCode.toString()}';
+          _errorMessage =
+              'Failed to track item. Error code ${response.statusCode.toString()}';
         });
       }
     } catch (e) {
       setState(() {
         _errorMessage = 'Network error. Please check your connection.';
       });
-    }
-    finally {
+    } finally {
       setState(() {
         _isLoading = false;
       });
@@ -308,24 +320,28 @@ class ItemModalState extends State<ItemModal> {
     return SimpleDialog(
       title: Text(widget.item.title),
       children: <Widget>[
-      Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(widget.item.description ?? 'No description'),
-            BoldElevatedButton(
-              text: 'Track',
-              onPressed: () {
-                _isLoading ? null : _track();
-              },
-              minWidth: 20,
-              minHeight: 30
-            )
-          ]
-        )
-      )
-      ]
+        Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(widget.item.description ?? 'No description'),
+              BoldElevatedButton(
+                text: 'Track',
+                onPressed: _isLoading
+                    ? null
+                    : () {
+                        // Close the dialog immediately, then start tracking
+                        Navigator.of(context).pop();
+                        _track();
+                      },
+                minWidth: 20,
+                minHeight: 30,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
