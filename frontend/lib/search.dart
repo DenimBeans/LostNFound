@@ -71,7 +71,6 @@ class ItemSearchState extends State<ItemSearch> {
     return await Geolocator.getCurrentPosition();
   }
 
-
   Future<List<Item>> get itemsFuture => searchItems();
 
   Future<List<Item>> searchItems() async {
@@ -102,33 +101,41 @@ class ItemSearchState extends State<ItemSearch> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Center(
-        child: SizedBox(
-          height: 250,
-          //  To display items in ListView
-          child: FutureBuilder<List<Item>>(
-            future: itemsFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                // until data is fetched, show loader
-                return const CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else if (snapshot.hasData) {
-                // once data is fetched, pass it to the map
-                final items = snapshot.data!;
-                return SizedBox(
-                  width: 350,
-                  height: 250,
-                  child: SearchMap(items: items, userId: widget.userId),
-                );
-              } else {
-                // if no data, show simple Text
-                return const Text("No data available");
-              }
-            },
-          ),
-        ),
+      child: FutureBuilder<Position>(
+        future: _determinePosition(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            debugPrint('error with user position future');
+          } else {
+            Position userPos = snapshot.data!;
+            return SizedBox(
+              height: 250,
+              //  To display items in ListView
+              child: FutureBuilder<List<Item>>(
+                future: itemsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    // until data is fetched, show loader
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (snapshot.hasData) {
+                    // once data is fetched, pass it to the map
+                    final items = snapshot.data!;
+                    return SizedBox(
+                      width: 350,
+                      height: 250,
+                      child: SearchMap(items: items, userId: widget.userId, userPos: userPos),
+                    );
+                  } else {
+                    // if no data, show simple Text
+                    return const Text("No data available");
+                  }
+                },
+              ),
+            );
+          }
+        }
       ),
     );
   }
@@ -159,16 +166,17 @@ class ItemSearchState extends State<ItemSearch> {
 }
 
 class SearchMap extends StatefulWidget {
-  const SearchMap({super.key, required this.items, required this.userId});
+  const SearchMap({super.key, required this.items, required this.userId, required this.userPos});
   final List<Item> items;
   final String userId;
+  final Position userPos;
 
   @override
   State<SearchMap> createState() => _SearchMapState();
 }
 
 class _SearchMapState extends State<SearchMap> {
-  static const LatLng _pontoCentral = LatLng(28.6024274, -81.2000599);
+  late final LatLng _pontoCentral = LatLng(widget.userPos.latitude, widget.userPos.longitude);
 
   // A list that will hold our pins (markers)
   late final List<Marker> _markers;
