@@ -59,6 +59,7 @@ function Notification() {
 
     const [Sender, setSender] = React.useState('');
 
+    const [VitemImage, setItemImageValueV] = React.useState('');
     const [NotifTitle, setNotifTitle] = React.useState('');
     const [NotifDescription, setNotifDescription] = React.useState('');
     const [NotifCategory, setNotifCategory] = React.useState('');
@@ -223,9 +224,18 @@ function Notification() {
     async function View(Notif: any) {
         console.log(Notif);
         setNotifContainer(NotifContainer.map((j) => j._id === Notif._id ? { ...j, isRead: true } : j));
+        setItemImageValueV(Notif.itemId.imageUrl);
         Read(Notif._id);
+        if (imageViewRef.current)
+            {
+                if(Notif.itemId.imageUrl == "")
+                imageViewRef.current.style.display = 'none';
+                else
+                    imageViewRef.current.style.display = 'flex';
+            }
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
+            
             if (Notif.isMeetup === false && ViewNotIfButton.current) {
                 meettime.current.style.display = 'none'
                 ViewNotIfButton.current.style.visibility = 'hidden';
@@ -514,6 +524,9 @@ function Notification() {
                 <input type='text' id='from' className="NotifData" value={Sender} readOnly></input>
 
                 <span id="ItemInfo">Item Info</span>
+                <div id = "imgContainer" ref = {imageViewRef}>
+                    <img id = "reportImg" src = {VitemImage}/>
+                </div>
                 <input type="text" id="NotifTitle" className="NotifData" value={NotifTitle} readOnly />
                 <input type="text" id="NotifDesc" className="NotifData" value={NotifDescription} readOnly />
                 <input type="text" id="NotifCat" className="NotifData" value={NotifCategory} readOnly />
