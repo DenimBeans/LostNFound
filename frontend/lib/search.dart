@@ -106,6 +106,7 @@ class ItemSearchState extends State<ItemSearch> {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             debugPrint('error with user position future');
+            return Text('Error: ${snapshot.error}');
           } else {
             Position userPos = snapshot.data!;
             return SizedBox(
