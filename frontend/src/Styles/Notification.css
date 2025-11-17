@@ -331,7 +331,7 @@ overflow-y: auto;
     margin-right: 5px;
 }
 
-#Intro,#SenderInfo,#ItemInfo,#MeetUpInfo{
+#Intro,#SenderInfo,#ItemInfo{
     margin-top: 10px;
     font-size: x-large;
     font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
@@ -339,4 +339,14 @@ overflow-y: auto;
     justify-content:center;
     color: white;
     text-shadow: 1px 1px 2px rgb(175, 173, 173);
+}
+#MeetUpInfo{
+    margin-top: 10px;
+    font-size: x-large;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    color: white;
+    text-shadow: 1px 1px 2px rgb(175, 173, 173);
+    display: none;
 }
