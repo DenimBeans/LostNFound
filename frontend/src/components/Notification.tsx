@@ -27,7 +27,7 @@ function Notification() {
     const ViewNotIfButton = useRef<HTMLDivElement>(null);
     const Contest = useRef<HTMLDivElement>(null);
 
-    
+
 
     const [NotifContainer, setNotifContainer] = useState<NotifData[]>([]);
 
@@ -36,7 +36,7 @@ function Notification() {
     const [viewNotifId, setviewNotifId] = React.useState('');
     //contest
     const [contestLocation, setContestLocation] = React.useState('');
-    const [contestTime, setContestTime] = React.useState<Date | null >(null);
+    const [contestTime, setContestTime] = React.useState<Date | null>(null);
     //View notification
     const [NotifMain, setNotifMain] = React.useState('');
 
@@ -58,20 +58,20 @@ function Notification() {
         setContestTime(new Date(e.target.value));
     }
 
-    async function exit(){
-        if(ViewNotIf.current){
-                ViewNotIf.current.style.visibility = 'hidden';
-                ViewNotIfButton.current.style.visibility = 'hidden';
+    async function exit() {
+        if (ViewNotIf.current) {
+            ViewNotIf.current.style.visibility = 'hidden';
+            ViewNotIfButton.current.style.visibility = 'hidden';
         }
-        
+
     }
 
-    async function exitContest(){
-        if(Contest.current){
-                Contest.current.style.visibility = 'hidden';
-                ViewNotIfButton.current.style.visibility = 'hidden';
+    async function exitContest() {
+        if (Contest.current) {
+            Contest.current.style.visibility = 'hidden';
+            ViewNotIfButton.current.style.visibility = 'hidden';
         }
-        
+
     }
 
     async function AllNotif(id: any) {
@@ -82,17 +82,17 @@ function Notification() {
             let txt = await response.text();
             let res = JSON.parse(txt);
             setNotifContainer(res.results);
-            if(res.count == 0){
+            if (res.count == 0) {
                 NoNotif.current.style.display = 'flex';
                 NotifPage.current.style.display = 'none';
             }
-            else{
+            else {
                 NoNotif.current.style.display = 'none';
                 NotifPage.current.style.display = 'flex';
 
             }
         }
-        
+
 
 
         catch (error: any) {
@@ -205,14 +205,14 @@ function Notification() {
 
     async function View(Notif: any) {
         console.log(Notif);
-        setNotifContainer(NotifContainer.map((j) => j._id === Notif._id ? {...j,isRead: true}: j));
+        setNotifContainer(NotifContainer.map((j) => j._id === Notif._id ? { ...j, isRead: true } : j));
         Read(Notif._id);
         if (ViewNotIf.current) {
             ViewNotIf.current.style.visibility = 'visible';
-            if (Notif.isMeetup === false  && ViewNotIfButton.current) {
+            if (Notif.isMeetup === false && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'hidden';
             }
-            else if (Notif.isMeetup === true  && ViewNotIfButton.current) {
+            else if (Notif.isMeetup === true && ViewNotIfButton.current) {
                 ViewNotIfButton.current.style.visibility = 'visible';
             }
         }
@@ -240,7 +240,7 @@ function Notification() {
 
             setNotifMeetTime(`${Month}/${Day}/${Year}--${Hour}:${Minutes}`);
         }
-        else{
+        else {
             setNotifMeetTime('');
         }
 
@@ -251,12 +251,12 @@ function Notification() {
         if (Contest.current) {
             Contest.current.style.visibility = 'visible';
         }
-        
+
     };
 
     async function ReturnNotif(Notif: any, answer: string) {
         console.log(Notif);
-        
+
         const NotifId = Notif._id;
         if (answer == "Accept") {
             let Response = `Meeting accepted, Location at ${Notif.location} and the meeting will take place at ${Notif.meetTime}.`
@@ -275,7 +275,7 @@ function Notification() {
 
             let objRet = {
                 userId: itemUSERID,
-                text: self,
+                text: Self,
                 isMeetup: false,
                 location: Notif.location,
                 meetTime: Notif.meetTime,
@@ -296,7 +296,7 @@ function Notification() {
                     console.log(res.error)
                 }
                 else {
-                    
+
                 }
 
             }
@@ -337,7 +337,7 @@ function Notification() {
                 text: Response,
                 isMeetup: Notif.isMeetup,
                 location: contestLocation,
-                meetTime: contestTime ? contestTime.toISOString(): null,
+                meetTime: contestTime ? contestTime.toISOString() : null,
                 senderId: itemUSERID,
                 itemId: Notif.itemId,
 
@@ -349,7 +349,7 @@ function Notification() {
                 text: Self,
                 isMeetup: false,
                 location: contestLocation,
-                meetTime: contestTime ? contestTime.toISOString(): null,
+                meetTime: contestTime ? contestTime.toISOString() : null,
                 senderId: itemUSERID,
                 itemId: Notif.itemId,
 
@@ -366,7 +366,7 @@ function Notification() {
                     console.log(res.error)
                 }
                 else {
-                    
+
                 }
 
             }
@@ -437,7 +437,7 @@ function Notification() {
                     console.log(res.error)
                 }
                 else {
-                    
+
                 }
             }
 
@@ -460,7 +460,7 @@ function Notification() {
                     Delete(NotifId);
                     ViewNotIf.current.style.visibility = 'hidden';
                     ViewNotIfButton.current.style.visibility = 'hidden';
-                    
+
                 }
             }
 
@@ -475,10 +475,10 @@ function Notification() {
 
     return (
         <div id="NotificationMain">
-            <div id="NotifPage" ref = {NotifPage}>
+            <div id="NotifPage" ref={NotifPage}>
                 {NotifContainer.map(NotifContainer => (
                     <div key={NotifContainer._id} className="NotifContainers">
-                        <input type = "text" id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly/>
+                        <input type="text" id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly />
                         <input type="text" id="NotificationMeetup" className="NotTitle" value={NotifContainer.isRead} readOnly />
                         <button type="button" id="NotificationView" className="NotIfBtn" onClick={() => View(NotifContainer)}>View Report</button>
                         <button type="button" id="NotificationRead" className="NotIfBtn" onClick={() => Read(NotifContainer._id)}>Read</button>
@@ -487,17 +487,17 @@ function Notification() {
                 ))}
 
             </div>
-            <div id = "NoNotif" ref = {NoNotif}>
-                <img alt = "EmptyNotifications" src = {Empty} id = "EmptyNotifications"/>
+            <div id="NoNotif" ref={NoNotif}>
+                <img alt="EmptyNotifications" src={Empty} id="EmptyNotifications" />
             </div>
             <div id="ViewNotIf" ref={ViewNotIf}>
-                <button type = "button" id="exit" onClick={() => exit()}>X</button>
+                <button type="button" id="exit" onClick={() => exit()}>X</button>
 
                 <span id="Intro">Notification Details</span>
-                <textarea id="NotifMain" value = {NotifMain} readOnly></textarea>
+                <textarea id="NotifMain" value={NotifMain} readOnly></textarea>
 
                 <span id="SenderInfo">From</span>
-                <input type = 'text' id = 'from' className="NotifData" value = {Sender} readOnly></input>
+                <input type='text' id='from' className="NotifData" value={Sender} readOnly></input>
 
                 <span id="ItemInfo">Item Info</span>
                 <input type="text" id="NotifTitle" className="NotifData" value={NotifTitle} readOnly />
@@ -518,15 +518,15 @@ function Notification() {
             </div>
 
             <div id="Contest" ref={Contest}>
-                <button type = "button" id="exit" onClick={() => exitContest()}>X</button>
+                <button type="button" id="exit" onClick={() => exitContest()}>X</button>
                 <input type="text" id="ContestLocation" className="Contest" onChange={handleContestLocation} />
                 <input type="datetime-local" id="ContestTime" className="Contest" onChange={handleContestDate} />
                 <button type="button" id="SubmitContest" onClick={() => ReturnNotif(viewNotifId, "Contest")}>Submit new contest</button>
             </div>
 
             <div id="buttonholder">
-                <button type="button" className="bottombutton" id = "readAll" onClick={ReadAll}></button>
-                <button type="button" className="bottombutton" id = "deleteAll" onClick={DeleteAll}></button>
+                <button type="button" className="bottombutton" id="readAll" onClick={ReadAll}></button>
+                <button type="button" className="bottombutton" id="deleteAll" onClick={DeleteAll}></button>
             </div>
         </div>
     );

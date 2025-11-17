@@ -657,12 +657,22 @@ class _InboxDisplayState extends State<InboxDisplay> {
   Future<void> _respondToMeetup(Notification notif, String responseType) async {
     try {
       // 1. Send notification to the other person
+      String textToSender;
+      if (responseType == 'Accept') {
+        textToSender =
+            'Meeting accepted, Location at ${notif.location} and the meeting will take place at ${notif.meetTime}.';
+      } else if (responseType == 'Deny') {
+        textToSender = 'Your meetup request has been rejected.';
+      } else {
+        textToSender = '$responseType - ${notif.notifText}';
+      }
+
       final notificationToSender = {
         'userId': notif.senderId!.id,
-        'text': '$responseType - ${notif.notifText}',
+        'text': textToSender,
         'isMeetup': notif.isMeetup,
         'location': notif.location,
-        'meetTime': notif.meetTime?.toIso8601String(),
+        'meetTime': notif.meetTime?.toUtc().toIso8601String(),
         'senderId': widget.userId,
         'itemId': notif.itemId?.itemId ?? '',
       };
@@ -681,9 +691,10 @@ class _InboxDisplayState extends State<InboxDisplay> {
       String confirmationText;
       if (responseType == 'Accept') {
         confirmationText =
-            'You accepted the meetup request. Location: ${notif.location}, Time: ${notif.meetTime != null ? "${notif.meetTime!.month}/${notif.meetTime!.day}/${notif.meetTime!.year} at ${notif.meetTime!.hour}:${notif.meetTime!.minute.toString().padLeft(2, '0')}" : "Not specified"}';
+            'You have accepted this meeting at Location at ${notif.location} and the meeting will take place at ${notif.meetTime}.';
       } else if (responseType == 'Deny') {
-        confirmationText = 'You denied the meetup request.';
+        confirmationText =
+            'You have denied this meeting at the location ${notif.location} at the time of ${notif.meetTime}.';
       } else {
         // This shouldn't happen for Accept/Deny, but just in case
         confirmationText = 'You responded: $responseType';
@@ -694,7 +705,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
         'text': confirmationText,
         'isMeetup': false,
         'location': notif.location,
-        'meetTime': notif.meetTime?.toIso8601String(),
+        'meetTime': notif.meetTime?.toUtc().toIso8601String(),
         'senderId': widget.userId,
         'itemId': notif.itemId?.itemId ?? '',
       };
@@ -831,10 +842,11 @@ class _InboxDisplayState extends State<InboxDisplay> {
                       // 1. Send notification to the other person
                       final notificationToSender = {
                         'userId': notif.senderId!.id,
-                        'text': 'Contest - ${notif.notifText}',
+                        'text':
+                            'The meetup at ${notif.location} at the time ${notif.meetTime.toIso8601String()} was contested.',
                         'isMeetup': true,
                         'location': locationController.text,
-                        'meetTime': selectedDate.toIso8601String(),
+                        'meetTime': selectedDate.toUtc().toIso8601String(),
                         'senderId': widget.userId,
                         'itemId': notif.itemId?.itemId ?? '',
                       };
@@ -853,14 +865,14 @@ class _InboxDisplayState extends State<InboxDisplay> {
 
                       // 2. Send confirmation notification back to current user
                       final confirmationText =
-                          'You contested the meetup with new details. Location: ${locationController.text}, Time: ${selectedDate.month}/${selectedDate.day}/${selectedDate.year} at ${selectedDate.hour}:${selectedDate.minute.toString().padLeft(2, '0')}';
+                          'You contested the meetup with new information, Location: ${locationController.text} Time: ${selectedDate.toIso8601String()}';
 
                       final confirmationNotification = {
                         'userId': widget.userId,
                         'text': confirmationText,
                         'isMeetup': false,
                         'location': locationController.text,
-                        'meetTime': selectedDate.toIso8601String(),
+                        'meetTime': selectedDate.toUtc().toIso8601String(),
                         'senderId': widget.userId,
                         'itemId': notif.itemId?.itemId ?? '',
                       };
