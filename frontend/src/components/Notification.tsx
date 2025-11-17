@@ -42,6 +42,7 @@ function Notification() {
     const ViewNotIfButton = useRef<HTMLDivElement>(null);
     const Contest = useRef<HTMLDivElement>(null);
     const meettime = useRef<HTMLInputElement>(null);
+    const imageViewRef = useRef<HTMLDivElement>(null);
     
 
 
