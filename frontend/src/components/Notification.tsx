@@ -531,7 +531,7 @@ function Notification() {
                 <input type="text" id="NotifTitle" className="NotifData" value={NotifTitle} readOnly />
                 <input type="text" id="NotifDesc" className="NotifData" value={NotifDescription} readOnly />
                 <input type="text" id="NotifCat" className="NotifData" value={NotifCategory} readOnly />
-                <input type="text" id="NotifImage" className="NotifData" value={NotifImageUrl} readOnly />
+                <input type="text" id="NotifImage" ref = {imageViewRef} className="NotifData" value={NotifImageUrl} readOnly />
 
                 <span id="MeetUpInfo" ref = {meettime} >MeetUp Info</span>
 
