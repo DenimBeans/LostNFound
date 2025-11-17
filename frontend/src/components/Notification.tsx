@@ -525,8 +525,8 @@ function Notification() {
             </div>
 
             <div id="buttonholder">
-                <button type="button" className="bottombutton" id = "readAll" onClick={ReadAll}>Read-ALL</button>
-                <button type="button" className="bottombutton" id = "deleteAll" onClick={DeleteAll}>Delete-ALL</button>
+                <button type="button" className="bottombutton" id = "readAll" onClick={ReadAll}></button>
+                <button type="button" className="bottombutton" id = "deleteAll" onClick={DeleteAll}></button>
             </div>
         </div>
     );
