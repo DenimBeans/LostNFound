@@ -41,6 +41,7 @@ function Notification() {
     const ViewNotIf = useRef<HTMLDivElement>(null);
     const ViewNotIfButton = useRef<HTMLDivElement>(null);
     const Contest = useRef<HTMLDivElement>(null);
+    
 
 
 
@@ -488,7 +489,7 @@ function Notification() {
             <div id="NotifPage" ref={NotifPage}>
                 {NotifContainer.map(NotifContainer => (
                     <div key={NotifContainer._id} className="NotifContainers">
-                        <input type="text" id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly />
+                        <input type="text" style={{opacity : NotifContainer.isRead ? 0.7 : 1}} id="NotificationTitle" className="NotTitle" value={NotifContainer.text} readOnly />
                         <input type="text" id="NotificationMeetup" className="NotTitle" value={NotifContainer.isRead} readOnly />
                         <button type="button" id="NotificationView" className="NotIfBtn" onClick={() => View(NotifContainer)}>View Report</button>
                         <button type="button" id="NotificationRead" className="NotIfBtn" onClick={() => Read(NotifContainer._id)}>Read</button>

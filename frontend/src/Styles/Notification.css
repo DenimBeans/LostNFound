@@ -219,7 +219,7 @@ overflow-y: auto;
 
     border-width: 3px;
     border-radius: 20px;
-    border-style:solid;
+    
     border-color: rgb(170, 125, 11);
     filter: drop-shadow(2px 2px 15px rgba(170, 125, 11, 0.541));
     box-shadow: 0 8px rgb(134, 99, 9);
@@ -228,10 +228,10 @@ overflow-y: auto;
 .NotifContainers{
     margin-top: 5px;
     margin-bottom: 2px;
-    margin-left: 5px;
+    
     display:flex;
     height: 50px;
-    width: 99%;
+    width: 100%;
     justify-content: center;
     flex-shrink: 0;
 
@@ -243,6 +243,7 @@ overflow-y: auto;
 #NotificationTitle{
     border-right: 0px;
     width: 36%;
+    filter: drop-shadow(1px 0.5px 1px black)
 }
 
 #NotificationMeetup{
