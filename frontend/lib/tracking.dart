@@ -811,7 +811,7 @@ class _MeetingRequestState extends State<MeetingRequest> {
                 'text': notificationText,
                 'isMeetup': isMeetup,
                 'location': _locationController.text,
-                'meetTime': selectedDate.toIso8601String(),
+                'meetTime': selectedDate.toUtc().toIso8601String(),
                 'senderId': senderId,
                 'itemId': itemId ?? '',
               };

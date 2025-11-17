@@ -88,15 +88,7 @@ class Notification {
     if (json['meetTime'] != null) {
       try {
         if (json['meetTime'] is String) {
-          DateTime parsed = DateTime.parse(json['meetTime']);
-          // If the time has Z (UTC), convert it to EST (UTC-5)
-          if (json['meetTime'].toString().endsWith('Z')) {
-            // Subtract 5 hours to convert UTC to EST
-            parsedMeetTime = parsed.subtract(const Duration(hours: 5));
-          } else {
-            // Already in local time
-            parsedMeetTime = parsed;
-          }
+          parsedMeetTime = DateTime.parse(json['meetTime']);
         } else if (json['meetTime'] is DateTime) {
           parsedMeetTime = json['meetTime'];
         }
@@ -170,13 +162,19 @@ class _InboxDisplayState extends State<InboxDisplay> {
   String _errorMessage = '';
 
   // Helper function to format DateTime as EST string
+  // Input: DateTime object (which is always in local timezone in Dart)
+  // We convert to UTC first to get the actual stored time, then display it
   String _formatTimeAsEST(DateTime? dateTime) {
     if (dateTime == null) return '';
-    final day = dateTime.day.toString().padLeft(2, '0');
-    final month = dateTime.month.toString().padLeft(2, '0');
-    final year = dateTime.year;
-    final hours = dateTime.hour.toString().padLeft(2, '0');
-    final minutes = dateTime.minute.toString().padLeft(2, '0');
+    // The DateTime object is in local time; convert to UTC to see what was sent to backend
+    final utcTime = dateTime.toUtc();
+    // Now subtract 5 hours to get EST (UTC-5)
+    final estTime = utcTime.subtract(Duration(hours: 5));
+    final day = estTime.day.toString().padLeft(2, '0');
+    final month = estTime.month.toString().padLeft(2, '0');
+    final year = estTime.year;
+    final hours = estTime.hour.toString().padLeft(2, '0');
+    final minutes = estTime.minute.toString().padLeft(2, '0');
     return '$month/$day/$year $hours:$minutes EST';
   }
 
@@ -693,7 +691,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
         'text': textToSender,
         'isMeetup': notif.isMeetup,
         'location': notif.location,
-        'meetTime': notif.meetTime?.toIso8601String(),
+        'meetTime': notif.meetTime?.toUtc().toIso8601String(),
         'senderId': widget.userId,
         'itemId': notif.itemId?.itemId ?? '',
       };
@@ -726,7 +724,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
         'text': confirmationText,
         'isMeetup': false,
         'location': notif.location,
-        'meetTime': notif.meetTime?.toIso8601String(),
+        'meetTime': notif.meetTime?.toUtc().toIso8601String(),
         'senderId': widget.userId,
         'itemId': notif.itemId?.itemId ?? '',
       };
@@ -870,7 +868,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
                             'The meetup at ${notif.location} at the time $formattedOriginalTime was contested.',
                         'isMeetup': true,
                         'location': locationController.text,
-                        'meetTime': selectedDate.toIso8601String(),
+                        'meetTime': selectedDate.toUtc().toIso8601String(),
                         'senderId': widget.userId,
                         'itemId': notif.itemId?.itemId ?? '',
                       };
@@ -899,7 +897,7 @@ class _InboxDisplayState extends State<InboxDisplay> {
                         'text': confirmationText,
                         'isMeetup': false,
                         'location': locationController.text,
-                        'meetTime': selectedDate.toIso8601String(),
+                        'meetTime': selectedDate.toUtc().toIso8601String(),
                         'senderId': widget.userId,
                         'itemId': notif.itemId?.itemId ?? '',
                       };

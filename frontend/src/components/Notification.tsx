@@ -10,14 +10,15 @@ function Notification() {
     // Helper function to format ISO 8601 string as EST time
     const formatTimeAsEST = (isoString: string): string => {
         const date = new Date(isoString);
-        // Convert UTC time to EST (UTC-5, or UTC-4 during DST)
-        const estDate = new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-
-        const day = String(estDate.getDate()).padStart(2, '0');
-        const month = String(estDate.getMonth() + 1).padStart(2, '0');
-        const year = estDate.getFullYear();
-        const hours = String(estDate.getHours()).padStart(2, '0');
-        const minutes = String(estDate.getMinutes()).padStart(2, '0');
+        // The isoString comes from backend as UTC (with Z suffix)
+        // JavaScript automatically parses it as UTC
+        // We need to subtract 5 hours to display as EST (UTC-5)
+        const estTime = new Date(date.getTime() - (5 * 60 * 60 * 1000));
+        const day = String(estTime.getUTCDate()).padStart(2, '0');
+        const month = String(estTime.getUTCMonth() + 1).padStart(2, '0');
+        const year = estTime.getUTCFullYear();
+        const hours = String(estTime.getUTCHours()).padStart(2, '0');
+        const minutes = String(estTime.getUTCMinutes()).padStart(2, '0');
         return `${month}/${day}/${year} ${hours}:${minutes} EST`;
     };
 
