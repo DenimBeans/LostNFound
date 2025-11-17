@@ -11,6 +11,36 @@ border-style:solid;
 border-color:black;
 }
 
+#NotificationView{
+    width: 20%;
+    background-color: rgb(12, 53, 100);
+    color: white;
+    border-style: solid;
+    border-color: rgb(7, 36, 69);
+    border-width: 1px;
+    background-image:url('../assets/View.webp');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#NotificationRead{
+
+}
+
+#NotificationDelete{
+    background-color: rgb(175, 11, 11);
+    color: white;
+    border-style: solid;
+    border-color: rgb(110, 1, 1);
+    border-width: 1px;
+    background-image:url('../assets/delete.webp') ;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+
+}
+
 #NotifPage{
 display: none;
 
@@ -114,6 +144,11 @@ background-position: center;
 }
 
 #deleteAll{
+background-color: rgb(175, 11, 11);
+color: white;
+border-style: solid;
+border-color: rgb(110, 1, 1);
+border-width: 1px;    
 background-image:url('../assets/delete\ all.webp') ;
 background-size: cover;
 background-repeat: no-repeat;
