@@ -3,6 +3,7 @@ import { buildAPIPath } from './Path';
 import { useEffect } from 'react';
 import { useRef } from 'react';
 import '../Styles/Notification.css';
+import Empty from '../assets/EmptyIcon.webp'
 
 function Notification() {
 
@@ -25,6 +26,8 @@ function Notification() {
     const ViewNotIf = useRef<HTMLDivElement>(null);
     const ViewNotIfButton = useRef<HTMLDivElement>(null);
     const Contest = useRef<HTMLDivElement>(null);
+
+    
 
     const [NotifContainer, setNotifContainer] = useState<NotifData[]>([]);
 
@@ -485,7 +488,7 @@ function Notification() {
 
             </div>
             <div id = "NoNotif" ref = {NoNotif}>
-                <span>No notifications!</span>
+                <img alt = "EmptyNotifications" src = {Empty} id = "EmptyNotifications"/>
             </div>
             <div id="ViewNotIf" ref={ViewNotIf}>
                 <button type = "button" id="exit" onClick={() => exit()}>X</button>
@@ -503,6 +506,7 @@ function Notification() {
                 <input type="text" id="NotifImage" className="NotifData" value={NotifImageUrl} readOnly />
 
                 <span id="MeetUpInfo">MeetUp Info</span>
+
                 <input type="text" id="NotifLoc" className="NotifMeetUp" value={NotifMeetLoc} readOnly />
                 <input type="text" id="NotifTime" className="NotifMeetUp" value={NotifMeetTime} readOnly />
 

@@ -4,6 +4,9 @@ import {useEffect} from 'react';
 import {useRef} from 'react';
 import '../Styles/MainPage.css';
 import '../Styles/FrontPage.css';
+import Edit from '../assets/edit.webp'
+import Delete from '../assets/delete.webp'
+import Empty from '../assets/EmptyIcon.webp'
 
 //Map imports - Jean
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -395,7 +398,7 @@ function ChangeView({center, zoom }: any) {
                 
             </div>
             <div id = "NoItemPage" ref ={NoItemPage}>
-                <span>No items!</span>
+                <img alt = "EmptyItems" src = {Empty} id = "EmptyItem"/>
             </div>
 
             <div id = "SearchBar">
