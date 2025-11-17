@@ -162,7 +162,7 @@ background-position: center;
 }
 
 #readAll{
-background-color: darkgoldenrod;
+background-color: linear-gradient(-45deg, darkgoldenrod 40%,  rgb(216, 159, 14) 50%,  darkgoldenrod 60%); 
 color: white;
 border-style: solid;
 border-color: darkgoldenrod;
@@ -174,7 +174,7 @@ background-position: center;
 }
 
 #deleteAll{
-background-color: darkgoldenrod;
+background-color: linear-gradient(-45deg, darkgoldenrod 40%,  rgb(216, 159, 14) 50%,  darkgoldenrod 60%); 
 color: white;
 border-style: solid;
 border-color: darkgoldenrod;
