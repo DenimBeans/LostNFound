@@ -510,12 +510,11 @@ function Notification() {
                         <button type="button" id="NotificationDelete" className="NotIfBtn" onClick={() => Delete(NotifContainer._id)}></button>
                     </div>
                 ))}
-                <div id="NoNotif" ref={NoNotif}>
-                <img alt="EmptyNotifications" src={Empty} id="EmptyNotifications" />
-            </div>
 
             </div>
-            
+            <div id="NoNotif" ref={NoNotif}>
+                <img alt="EmptyNotifications" src={Empty} id="EmptyNotifications" />
+            </div>
             <div id="ViewNotIf" ref={ViewNotIf}>
                 <button type="button" id="exit" onClick={() => exit()}>X</button>
 
