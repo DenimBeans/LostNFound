@@ -209,8 +209,8 @@ function AccountSettings(){
             
             
             <div id = "buttonbar">
-                <button type = "button" id = "edituser" className = "button" onClick = {showEdit}>Edit User</button>
-                <button type = "button" id = "deleteuser" className = "button" onClick = {showDelete}>Delete User</button>
+                <button type = "button" id = "edituser" className = "Accbutton" onClick = {showEdit}>Edit User</button>
+                <button type = "button" id = "deleteuser" className = "Accbutton" onClick = {showDelete}>Delete User</button>
             </div>
 
         </div>

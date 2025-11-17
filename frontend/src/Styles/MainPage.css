@@ -33,7 +33,7 @@ background-color: rgb(101, 101, 101);
 flex-direction: column;
 float: left;
 overflow-y: auto;
-overflow-x: auto;
+
 border-bottom: 5px solid rgb(50, 50, 50);
 }
 
