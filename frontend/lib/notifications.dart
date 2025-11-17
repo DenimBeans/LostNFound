@@ -88,7 +88,15 @@ class Notification {
     if (json['meetTime'] != null) {
       try {
         if (json['meetTime'] is String) {
-          parsedMeetTime = DateTime.parse(json['meetTime']);
+          DateTime parsed = DateTime.parse(json['meetTime']);
+          // If the time has Z (UTC), convert it to EST (UTC-5)
+          if (json['meetTime'].toString().endsWith('Z')) {
+            // Subtract 5 hours to convert UTC to EST
+            parsedMeetTime = parsed.subtract(const Duration(hours: 5));
+          } else {
+            // Already in local time
+            parsedMeetTime = parsed;
+          }
         } else if (json['meetTime'] is DateTime) {
           parsedMeetTime = json['meetTime'];
         }

@@ -10,12 +10,14 @@ function Notification() {
     // Helper function to format ISO 8601 string as EST time
     const formatTimeAsEST = (isoString: string): string => {
         const date = new Date(isoString);
-        // Parse as local time, not UTC
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
+        // Convert UTC time to EST (UTC-5, or UTC-4 during DST)
+        const estDate = new Date(date.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+
+        const day = String(estDate.getDate()).padStart(2, '0');
+        const month = String(estDate.getMonth() + 1).padStart(2, '0');
+        const year = estDate.getFullYear();
+        const hours = String(estDate.getHours()).padStart(2, '0');
+        const minutes = String(estDate.getMinutes()).padStart(2, '0');
         return `${month}/${day}/${year} ${hours}:${minutes} EST`;
     };
 
