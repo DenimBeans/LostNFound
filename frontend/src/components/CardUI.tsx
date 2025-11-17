@@ -398,7 +398,7 @@ function ChangeView({center, zoom }: any) {
                 
             </div>
             <div id = "NoItemPage" ref ={NoItemPage}>
-                
+                <span id = "NoItems">You have no items created.</span>
             </div>
 
             <div id = "SearchBar">

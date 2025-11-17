@@ -37,6 +37,16 @@ overflow-x: auto;
 border-bottom: 5px solid rgb(50, 50, 50);
 }
 
+#NoItems{
+    margin-top: 20px;
+    font-size: x-large;
+    font-family: 'Rockwell', 'Arial Narrow', Arial, sans-serif;
+    display:flex;
+    justify-content:center;
+    color: white;
+    text-shadow: 1px 1px 2px rgb(175, 173, 173);
+}
+
 #homeHeader
 {
     margin-top: 2%;
