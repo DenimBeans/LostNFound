@@ -20,8 +20,22 @@ background-color: rgb(56, 56, 61);
 flex-direction: column;
 float: left;
 overflow-y: auto;
-overflow-x: auto;
+clip-path:fill-box;
+
 border-bottom: 5px solid rgb(50, 50, 50);
+}
+
+#LostItemPage::-webkit-scrollbar{
+width: 10px;    
+border-width: 3px;
+border-radius: 16px;
+background-color: whitesmoke;
+}
+
+#LostItemPage::-webkit-scrollbar-thumb{
+min-height: 30px;
+background: black;
+border-radius: 16px;
 }
 
 #NoItemPage{

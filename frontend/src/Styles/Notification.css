@@ -66,12 +66,16 @@ text-align: center;
 }
 
 #NotifPage::-webkit-scrollbar{
+width: 10px;    
 border-width: 3px;
-border-radius: 20px;
+border-radius: 16px;
+background-color: whitesmoke;
 }
 
 #NotifPage::-webkit-scrollbar-thumb{
-min-height: 30px;
+    min-height: 30px;
+    background: black;
+    border-radius: 16px;
 }
 
 
